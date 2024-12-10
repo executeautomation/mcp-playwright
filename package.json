@@ -1,6 +1,6 @@
 {
   "name": "@executeautomation/playwright-mcp-server",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Model Context Protocol servers for Playwright",
   "license": "MIT",
   "author": "ExecuteAutomation, Ltd (https://executeautomation.com)",
@@ -9,7 +9,7 @@
   "types": "dist/index.d.ts",
   "type": "module",
   "bin": {
-    "mcp-server-playwright": "dist/index.js"
+    "playwright-mcp-server": "dist/index.js"
   },
   "files": [
     "dist"
