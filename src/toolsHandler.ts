@@ -1,12 +1,16 @@
 import { chromium, Browser, Page, request } from "playwright";
 import { CallToolResult, TextContent, ImageContent } from "@modelcontextprotocol/sdk/types.js";
 import { BROWSER_TOOLS } from "./tools.js";
+import fs from 'node:fs';
+import * as os from 'os';
+import * as path from 'path';
 
 // Global state
 let browser: Browser | undefined;
 let page: Page | undefined;
 const consoleLogs: string[] = [];
 const screenshots = new Map<string, string>();
+const defaultDownloadsPath = path.join(os.homedir(), 'Downloads');
 
 async function ensureBrowser() {
   if (!browser) {
@@ -113,24 +117,44 @@ export async function handleToolCall(
         const screenshot = await page!.screenshot(screenshotOptions);
         const base64Screenshot = screenshot.toString('base64');
 
-        screenshots.set(args.name, base64Screenshot);
-        server.notification({
-          method: "notifications/resources/list_changed",
-        });
+        const responseContent: (TextContent | ImageContent)[] = [];
+        
+        // Handle PNG file saving
+        if (args.savePng !== false) {
+          const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+          const filename = `${args.name}-${timestamp}.png`;
+          const downloadsDir = args.downloadsDir || defaultDownloadsPath;
+          
+          // Create downloads directory if it doesn't exist
+          if (!fs.existsSync(downloadsDir)) {
+            fs.mkdirSync(downloadsDir, { recursive: true });
+          }
+          
+          const filePath = path.join(downloadsDir, filename);
+          await fs.promises.writeFile(filePath, screenshot);
+          responseContent.push({
+            type: "text",
+            text: `Screenshot saved to: ${filePath}`,
+          } as TextContent);
+        }
+
+        // Handle base64 storage
+        if (args.storeBase64 !== false) {
+          screenshots.set(args.name, base64Screenshot);
+          server.notification({
+            method: "notifications/resources/list_changed",
+          });
+          
+          responseContent.push({
+            type: "image",
+            data: base64Screenshot,
+            mimeType: "image/png",
+          } as ImageContent);
+        }
 
         return {
           toolResult: {
-            content: [
-              {
-                type: "text",
-                text: `Screenshot '${args.name}' taken`,
-              } as TextContent,
-              {
-                type: "image",
-                data: base64Screenshot,
-                mimeType: `image/${args.type || 'png'}`,
-              } as ImageContent,
-            ],
+            content: responseContent,
             isError: false,
           },
         };
