@@ -13,14 +13,15 @@ const screenshots = new Map<string, string>();
 const defaultDownloadsPath = path.join(os.homedir(), 'Downloads');
 
 // Viewport type definition
-type ViewportSize = {
+type ViewportConfig = {
+  channel?: string;
   width?: number;
   height?: number;
 };
 
-async function ensureBrowser(viewport?: ViewportSize) {
+async function ensureBrowser(viewport?: ViewportConfig) {
   if (!browser) {
-    browser = await chromium.launch({ headless: false });
+    browser = await chromium.launch({ headless: false, channel: viewport?.channel ?? 'chromium' });
     const context = await browser.newContext({
       viewport: {
         width: viewport?.width ?? 1920,
@@ -59,12 +60,12 @@ export async function handleToolCall(
   let apiContext: APIRequestContext;
 
   // Only launch browser if the tool requires browser interaction
-  if (requiresBrowser) {
-    page = await ensureBrowser({
-      width: args.width,
-      height: args.height
-    });
-  }
+  // if (requiresBrowser) {
+  //   page = await ensureBrowser({
+  //     width: args.width,
+  //     height: args.height
+  //   });
+  // }
 
   // Set up API context for API-related operations
   if (requiresApi) {
@@ -74,6 +75,13 @@ export async function handleToolCall(
   switch (name) {
     case "playwright_navigate":
       try {
+        if(!page) {
+          page = await ensureBrowser({
+                 channel: args.channel,
+                 width: args.width,
+                 height: args.height
+               });
+        }
         await page!.goto(args.url, {
           timeout: args.timeout || 30000,
           waitUntil: args.waitUntil || "load"
