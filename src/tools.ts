@@ -1,5 +1,5 @@
 import { Tool } from "@modelcontextprotocol/sdk/types.js";
-import { channel } from "node:diagnostics_channel";
+
 
 export function createToolDefinitions(): Tool[] {
   return [

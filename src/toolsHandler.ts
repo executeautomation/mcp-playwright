@@ -59,13 +59,7 @@ export async function handleToolCall(
   let page: Page | undefined;
   let apiContext: APIRequestContext;
 
-  // Only launch browser if the tool requires browser interaction
-  // if (requiresBrowser) {
-  //   page = await ensureBrowser({
-  //     width: args.width,
-  //     height: args.height
-  //   });
-  // }
+
 
   // Set up API context for API-related operations
   if (requiresApi) {
