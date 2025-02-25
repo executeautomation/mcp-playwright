@@ -1,5 +1,6 @@
 import { Tool } from "@modelcontextprotocol/sdk/types.js";
 
+
 export function createToolDefinitions(): Tool[] {
   return [
     {
@@ -8,6 +9,7 @@ export function createToolDefinitions(): Tool[] {
       inputSchema: {
         type: "object",
         properties: {
+          channel: { type: "string", description: "Channel to use for browser instance" },
           url: { type: "string" },
           width: { type: "number", description: "Viewport width in pixels (default: 1920)" },
           height: { type: "number", description: "Viewport height in pixels (default: 1080)" },
