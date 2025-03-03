@@ -13,14 +13,15 @@ const screenshots = new Map<string, string>();
 const defaultDownloadsPath = path.join(os.homedir(), 'Downloads');
 
 // Viewport type definition
-type ViewportSize = {
+type ViewportConfig = {
+  channel?: string;
   width?: number;
   height?: number;
 };
 
-async function ensureBrowser(viewport?: ViewportSize) {
+async function ensureBrowser(viewport?: ViewportConfig) {
   if (!browser) {
-    browser = await chromium.launch({ headless: false });
+    browser = await chromium.launch({ headless: false, channel: viewport?.channel ?? 'chromium' });
     const context = await browser.newContext({
       viewport: {
         width: viewport?.width ?? 1920,
@@ -61,7 +62,8 @@ export async function handleToolCall(
   if (requiresBrowser) {
     page = await ensureBrowser({
       width: args.width,
-      height: args.height
+      height: args.height,
+      channel: args.channel
     });
   }
 

@@ -1,5 +1,6 @@
 import { Tool } from "@modelcontextprotocol/sdk/types.js";
 
+
 export function createToolDefinitions(): Tool[] {
   return [
     {
@@ -12,7 +13,8 @@ export function createToolDefinitions(): Tool[] {
           width: { type: "number", description: "Viewport width in pixels (default: 1920)" },
           height: { type: "number", description: "Viewport height in pixels (default: 1080)" },
           timeout: { type: "number", description: "Navigation timeout in milliseconds" },
-          waitUntil: { type: "string", description: "Navigation wait condition" }
+          waitUntil: { type: "string", description: "Navigation wait condition" },
+          channel: { type: "string", description: "Channel to use for browser instance" },
         },
         required: ["url"],
       },
