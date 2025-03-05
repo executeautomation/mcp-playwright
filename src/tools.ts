@@ -1,6 +1,6 @@
-import { Tool } from "@modelcontextprotocol/sdk/types.js";
+import type { Tool } from "@modelcontextprotocol/sdk/types.js";
 
-export function createToolDefinitions(): Tool[] {
+export function createToolDefinitions() {
   return [
     {
       name: "playwright_navigate",
@@ -40,9 +40,21 @@ export function createToolDefinitions(): Tool[] {
       inputSchema: {
         type: "object",
         properties: {
-          selector: { type: "string", description: "CSS selector for element to click" },
+          selector: { type: "string", description: "CSS selector for the element to click" },
         },
         required: ["selector"],
+      },
+    },
+    {
+      name: "playwright_iframe_click",
+      description: "Click an element in an iframe on the page",
+      inputSchema: {
+        type: "object",
+        properties: {
+          iframeSelector: { type: "string", description: "CSS selector for the iframe containing the element to click" },
+          selector: { type: "string", description: "CSS selector for the element to click" },
+        },
+        required: ["iframeSelector", "selector"],
       },
     },
     {
@@ -149,7 +161,7 @@ export function createToolDefinitions(): Tool[] {
         required: ["url"],
       },
     },
-  ];
+  ] as const satisfies Tool[];
 }
 
 // Browser-requiring tools for conditional browser launch
@@ -157,6 +169,7 @@ export const BROWSER_TOOLS = [
   "playwright_navigate",
   "playwright_screenshot",
   "playwright_click",
+  "playwright_iframe_click",
   "playwright_fill",
   "playwright_select",
   "playwright_hover",

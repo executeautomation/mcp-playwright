@@ -1,9 +1,9 @@
-import { chromium, Browser, Page, request, APIRequestContext } from "playwright";
-import { CallToolResult, TextContent, ImageContent } from "@modelcontextprotocol/sdk/types.js";
-import { BROWSER_TOOLS, API_TOOLS } from "./tools.js";
+import type { CallToolResult, ImageContent, TextContent } from '@modelcontextprotocol/sdk/types.js';
 import fs from 'node:fs';
-import * as os from 'os';
-import * as path from 'path';
+import * as os from 'node:os';
+import * as path from 'node:path';
+import { APIRequestContext, Browser, chromium, Page, request } from 'playwright';
+import { API_TOOLS, BROWSER_TOOLS } from './tools.js';
 
 // Global state
 let browser: Browser | undefined;
@@ -188,6 +188,27 @@ export async function handleToolCall(
           content: [{
             type: "text",
             text: `Failed to click ${args.selector}: ${(error as Error).message}`,
+          }],
+          isError: true,
+        };
+      }
+
+    case "playwright_iframe_click":
+      try {
+        const iframe = page!.frameLocator(args.iframeSelector);
+        await iframe.locator(args.selector).click();
+        return {
+          content: [{
+            type: "text",
+            text: `Clicked: ${args.selector} (iframe: ${args.iframeSelector})`,
+          }],
+          isError: false,
+        };
+      } catch (error) {
+        return {
+          content: [{
+            type: "text",
+            text: `Failed to click ${args.selector} in iframe ${args.iframeSelector}: ${(error as Error).message}`,
           }],
           isError: true,
         };
