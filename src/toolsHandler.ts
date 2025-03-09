@@ -479,7 +479,65 @@ export async function handleToolCall(
           isError: true,
         };
       }
-
+    case "playwright_get_visible_text":
+      try {
+        const visibleText = await page!.evaluate(() => {
+          const walker = document.createTreeWalker(
+            document.body,
+            NodeFilter.SHOW_TEXT,
+            {
+              acceptNode: (node) => {
+                const style = window.getComputedStyle(node.parentElement!);
+                return (style.display !== "none" && style.visibility !== "hidden")
+                  ? NodeFilter.FILTER_ACCEPT
+                  : NodeFilter.FILTER_REJECT;
+              },
+            }
+          );
+          let text = "";
+          let node;
+          while ((node = walker.nextNode())) {
+            text += node.textContent + "\n";
+          }
+          return text.trim();
+        });
+        return {
+          content: [{
+            type: "text",
+            text: `Visible text content:\n${visibleText}`,
+          }],
+          isError: false,
+        };
+      } catch (error) {
+        return {
+          content: [{
+            type: "text",
+            text: `Failed to get visible text: ${(error as Error).message}`,
+          }],
+          isError: true,
+        };
+      }
+  
+    case "playwright_get_html":
+      try {
+        const htmlContent = await page!.content();
+        return {
+          content: [{
+            type: "text",
+            text: `HTML content:\n${htmlContent}`,
+          }],
+          isError: false,
+        };
+      } catch (error) {
+        return {
+          content: [{
+            type: "text",
+            text: `Failed to get HTML content: ${(error as Error).message}`,
+          }],
+          isError: true,
+        };
+      }
+  
     default:
       return {
         content: [{

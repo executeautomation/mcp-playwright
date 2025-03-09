@@ -162,6 +162,24 @@ export function createToolDefinitions() {
         required: ["url"],
       },
     },
+    {
+      name: "playwright_get_visible_text",
+      description: "Get the visible text content of the current page",
+      inputSchema: {
+        type: "object",
+        properties: {},
+        required: [],
+      },
+    },
+    {
+      name: "playwright_get_html",
+      description: "Get the HTML content of the current page",
+      inputSchema: {
+        type: "object",
+        properties: {},
+        required: [],
+      },
+    },
   ] as const satisfies Tool[];
 }
 
@@ -174,7 +192,9 @@ export const BROWSER_TOOLS = [
   "playwright_fill",
   "playwright_select",
   "playwright_hover",
-  "playwright_evaluate"
+  "playwright_evaluate",
+  "playwright_get_visible_text",
+  "playwright_get_html"
 ];
 
 // API Request tools for conditional launch
