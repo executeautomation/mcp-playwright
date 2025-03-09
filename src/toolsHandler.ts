@@ -8,6 +8,7 @@ import { API_TOOLS, BROWSER_TOOLS } from './tools.js';
 // Global state
 let browser: Browser | undefined;
 let page: Page | undefined;
+let currentHeadless: boolean = false;
 const consoleLogs: string[] = [];
 const screenshots = new Map<string, string>();
 const defaultDownloadsPath = path.join(os.homedir(), 'Downloads');
@@ -18,9 +19,15 @@ type ViewportSize = {
   height?: number;
 };
 
-async function ensureBrowser(viewport?: ViewportSize) {
+async function ensureBrowser(viewport?: ViewportSize, headless: boolean = false) {
+  if (browser && currentHeadless !== headless) {
+    await browser.close();
+    browser = undefined;
+    page = undefined;
+  }
+
   if (!browser) {
-    browser = await chromium.launch({ headless: false });
+    browser = await chromium.launch({ headless });
     const context = await browser.newContext({
       viewport: {
         width: viewport?.width ?? 1280,
@@ -35,6 +42,8 @@ async function ensureBrowser(viewport?: ViewportSize) {
       const logEntry = `[${msg.type()}] ${msg.text()}`;
       consoleLogs.push(logEntry);
     });
+
+    currentHeadless = headless; // Speichere den aktuellen headless-Status
   }
   return page!;
 }
@@ -50,22 +59,20 @@ export async function handleToolCall(
   args: any,
   server: any
 ): Promise<CallToolResult> {
-  // Check if the tool requires browser interaction
   const requiresBrowser = BROWSER_TOOLS.includes(name);
-  // Check if the tool requires api interaction
   const requiresApi = API_TOOLS.includes(name);
   let page: Page | undefined;
   let apiContext: APIRequestContext;
 
-  // Only launch browser if the tool requires browser interaction
   if (requiresBrowser) {
+    // Verwende die headless-Option aus den Argumenten, falls vorhanden (nur für playwright_navigate relevant)
+    const headless = name === "playwright_navigate" ? (args.headless ?? false) : currentHeadless;
     page = await ensureBrowser({
       width: args.width,
       height: args.height
-    });
+    }, headless);
   }
 
-  // Set up API context for API-related operations
   if (requiresApi) {
     apiContext = await ensureApiContext(args.url);
   }
@@ -479,7 +486,65 @@ export async function handleToolCall(
           isError: true,
         };
       }
-
+    case "playwright_get_visible_text":
+      try {
+        const visibleText = await page!.evaluate(() => {
+          const walker = document.createTreeWalker(
+            document.body,
+            NodeFilter.SHOW_TEXT,
+            {
+              acceptNode: (node) => {
+                const style = window.getComputedStyle(node.parentElement!);
+                return (style.display !== "none" && style.visibility !== "hidden")
+                  ? NodeFilter.FILTER_ACCEPT
+                  : NodeFilter.FILTER_REJECT;
+              },
+            }
+          );
+          let text = "";
+          let node;
+          while ((node = walker.nextNode())) {
+            text += node.textContent + "\n";
+          }
+          return text.trim();
+        });
+        return {
+          content: [{
+            type: "text",
+            text: `Visible text content:\n${visibleText}`,
+          }],
+          isError: false,
+        };
+      } catch (error) {
+        return {
+          content: [{
+            type: "text",
+            text: `Failed to get visible text: ${(error as Error).message}`,
+          }],
+          isError: true,
+        };
+      }
+  
+    case "playwright_get_html":
+      try {
+        const htmlContent = await page!.content();
+        return {
+          content: [{
+            type: "text",
+            text: `HTML content:\n${htmlContent}`,
+          }],
+          isError: false,
+        };
+      } catch (error) {
+        return {
+          content: [{
+            type: "text",
+            text: `Failed to get HTML content: ${(error as Error).message}`,
+          }],
+          isError: true,
+        };
+      }
+  
     default:
       return {
         content: [{
