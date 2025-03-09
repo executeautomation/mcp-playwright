@@ -162,7 +162,6 @@ export function createToolDefinitions() {
         required: ["url"],
       },
     },
-    // Neue Tool-Definitionen hinzufügen
     {
       name: "playwright_get_visible_text",
       description: "Get the visible text content of the current page",
@@ -194,8 +193,8 @@ export const BROWSER_TOOLS = [
   "playwright_select",
   "playwright_hover",
   "playwright_evaluate",
-  "playwright_get_visible_text", // Neu hinzugefügt
-  "playwright_get_html"          // Neu hinzugefügt
+  "playwright_get_visible_text",
+  "playwright_get_html"
 ];
 
 // API Request tools for conditional launch
