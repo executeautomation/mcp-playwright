@@ -504,7 +504,10 @@ export async function handleToolCall(
           let text = "";
           let node;
           while ((node = walker.nextNode())) {
-            text += node.textContent + "\n";
+            const trimmedText = node.textContent?.trim();
+            if (trimmedText) {
+              text += trimmedText + "\n";
+            }
           }
           return text.trim();
         });
