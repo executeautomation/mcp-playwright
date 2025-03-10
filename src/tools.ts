@@ -12,7 +12,8 @@ export function createToolDefinitions() {
           width: { type: "number", description: "Viewport width in pixels (default: 1280)" },
           height: { type: "number", description: "Viewport height in pixels (default: 720)" },
           timeout: { type: "number", description: "Navigation timeout in milliseconds" },
-          waitUntil: { type: "string", description: "Navigation wait condition" }
+          waitUntil: { type: "string", description: "Navigation wait condition" },
+          headless: { type: "boolean", description: "Run browser in headless mode (default: false)" },
         },
         required: ["url"],
       },
@@ -31,7 +32,6 @@ export function createToolDefinitions() {
           fullPage: { type: "boolean", description: "Store screenshot of the entire page (default: false)" },
           savePng: { type: "boolean", description: "Save screenshot as PNG file (default: false)" },
           downloadsDir: { type: "string", description: "Custom downloads directory path (default: user's Downloads folder)" },
-          headless: { type: "boolean", description: "Run browser in headless mode (default: false)" },
         },
         required: ["name"],
       },
