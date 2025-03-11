@@ -2,7 +2,7 @@
 sidebar_position: 2
 ---
 
-# Examples of API automation
+# ⚙️Examples of API automation
 Lets see how we can use the power of Playwright MCP Server to automate API of our application
 
 ### Scenario

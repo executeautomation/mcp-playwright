@@ -106,6 +106,42 @@ export function createToolDefinitions() {
       },
     },
     {
+      name: "playwright_console_logs",
+      description: "Retrieve console logs from the browser with filtering options",
+      inputSchema: {
+        type: "object",
+        properties: {
+          type: {
+            type: "string",
+            description: "Type of logs to retrieve (all, error, warning, log, info, debug)",
+            enum: ["all", "error", "warning", "log", "info", "debug"]
+          },
+          search: {
+            type: "string",
+            description: "Text to search for in logs (handles text with square brackets)"
+          },
+          limit: {
+            type: "number",
+            description: "Maximum number of logs to return"
+          },
+          clear: {
+            type: "boolean",
+            description: "Whether to clear logs after retrieval (default: false)"
+          }
+        },
+        required: [],
+      },
+    },
+    {
+      name: "playwright_close",
+      description: "Close the browser and release all resources",
+      inputSchema: {
+        type: "object",
+        properties: {},
+        required: [],
+      },
+    },
+    {
       name: "playwright_get",
       description: "Perform an HTTP GET request",
       inputSchema: {
@@ -194,6 +230,7 @@ export const BROWSER_TOOLS = [
   "playwright_select",
   "playwright_hover",
   "playwright_evaluate",
+  "playwright_close",
   "playwright_get_visible_text",
   "playwright_get_html"
 ];

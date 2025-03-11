@@ -1,6 +1,6 @@
 {
   "name": "@executeautomation/playwright-mcp-server",
-  "version": "0.2.9",
+  "version": "0.3.1",
   "description": "Model Context Protocol servers for Playwright",
   "license": "MIT",
   "author": "ExecuteAutomation, Ltd (https://executeautomation.com)",
@@ -17,7 +17,9 @@
   "scripts": {
     "build": "tsc && shx chmod +x dist/*.js",
     "prepare": "npm run build",
-    "watch": "tsc --watch"
+    "watch": "tsc --watch",
+    "test": "jest",
+    "test:coverage": "jest --coverage"
   },
   "repository": {
     "type": "git",
@@ -25,13 +27,22 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.6.1",
-    "playwright": "1.51.0",
-    "@playwright/browser-chromium": "1.51.0"
+    "@playwright/browser-chromium": "1.51.0",
+    "playwright": "1.51.0"
   },
-  "keywords": ["playwright", "automation", "AI", "Claude MCP"],
+  "keywords": [
+    "playwright",
+    "automation",
+    "AI",
+    "Claude MCP"
+  ],
   "devDependencies": {
+    "@types/jest": "^29.5.14",
     "@types/node": "^20.10.5",
+    "jest": "^29.7.0",
+    "jest-playwright-preset": "^4.0.0",
     "shx": "^0.3.4",
+    "ts-jest": "^29.2.6",
     "typescript": "^5.8.2"
   }
 }

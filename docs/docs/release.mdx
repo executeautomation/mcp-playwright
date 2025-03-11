@@ -5,6 +5,40 @@ import YouTubeVideoEmbed from '@site/src/components/HomepageFeatures/YouTubeVide
 
 # Release Notes
 
+## Version 0.3.1
+- Fixed BROWSER_TOOLS as Playwright_console_logs is not required (Thanks to https://github.com/kfern)
+- Added Tests for all the Playwright MCP Server tools (Thanks to https://github.com/kfern)
+- Updated documentation with AI Courses 
+  - Gen AI Course [Details here](/docs/ai-courses/AIAgents)
+  - AI Agents Course [Details here](/docs/ai-courses/AIAgents)
+  - Machine Learning Course [Details here](/docs/ai-courses/MachineLearning)
+
+## Version 0.3.0
+- Added support for `Playwright_console_logs` to get the console logs from the browser. Following logs types
+are supported.[More Detail available here](/docs/playwright-web/Console-Logging)
+  - `log`
+  - `info`
+  - `warn`
+  - `error`
+  - `debug`
+  - `all`
+
+
+:::tip Usage Example
+To invoke `Playwright_console_logs` via MCP Playwright, use the following prompt:
+
+```plaintext
+Get the console log from the browser whenever you perform any action.
+:::
+- Added support for `Playwright_close` to close the browser and release all resources.
+
+:::tip Usage Example
+To invoke `Playwright_close` via MCP Playwright, use the following prompt:
+
+```plaintext
+Close the browser once the operation is completed.
+:::
+
 ## Version 0.2.9
 - Fixed Screenshot issue with Cline, Cursor and Windows 11 (Reported by @MackDing, @mengjian-github)
 

@@ -1,8 +1,8 @@
 ---
-sidebar_position: 2
+sidebar_position: 4
 ---
 
-# Examples of browser automation
+# 🌐 Examples of browser automation
 Lets see how we can use the power of Playwright MCP Server to automate our browser and do webscrapping
 
 ### Scenario in BDD Format

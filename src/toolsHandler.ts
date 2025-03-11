@@ -101,88 +101,88 @@ export async function handleToolCall(
         };
       }
 
-      case "playwright_screenshot": {
-        try {
-          const screenshotOptions: any = {
-            type: args.type || "png",
-            fullPage: !!args.fullPage
-          };
-          
-          if (args.selector) {
-            const element = await page!.$(args.selector);
-            if (!element) {
-              return {
-                content: [{
-                  type: "text",
-                  text: `Element not found: ${args.selector}`,
-                }],
-                isError: true
-              };
-            }
-            screenshotOptions.element = element;
+    case "playwright_screenshot": {
+      try {
+        const screenshotOptions: any = {
+          type: args.type || "png",
+          fullPage: !!args.fullPage
+        };
+
+        if (args.selector) {
+          const element = await page!.$(args.selector);
+          if (!element) {
+            return {
+              content: [{
+                type: "text",
+                text: `Element not found: ${args.selector}`,
+              }],
+              isError: true
+            };
           }
-          
-          if (args.mask) {
-            screenshotOptions.mask = await Promise.all(
-              args.mask.map(async (selector: string) => await page!.$(selector))
-            );
-          }
-          
-          // Generate an output path
-          const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-          const filename = `${args.name || 'screenshot'}-${timestamp}.png`;
-          const downloadsDir = args.downloadsDir || defaultDownloadsPath;
-          
-          // Create downloads directory if it doesn't exist
-          if (!fs.existsSync(downloadsDir)) {
-            fs.mkdirSync(downloadsDir, { recursive: true });
-          }
-          
-          const outputPath = path.join(downloadsDir, filename);
-          
-          // Add the path to the screenshot options
-          screenshotOptions.path = outputPath;
-          
-          // Take the screenshot with the path included
-          const screenshot = await page!.screenshot(screenshotOptions);
-          const base64Screenshot = screenshot.toString('base64');
-          
-          const responseContent: TextContent[] = [];
-          
-          // Add relative path info to response
-          const relativePath = path.relative(process.cwd(), outputPath);
+          screenshotOptions.element = element;
+        }
+
+        if (args.mask) {
+          screenshotOptions.mask = await Promise.all(
+            args.mask.map(async (selector: string) => await page!.$(selector))
+          );
+        }
+
+        // Generate an output path
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const filename = `${args.name || 'screenshot'}-${timestamp}.png`;
+        const downloadsDir = args.downloadsDir || defaultDownloadsPath;
+
+        // Create downloads directory if it doesn't exist
+        if (!fs.existsSync(downloadsDir)) {
+          fs.mkdirSync(downloadsDir, { recursive: true });
+        }
+
+        const outputPath = path.join(downloadsDir, filename);
+
+        // Add the path to the screenshot options
+        screenshotOptions.path = outputPath;
+
+        // Take the screenshot with the path included
+        const screenshot = await page!.screenshot(screenshotOptions);
+        const base64Screenshot = screenshot.toString('base64');
+
+        const responseContent: TextContent[] = [];
+
+        // Add relative path info to response
+        const relativePath = path.relative(process.cwd(), outputPath);
+        responseContent.push({
+          type: "text",
+          text: `Screenshot saved to: ${relativePath}`,
+        });
+
+        // Handle base64 storage, but only store it without returning image content
+        if (args.storeBase64 !== false) {
+          screenshots.set(args.name || 'screenshot', base64Screenshot);
+          server.notification({
+            method: "notifications/resources/list_changed",
+          });
+
           responseContent.push({
             type: "text",
-            text: `Screenshot saved to: ${relativePath}`,
+            text: `Screenshot also stored in memory with name: '${args.name || 'screenshot'}'`,
           });
-          
-          // Handle base64 storage, but only store it without returning image content
-          if (args.storeBase64 !== false) {
-            screenshots.set(args.name || 'screenshot', base64Screenshot);
-            server.notification({
-              method: "notifications/resources/list_changed",
-            });
-            
-            responseContent.push({
-              type: "text",
-              text: `Screenshot also stored in memory with name: '${args.name || 'screenshot'}'`,
-            });
-          }
-          
-          return {
-            content: responseContent,
-            isError: false,
-          };
-        } catch (error) {
-          return {
-            content: [{
-              type: "text",
-              text: `Screenshot failed: ${(error as Error).message}`,
-            }],
-            isError: true,
-          };
         }
+
+        return {
+          content: responseContent,
+          isError: false,
+        };
+      } catch (error) {
+        return {
+          content: [{
+            type: "text",
+            text: `Screenshot failed: ${(error as Error).message}`,
+          }],
+          isError: true,
+        };
       }
+    }
     case "playwright_click":
       try {
         await page!.click(args.selector);
@@ -329,6 +329,115 @@ export async function handleToolCall(
           isError: true,
         };
       }
+
+    case "playwright_console_logs": {
+      try {
+        const logType = args.type?.toLowerCase();
+        let filteredLogs: string[] = [];
+
+        // Improved pattern matching for different log types
+        if (logType === "all") {
+          filteredLogs = [...consoleLogs];
+        } else if (logType === "error") {
+          filteredLogs = consoleLogs.filter(log =>
+            log.includes("[error]") ||
+            log.includes("[pageerror]") ||
+            log.includes("[crash]") ||
+            log.includes("Failed to load resource") ||
+            log.includes("net::ERR_") ||
+            log.includes("Error with")
+          );
+        } else if (logType === "warning") {
+          filteredLogs = consoleLogs.filter(log =>
+            log.includes("[warning]") ||
+            log.includes("Warning:")
+          );
+        } else if (logType === "log") {
+          // Filter out errors and warnings to keep general logs
+          filteredLogs = consoleLogs.filter(log =>
+            !log.includes("[error]") &&
+            !log.includes("[warning]") &&
+            !log.includes("Failed to load") &&
+            !log.includes("Error with") &&
+            !log.includes("Warning:")
+          );
+        } else if (logType === "info") {
+          filteredLogs = consoleLogs.filter(log => log.includes("[info]"));
+        } else if (logType === "debug") {
+          filteredLogs = consoleLogs.filter(log => log.includes("[debug]"));
+        } else {
+          // Default to all logs if type is not specified
+          filteredLogs = [...consoleLogs];
+        }
+
+        // Rest of the code remains the same
+        if (args.search) {
+          const searchTerm = args.search.toString();
+          filteredLogs = filteredLogs.filter(log => log.includes(searchTerm));
+        }
+
+        if (args.clear === true) {
+          consoleLogs.length = 0;
+        }
+
+        if (args.limit && typeof args.limit === 'number' && args.limit > 0) {
+          filteredLogs = filteredLogs.slice(-args.limit);
+        }
+
+        return {
+          content: [{
+            type: "text",
+            text: filteredLogs.length > 0
+              ? `Console Logs (${filteredLogs.length}):\n${filteredLogs.join('\n')}`
+              : "No matching console logs found."
+          }],
+          isError: false
+        };
+      } catch (error) {
+        return {
+          content: [{
+            type: "text",
+            text: `Failed to retrieve console logs: ${(error as Error).message}`
+          }],
+          isError: true
+        };
+      }
+    }
+
+    case "playwright_close": {
+      try {
+        // Check if there's an active browser instance
+        if (browser) {
+          await browser.close();
+          browser = undefined;
+          page = undefined;
+
+          return {
+            content: [{
+              type: "text",
+              text: "Browser successfully closed"
+            }],
+            isError: false
+          };
+        } else {
+          return {
+            content: [{
+              type: "text",
+              text: "No active browser to close"
+            }],
+            isError: false
+          };
+        }
+      } catch (error) {
+        return {
+          content: [{
+            type: "text",
+            text: `Failed to close browser: ${(error as Error).message}`
+          }],
+          isError: true
+        };
+      }
+    }
 
     case "playwright_get":
       try {

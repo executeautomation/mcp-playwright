@@ -5,7 +5,7 @@ sidebar_position: 1
 import YouTubeVideoEmbed from '@site/src/components/HomepageFeatures/YouTubeVideoEmbed';
 
 
-# Supported Tools
+# 🛠️ Supported Tools
 
 Playwright MCP for Browser automation has following key features
 - Console log monitoring
@@ -111,3 +111,30 @@ Execute JavaScript in the browser console.
 
 - **`script`** *(string)*:  
   JavaScript code to execute.
+
+---
+
+### Playwright_console_logs
+Retrieve console logs from the browser with filtering options
+Supports Retrieval of logs like - all, error, warning, log, info, debug
+
+- **`search`** *(string)*:  
+  Text to search for in logs (handles text with square brackets).
+
+- **`limit`** *(number)*:
+  Maximum number of logs to retrieve.
+
+- **`type`** *(string)*:
+  Type of logs to retrieve (all, error, warning, log, info, debug).
+
+- **`clear`** *(boolean)*:
+  Whether to clear logs after retrieval (default: false).
+
+---
+
+### Playwright_close
+  Close the browser and release all resources.
+  Useful while working with Cline, Cursor to release the resources.
+
+
+
