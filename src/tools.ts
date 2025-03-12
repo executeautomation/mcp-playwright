@@ -12,7 +12,8 @@ export function createToolDefinitions() {
           width: { type: "number", description: "Viewport width in pixels (default: 1280)" },
           height: { type: "number", description: "Viewport height in pixels (default: 720)" },
           timeout: { type: "number", description: "Navigation timeout in milliseconds" },
-          waitUntil: { type: "string", description: "Navigation wait condition" }
+          waitUntil: { type: "string", description: "Navigation wait condition" },
+          headless: { type: "boolean", description: "Run browser in headless mode (default: false)" },
         },
         required: ["url"],
       },
@@ -198,6 +199,24 @@ export function createToolDefinitions() {
         required: ["url"],
       },
     },
+    {
+      name: "playwright_get_visible_text",
+      description: "Get the visible text content of the current page",
+      inputSchema: {
+        type: "object",
+        properties: {},
+        required: [],
+      },
+    },
+    {
+      name: "playwright_get_html",
+      description: "Get the HTML content of the current page",
+      inputSchema: {
+        type: "object",
+        properties: {},
+        required: [],
+      },
+    },
   ] as const satisfies Tool[];
 }
 
@@ -211,7 +230,9 @@ export const BROWSER_TOOLS = [
   "playwright_select",
   "playwright_hover",
   "playwright_evaluate",
-  "playwright_close"
+  "playwright_close",
+  "playwright_get_visible_text",
+  "playwright_get_html"
 ];
 
 // API Request tools for conditional launch
