@@ -34,6 +34,7 @@ export const mockPage = {
   evaluate: jest.fn().mockResolvedValue({ result: "mock-result", logs: [] }),
   waitForSelector: jest.fn(),
   setContent: jest.fn(),
+  content: jest.fn().mockResolvedValue("<html><body>Mock HTML</body></html>"),
   on: jest.fn(),
   frameLocator: jest.fn().mockReturnValue({
     locator: jest.fn().mockReturnValue({
