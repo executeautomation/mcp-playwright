@@ -136,5 +136,34 @@ Supports Retrieval of logs like - all, error, warning, log, info, debug
   Close the browser and release all resources.
   Useful while working with Cline, Cursor to release the resources.
 
+---
+
+### Playwright_get_visible_text
+Retrieve all visible text content from the current page.
+
+This tool extracts text that would be visible to a user, ignoring hidden elements.
+
+- No input parameters required
+
+**Example usage:**
+```javascript
+const result = await agent.runTool("playwright_get_visible_text", {});
+console.log(result.content[0].text); // Displays all visible text from the page
+```
+
+---
+
+### Playwright_get_html
+Retrieve the full HTML content of the current page.
+
+This tool returns the complete HTML source code of the current page, useful for debugging or analysis.
+
+- No input parameters required
+
+**Example usage:**
+```javascript
+const result = await agent.runTool("playwright_get_html", {});
+console.log(result.content[0].text); // Displays the HTML source
+```
 
 
