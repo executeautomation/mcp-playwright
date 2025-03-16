@@ -383,5 +383,21 @@ exports[`Tool Definitions should match snapshot 1`] = `
     },
     "name": "playwright_custom_user_agent",
   },
+  {
+    "description": "Generate a Playwright test file from recorded actions",
+    "inputSchema": {
+      "properties": {
+        "name": {
+          "description": "Name for the generated test file",
+          "type": "string",
+        },
+      },
+      "required": [
+        "name",
+      ],
+      "type": "object",
+    },
+    "name": "playwright_codegen",
+  },
 ]
 `;

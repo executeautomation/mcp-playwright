@@ -233,6 +233,17 @@ export function createToolDefinitions() {
         required: ["userAgent"],
       },
     },
+    {
+      name: "playwright_codegen",
+      description: "Generate a Playwright test file from recorded actions",
+      inputSchema: {
+        type: "object",
+        properties: {
+          name: { type: "string", description: "Name for the generated test file" }
+        },
+        required: ["name"],
+      },
+    },
   ] as const satisfies Tool[];
 }
 

@@ -1,4 +1,4 @@
-import type { Browser, Page } from 'playwright';
+import type { Browser, Page, APIRequestContext } from 'playwright';
 import { chromium, request } from 'playwright';
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { BROWSER_TOOLS, API_TOOLS } from './tools.js';
@@ -27,10 +27,12 @@ import {
   PatchRequestTool,
   DeleteRequestTool
 } from './tools/api/requests.js';
+import { CodeGeneratorTool } from './tools/browser/codegen.js';
 
 // Global state
 let browser: Browser | undefined;
 let page: Page | undefined;
+let apiContext: APIRequestContext | undefined;
 
 // Tool instances
 let screenshotTool: ScreenshotTool;
@@ -51,6 +53,7 @@ let postRequestTool: PostRequestTool;
 let putRequestTool: PutRequestTool;
 let patchRequestTool: PatchRequestTool;
 let deleteRequestTool: DeleteRequestTool;
+let codeGeneratorTool: CodeGeneratorTool;
 
 interface BrowserSettings {
   viewport?: {
@@ -122,6 +125,7 @@ function initializeTools(server: any) {
   if (!putRequestTool) putRequestTool = new PutRequestTool(server);
   if (!patchRequestTool) patchRequestTool = new PatchRequestTool(server);
   if (!deleteRequestTool) deleteRequestTool = new DeleteRequestTool(server);
+  if (!codeGeneratorTool) codeGeneratorTool = new CodeGeneratorTool(server);
 }
 
 /**
@@ -132,99 +136,118 @@ export async function handleToolCall(
   args: any,
   server: any
 ): Promise<CallToolResult> {
-  // Initialize tools
-  initializeTools(server);
+  const context: ToolContext = { page, server, apiContext };
 
-  // Prepare context based on tool requirements
-  const context: ToolContext = {
-    server
-  };
-  
-  // Set up browser if needed
-  if (BROWSER_TOOLS.includes(name)) {
-    const browserSettings = {
-      viewport: {
-        width: args.width,
-        height: args.height
-      },
-      userAgent: name === "playwright_custom_user_agent" ? args.userAgent : undefined
+  // Initialize tools if not already done
+  if (!screenshotTool) {
+    initializeTools(server);
+  }
+
+  // Create browser if not exists
+  if (!browser) {
+    browser = await chromium.launch();
+  }
+
+  // Create page if not exists and tool requires browser
+  if (!page && BROWSER_TOOLS.includes(name)) {
+    page = await browser.newPage();
+    context.page = page;
+  }
+
+  // Create API context if not exists and tool requires it
+  if (!apiContext && API_TOOLS.includes(name)) {
+    apiContext = await request.newContext();
+    context.apiContext = apiContext;
+  }
+
+  let result: CallToolResult;
+
+  try {
+    switch (name) {
+      case 'playwright_navigate':
+        result = await navigationTool.execute(args, context);
+        codeGeneratorTool.addAction(name, args);
+        break;
+      case 'playwright_screenshot':
+        result = await screenshotTool.execute(args, context);
+        codeGeneratorTool.addAction(name, args);
+        break;
+      case 'playwright_click':
+        result = await clickTool.execute(args, context);
+        codeGeneratorTool.addAction(name, args);
+        break;
+      case 'playwright_iframe_click':
+        result = await iframeClickTool.execute(args, context);
+        codeGeneratorTool.addAction(name, args);
+        break;
+      case 'playwright_fill':
+        result = await fillTool.execute(args, context);
+        codeGeneratorTool.addAction(name, args);
+        break;
+      case 'playwright_select':
+        result = await selectTool.execute(args, context);
+        codeGeneratorTool.addAction(name, args);
+        break;
+      case 'playwright_hover':
+        result = await hoverTool.execute(args, context);
+        codeGeneratorTool.addAction(name, args);
+        break;
+      case 'playwright_evaluate':
+        result = await evaluateTool.execute(args, context);
+        codeGeneratorTool.addAction(name, args);
+        break;
+      case 'playwright_console_logs':
+        result = await consoleLogsTool.execute(args, context);
+        break;
+      case 'playwright_close':
+        result = await closeBrowserTool.execute(args, context);
+        break;
+      case 'playwright_expect_response':
+        result = await expectResponseTool.execute(args, context);
+        break;
+      case 'playwright_assert_response':
+        result = await assertResponseTool.execute(args, context);
+        break;
+      case 'playwright_custom_user_agent':
+        result = await customUserAgentTool.execute(args, context);
+        break;
+      case 'playwright_get':
+        result = await getRequestTool.execute(args, context);
+        codeGeneratorTool.addAction(name, args);
+        break;
+      case 'playwright_post':
+        result = await postRequestTool.execute(args, context);
+        codeGeneratorTool.addAction(name, args);
+        break;
+      case 'playwright_put':
+        result = await putRequestTool.execute(args, context);
+        codeGeneratorTool.addAction(name, args);
+        break;
+      case 'playwright_patch':
+        result = await patchRequestTool.execute(args, context);
+        codeGeneratorTool.addAction(name, args);
+        break;
+      case 'playwright_delete':
+        result = await deleteRequestTool.execute(args, context);
+        codeGeneratorTool.addAction(name, args);
+        break;
+      case 'playwright_codegen':
+        result = await codeGeneratorTool.execute(args, context);
+        break;
+      default:
+        result = {
+          isError: true,
+          content: [{ text: `Unknown tool: ${name}`, mime: 'text/plain' }]
+        };
+    }
+  } catch (error) {
+    result = {
+      isError: true,
+      content: [{ text: `Error executing tool ${name}: ${error}`, mime: 'text/plain' }]
     };
-    context.page = await ensureBrowser(browserSettings);
-    context.browser = browser;
   }
 
-  // Set up API context if needed
-  if (API_TOOLS.includes(name)) {
-    context.apiContext = await ensureApiContext(args.url);
-  }
-
-  // Route to appropriate tool
-  switch (name) {
-    // Browser tools
-    case "playwright_navigate":
-      return await navigationTool.execute(args, context);
-      
-    case "playwright_screenshot":
-      return await screenshotTool.execute(args, context);
-      
-    case "playwright_close":
-      return await closeBrowserTool.execute(args, context);
-      
-    case "playwright_console_logs":
-      return await consoleLogsTool.execute(args, context);
-      
-    case "playwright_click":
-      return await clickTool.execute(args, context);
-      
-    case "playwright_iframe_click":
-      return await iframeClickTool.execute(args, context);
-      
-    case "playwright_fill":
-      return await fillTool.execute(args, context);
-      
-    case "playwright_select":
-      return await selectTool.execute(args, context);
-      
-    case "playwright_hover":
-      return await hoverTool.execute(args, context);
-      
-    case "playwright_evaluate":
-      return await evaluateTool.execute(args, context);
-
-    case "playwright_expect_response":
-      return await expectResponseTool.execute(args, context);
-
-    case "playwright_assert_response":
-      return await assertResponseTool.execute(args, context);
-
-    case "playwright_custom_user_agent":
-      return await customUserAgentTool.execute(args, context);
-      
-    // API tools
-    case "playwright_get":
-      return await getRequestTool.execute(args, context);
-      
-    case "playwright_post":
-      return await postRequestTool.execute(args, context);
-      
-    case "playwright_put":
-      return await putRequestTool.execute(args, context);
-      
-    case "playwright_patch":
-      return await patchRequestTool.execute(args, context);
-      
-    case "playwright_delete":
-      return await deleteRequestTool.execute(args, context);
-    
-    default:
-      return {
-        content: [{
-          type: "text",
-          text: `Unknown tool: ${name}`,
-        }],
-        isError: true,
-      };
-  }
+  return result;
 }
 
 /**
