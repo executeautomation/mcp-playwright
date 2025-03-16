@@ -12,7 +12,8 @@ export function createToolDefinitions() {
           width: { type: "number", description: "Viewport width in pixels (default: 1280)" },
           height: { type: "number", description: "Viewport height in pixels (default: 720)" },
           timeout: { type: "number", description: "Navigation timeout in milliseconds" },
-          waitUntil: { type: "string", description: "Navigation wait condition" }
+          waitUntil: { type: "string", description: "Navigation wait condition" },
+          headless: { type: "boolean", description: "Run browser in headless mode (default: false)" },
         },
         required: ["url"],
       },
@@ -199,6 +200,24 @@ export function createToolDefinitions() {
       },
     },
     {
+      name: "playwright_get_visible_text",
+      description: "Get the visible text content of the current page",
+      inputSchema: {
+        type: "object",
+        properties: {},
+        required: [],
+      },
+    },
+    {
+      name: "playwright_get_html",
+      description: "Get the HTML content of the current page",
+      inputSchema: {
+        type: "object",
+        properties: {},
+        required: [],
+      },
+    },
+    {
       name: "playwright_expect_response",
       description: "Ask Playwright to start waiting for a HTTP response. This tool initiates the wait operation but does not wait for its completion.",
       inputSchema: {
@@ -246,6 +265,9 @@ export const BROWSER_TOOLS = [
   "playwright_select",
   "playwright_hover",
   "playwright_evaluate",
+  "playwright_close",
+  "playwright_get_visible_text",
+  "playwright_get_html",
   "playwright_close",
   "playwright_expect_response",
   "playwright_assert_response",

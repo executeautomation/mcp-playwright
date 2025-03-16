@@ -6,6 +6,10 @@ exports[`Tool Definitions should match snapshot 1`] = `
     "description": "Navigate to a URL",
     "inputSchema": {
       "properties": {
+        "headless": {
+          "description": "Run browser in headless mode (default: false)",
+          "type": "boolean",
+        },
         "height": {
           "description": "Viewport height in pixels (default: 720)",
           "type": "number",
@@ -325,6 +329,24 @@ exports[`Tool Definitions should match snapshot 1`] = `
       "type": "object",
     },
     "name": "playwright_delete",
+  },
+  {
+    "description": "Get the visible text content of the current page",
+    "inputSchema": {
+      "properties": {},
+      "required": [],
+      "type": "object",
+    },
+    "name": "playwright_get_visible_text",
+  },
+  {
+    "description": "Get the HTML content of the current page",
+    "inputSchema": {
+      "properties": {},
+      "required": [],
+      "type": "object",
+    },
+    "name": "playwright_get_html",
   },
   {
     "description": "Ask Playwright to start waiting for a HTTP response. This tool initiates the wait operation but does not wait for its completion.",
