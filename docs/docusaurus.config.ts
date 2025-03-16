@@ -52,12 +52,12 @@ const config: Config = {
 
   themeConfig: {
     // Replace with your project's social card
-    image: 'img/ea-icon.png',
+    image: 'img/EA-Icon.svg',
     navbar: {
       title: 'Playwright MCP Server',
       logo: {
-        alt: 'My Site Logo',
-        src: 'img/logo.svg',
+        alt: 'Playwright MCP Server',
+        src: 'img/EA-Icon.svg',
       },
       items: [
         {

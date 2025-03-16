@@ -45,6 +45,26 @@ Here's the Claude Desktop configuration to use the Playwright server:
 }
 ```
 
+## Testing
+
+This project uses Jest for testing. The tests are located in the `src/__tests__` directory.
+
+### Running Tests
+
+You can run the tests using one of the following commands:
+
+```bash
+# Run tests using the custom script (with coverage)
+node run-tests.cjs
+
+# Run tests using npm scripts
+npm test           # Run tests without coverage
+npm run test:coverage  # Run tests with coverage
+npm run test:custom    # Run tests with custom script (same as node run-tests.cjs)
+```
+
+The test coverage report will be generated in the `coverage` directory.
+
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=executeautomation/mcp-playwright&type=Date)](https://star-history.com/#executeautomation/mcp-playwright&Date)

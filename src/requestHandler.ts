@@ -6,7 +6,7 @@ import {
   CallToolRequestSchema,
   Tool
 } from "@modelcontextprotocol/sdk/types.js";
-import { handleToolCall, getConsoleLogs, getScreenshots } from "./toolsHandler.js";
+import { handleToolCall, getConsoleLogs, getScreenshots } from "./toolHandler.js";
 
 export function setupRequestHandlers(server: Server, tools: Tool[]) {
   // List resources handler

@@ -1,0 +1,387 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Tool Definitions should match snapshot 1`] = `
+[
+  {
+    "description": "Navigate to a URL",
+    "inputSchema": {
+      "properties": {
+        "height": {
+          "description": "Viewport height in pixels (default: 720)",
+          "type": "number",
+        },
+        "timeout": {
+          "description": "Navigation timeout in milliseconds",
+          "type": "number",
+        },
+        "url": {
+          "type": "string",
+        },
+        "waitUntil": {
+          "description": "Navigation wait condition",
+          "type": "string",
+        },
+        "width": {
+          "description": "Viewport width in pixels (default: 1280)",
+          "type": "number",
+        },
+      },
+      "required": [
+        "url",
+      ],
+      "type": "object",
+    },
+    "name": "playwright_navigate",
+  },
+  {
+    "description": "Take a screenshot of the current page or a specific element",
+    "inputSchema": {
+      "properties": {
+        "downloadsDir": {
+          "description": "Custom downloads directory path (default: user's Downloads folder)",
+          "type": "string",
+        },
+        "fullPage": {
+          "description": "Store screenshot of the entire page (default: false)",
+          "type": "boolean",
+        },
+        "height": {
+          "description": "Height in pixels (default: 600)",
+          "type": "number",
+        },
+        "name": {
+          "description": "Name for the screenshot",
+          "type": "string",
+        },
+        "savePng": {
+          "description": "Save screenshot as PNG file (default: false)",
+          "type": "boolean",
+        },
+        "selector": {
+          "description": "CSS selector for element to screenshot",
+          "type": "string",
+        },
+        "storeBase64": {
+          "description": "Store screenshot in base64 format (default: true)",
+          "type": "boolean",
+        },
+        "width": {
+          "description": "Width in pixels (default: 800)",
+          "type": "number",
+        },
+      },
+      "required": [
+        "name",
+      ],
+      "type": "object",
+    },
+    "name": "playwright_screenshot",
+  },
+  {
+    "description": "Click an element on the page",
+    "inputSchema": {
+      "properties": {
+        "selector": {
+          "description": "CSS selector for the element to click",
+          "type": "string",
+        },
+      },
+      "required": [
+        "selector",
+      ],
+      "type": "object",
+    },
+    "name": "playwright_click",
+  },
+  {
+    "description": "Click an element in an iframe on the page",
+    "inputSchema": {
+      "properties": {
+        "iframeSelector": {
+          "description": "CSS selector for the iframe containing the element to click",
+          "type": "string",
+        },
+        "selector": {
+          "description": "CSS selector for the element to click",
+          "type": "string",
+        },
+      },
+      "required": [
+        "iframeSelector",
+        "selector",
+      ],
+      "type": "object",
+    },
+    "name": "playwright_iframe_click",
+  },
+  {
+    "description": "fill out an input field",
+    "inputSchema": {
+      "properties": {
+        "selector": {
+          "description": "CSS selector for input field",
+          "type": "string",
+        },
+        "value": {
+          "description": "Value to fill",
+          "type": "string",
+        },
+      },
+      "required": [
+        "selector",
+        "value",
+      ],
+      "type": "object",
+    },
+    "name": "playwright_fill",
+  },
+  {
+    "description": "Select an element on the page with Select tag",
+    "inputSchema": {
+      "properties": {
+        "selector": {
+          "description": "CSS selector for element to select",
+          "type": "string",
+        },
+        "value": {
+          "description": "Value to select",
+          "type": "string",
+        },
+      },
+      "required": [
+        "selector",
+        "value",
+      ],
+      "type": "object",
+    },
+    "name": "playwright_select",
+  },
+  {
+    "description": "Hover an element on the page",
+    "inputSchema": {
+      "properties": {
+        "selector": {
+          "description": "CSS selector for element to hover",
+          "type": "string",
+        },
+      },
+      "required": [
+        "selector",
+      ],
+      "type": "object",
+    },
+    "name": "playwright_hover",
+  },
+  {
+    "description": "Execute JavaScript in the browser console",
+    "inputSchema": {
+      "properties": {
+        "script": {
+          "description": "JavaScript code to execute",
+          "type": "string",
+        },
+      },
+      "required": [
+        "script",
+      ],
+      "type": "object",
+    },
+    "name": "playwright_evaluate",
+  },
+  {
+    "description": "Retrieve console logs from the browser with filtering options",
+    "inputSchema": {
+      "properties": {
+        "clear": {
+          "description": "Whether to clear logs after retrieval (default: false)",
+          "type": "boolean",
+        },
+        "limit": {
+          "description": "Maximum number of logs to return",
+          "type": "number",
+        },
+        "search": {
+          "description": "Text to search for in logs (handles text with square brackets)",
+          "type": "string",
+        },
+        "type": {
+          "description": "Type of logs to retrieve (all, error, warning, log, info, debug)",
+          "enum": [
+            "all",
+            "error",
+            "warning",
+            "log",
+            "info",
+            "debug",
+          ],
+          "type": "string",
+        },
+      },
+      "required": [],
+      "type": "object",
+    },
+    "name": "playwright_console_logs",
+  },
+  {
+    "description": "Close the browser and release all resources",
+    "inputSchema": {
+      "properties": {},
+      "required": [],
+      "type": "object",
+    },
+    "name": "playwright_close",
+  },
+  {
+    "description": "Perform an HTTP GET request",
+    "inputSchema": {
+      "properties": {
+        "url": {
+          "description": "URL to perform GET operation",
+          "type": "string",
+        },
+      },
+      "required": [
+        "url",
+      ],
+      "type": "object",
+    },
+    "name": "playwright_get",
+  },
+  {
+    "description": "Perform an HTTP POST request",
+    "inputSchema": {
+      "properties": {
+        "url": {
+          "description": "URL to perform POST operation",
+          "type": "string",
+        },
+        "value": {
+          "description": "Data to post in the body",
+          "type": "string",
+        },
+      },
+      "required": [
+        "url",
+        "value",
+      ],
+      "type": "object",
+    },
+    "name": "playwright_post",
+  },
+  {
+    "description": "Perform an HTTP PUT request",
+    "inputSchema": {
+      "properties": {
+        "url": {
+          "description": "URL to perform PUT operation",
+          "type": "string",
+        },
+        "value": {
+          "description": "Data to PUT in the body",
+          "type": "string",
+        },
+      },
+      "required": [
+        "url",
+        "value",
+      ],
+      "type": "object",
+    },
+    "name": "playwright_put",
+  },
+  {
+    "description": "Perform an HTTP PATCH request",
+    "inputSchema": {
+      "properties": {
+        "url": {
+          "description": "URL to perform PUT operation",
+          "type": "string",
+        },
+        "value": {
+          "description": "Data to PATCH in the body",
+          "type": "string",
+        },
+      },
+      "required": [
+        "url",
+        "value",
+      ],
+      "type": "object",
+    },
+    "name": "playwright_patch",
+  },
+  {
+    "description": "Perform an HTTP DELETE request",
+    "inputSchema": {
+      "properties": {
+        "url": {
+          "description": "URL to perform DELETE operation",
+          "type": "string",
+        },
+      },
+      "required": [
+        "url",
+      ],
+      "type": "object",
+    },
+    "name": "playwright_delete",
+  },
+  {
+    "description": "Ask Playwright to start waiting for a HTTP response. This tool initiates the wait operation but does not wait for its completion.",
+    "inputSchema": {
+      "properties": {
+        "id": {
+          "description": "Unique & arbitrary identifier to be used for retrieving this response later with \`Playwright_assert_response\`.",
+          "type": "string",
+        },
+        "url": {
+          "description": "URL pattern to match in the response.",
+          "type": "string",
+        },
+      },
+      "required": [
+        "id",
+        "url",
+      ],
+      "type": "object",
+    },
+    "name": "playwright_expect_response",
+  },
+  {
+    "description": "Wait for and validate a previously initiated HTTP response wait operation.",
+    "inputSchema": {
+      "properties": {
+        "id": {
+          "description": "Identifier of the HTTP response initially expected using \`Playwright_expect_response\`.",
+          "type": "string",
+        },
+        "value": {
+          "description": "Data to expect in the body of the HTTP response. If provided, the assertion will fail if this value is not found in the response body.",
+          "type": "string",
+        },
+      },
+      "required": [
+        "id",
+      ],
+      "type": "object",
+    },
+    "name": "playwright_assert_response",
+  },
+  {
+    "description": "Set a custom User Agent for the browser",
+    "inputSchema": {
+      "properties": {
+        "userAgent": {
+          "description": "Custom User Agent for the Playwright browser instance",
+          "type": "string",
+        },
+      },
+      "required": [
+        "userAgent",
+      ],
+      "type": "object",
+    },
+    "name": "playwright_custom_user_agent",
+  },
+]
+`;

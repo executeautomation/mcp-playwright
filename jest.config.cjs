@@ -8,9 +8,22 @@ module.exports = {
     'src/**/*.ts',
     '!src/index.ts', // exclude index.ts
   ],
-  modulePathIgnorePatterns: ["<rootDir>/docs/"],
+  testMatch: [
+    '<rootDir>/src/__tests__/**/*.test.ts'
+  ],
+  modulePathIgnorePatterns: [
+    "<rootDir>/docs/",
+    "<rootDir>/dist/"
+  ],
   moduleNameMapper: {
-    "^./tools.js$": "<rootDir>/test/helpers/index.ts",
-    "^./toolsHandler.js$": "<rootDir>/test/helpers/index.ts",
+    "^(.*)\\.js$": "$1"
   },
+  transform: {
+    '^.+\\.tsx?$': ['ts-jest', {
+      useESM: true,
+      tsconfig: 'tsconfig.test.json'
+    }],
+  },
+  extensionsToTreatAsEsm: ['.ts'],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
 };

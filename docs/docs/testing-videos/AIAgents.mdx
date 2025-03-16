@@ -1,0 +1,50 @@
+---
+sidebar_position: 1
+---
+
+import YouTubeVideoEmbed from '@site/src/components/HomepageFeatures/YouTubeVideoEmbed';
+
+# 🎭 UI + Database Testing 💽
+
+In this video, we explore API, UI, and Database testing using Playwright MCP Server + SQLite MCP Server in Cursor—where AI agents handle everything for you! No coding required, just seamless automation. 
+Watch how Cursor + MCP Servers transform testing into a fully automated, hands-free process! 🔥
+
+<div align="center">
+  <YouTubeVideoEmbed videoId="FZpUw1p370o" />
+</div>
+
+---
+
+:::info 💡 **Note**  
+We will be using following MCP Server Tools
+
+1. Playwright MCP server (Which is this tool that you are referring in the documentation)
+2. [SQLite MCP Server](https://github.com/modelcontextprotocol/servers/tree/main/src/sqlite)
+:::
+---
+
+## ⌨ **Cursor Rules**
+
+We will be using Cursor Rules in this demonstration, Cursor Rules help define how AI agents interact with the 
+code, automate tasks, and follow specific workflows. These rules guide how agents should generate, modify, or test code within the 
+development environment.
+
+Here is the Cursor Rules we are using in this demonstration
+
+```js title="api-ui-test.mdc"
+When I say /test, then perform following
+
+Navigate to http://localhost:8000/Product/List. 
+
+Create product by clicking Create link . 
+
+Then create a product with some realistic data for Name, Price and Select ProductType as CPU and click create input type with id as Create. 
+
+Check the Database for the created record
+
+Use the Schema: http://localhost:8001/swagger/v1/swagger.json
+
+Here is the baseURL of API Base URL: http://localhost:8001/
+
+Also check the API which performs the GET operation if the values are correctly retreived for the created product from the above schema
+

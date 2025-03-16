@@ -145,12 +145,6 @@ This tool extracts text that would be visible to a user, ignoring hidden element
 
 - No input parameters required
 
-**Example usage:**
-```javascript
-const result = await agent.runTool("playwright_get_visible_text", {});
-console.log(result.content[0].text); // Displays all visible text from the page
-```
-
 ---
 
 ### Playwright_get_html
@@ -160,10 +154,41 @@ This tool returns the complete HTML source code of the current page, useful for 
 
 - No input parameters required
 
-**Example usage:**
-```javascript
-const result = await agent.runTool("playwright_get_html", {});
-console.log(result.content[0].text); // Displays the HTML source
-```
+---
 
+### Playwright_expect_response
+Ask Playwright to start waiting for a HTTP response. This tool initiates the wait operation but does not wait for its completion.
 
+- **Inputs:**
+  - **`id`** *(string)*:
+    Unique & arbitrary identifier to be used for retrieving this response later with `Playwright_assert_response`.
+  - **`url`** *(string)*:
+    URL pattern to match in the response.
+
+---
+
+### Playwright_assert_response
+Wait for and validate a previously initiated HTTP response wait operation.
+
+- **Inputs:**
+  - **`id`** *(string)*:
+    Identifier of the HTTP response initially expected using `Playwright_expect_response`.
+  - **`value`** *(string, optional)*:
+    Data to expect in the body of the HTTP response. If provided, the assertion will fail if this value is not found in the response body.
+
+- **Response:**
+  - **`statusCode`** *(string)*:
+    Status code of the response.
+  - **`responseUrl`** *(string)*:
+    Full URL of the captured response.
+  - **`responseBody`** *(string)*:
+    Full response body in JSON format.
+
+---
+
+### playwright_custom_user_agent
+Set a custom User Agent for the browser.
+
+- **Inputs:**
+  - **`userAgent`** *(string)*:
+    Custom User Agent for the Playwright browser instance

@@ -10,11 +10,31 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 22 # Use current LTS version
+          cache: 'npm'
+      
       - name: Install dependencies
         run: npm install
-      - name: Run tests
-        run: npm run test
+      
+      - name: Build project
+        run: npm run build
+      
+      - name: Run tests with coverage (custom script)
+        run: node run-tests.cjs
+        continue-on-error: true
+        id: custom-test
+      
+      - name: Run tests with coverage (npm script)
+        if: steps.custom-test.outcome == 'failure'
+        run: npm run test:coverage -- --testMatch="<rootDir>/src/__tests__/**/*.test.ts"
+      
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          if-no-files-found: warn
