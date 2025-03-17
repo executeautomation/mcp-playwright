@@ -1,0 +1,60 @@
+---
+sidebar_position: 2
+---
+
+import YouTubeVideoEmbed from '@site/src/components/HomepageFeatures/YouTubeVideoEmbed';
+
+# 🎭 BDD Testing with Playwright MCP Server 🥒
+
+In this video, we explore **Behavior Driven Development (BDD) testing** using **Playwright MCP Server**, without writing a single line of code—just seamless automation! 
+
+Watch how **Cursor + MCP Servers** transform testing into a fully automated, hands-free process! 🔥
+
+<div align="center">
+  <YouTubeVideoEmbed videoId="5knmhGep2o4" />
+</div>
+
+---
+
+:::info 💡 **Note**  
+We will be using the following **MCP Server Tools**:
+
+1. **Playwright MCP Server** (This is the tool referenced in the documentation)
+:::
+
+---
+
+## 📚 **BDD Scenario for Login**
+
+```gherkin
+Feature: Login
+
+  Scenario: To Perform login operation in EAApp website
+    Given I navigate to "https://eaapp.somee.com/"
+    When I click on "Login" button
+    And I enter "admin" in "UserName" field
+    And I enter "password" in "Password" field
+    And I click on "Login" button
+    Then I should see the Employee Details menu
+```
+
+---
+
+## 📚 **BDD Scenario for Console Logs**
+
+```gherkin
+Feature: Network Console
+
+  Scenario: To Perform Network Console operation
+    Given I navigate to amazon.com
+    And I handle if there is any popup
+    And I click the All menu from the Amazon website
+    And I read the network console logs
+    When I see any error in the network console logs
+    Then I print them out
+    And I close the browser
+```
+
+---
+
+This structured format enhances readability and ensures clarity for developers and testers. 🚀

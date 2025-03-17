@@ -30,4 +30,7 @@ async function runServer() {
   await server.connect(transport);
 }
 
-runServer().catch(console.error);
+runServer().catch((error) => {
+  console.error("Fatal error in main():", error);
+  process.exit(1);
+});
