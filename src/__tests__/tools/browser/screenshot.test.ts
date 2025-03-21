@@ -161,4 +161,18 @@ describe('ScreenshotTool', () => {
     const screenshots = screenshotTool.getScreenshots();
     expect(screenshots.has('test-screenshot')).toBe(true);
   });
+
+  test('should take a screenshot with specific browser type', async () => {
+    const args = {
+      name: 'browser-type-test',
+      browserType: 'firefox'
+    };
+
+    // Execute with browser type
+    const result = await screenshotTool.execute(args, mockContext);
+    
+    expect(mockScreenshot).toHaveBeenCalled();
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('Screenshot saved to');
+  });
 }); 

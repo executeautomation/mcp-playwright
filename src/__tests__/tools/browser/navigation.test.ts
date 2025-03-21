@@ -55,6 +55,33 @@ describe('NavigationTool', () => {
     expect(result.content[0].text).toContain('Navigated to');
   });
 
+  test('should handle navigation with specific browser type', async () => {
+    const args = {
+      url: 'https://example.com',
+      waitUntil: 'networkidle',
+      browserType: 'firefox'
+    };
+
+    const result = await navigationTool.execute(args, mockContext);
+
+    expect(mockGoto).toHaveBeenCalledWith('https://example.com', { waitUntil: 'networkidle', timeout: 30000 });
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('Navigated to');
+  });
+
+  test('should handle navigation with webkit browser type', async () => {
+    const args = {
+      url: 'https://example.com',
+      browserType: 'webkit'
+    };
+
+    const result = await navigationTool.execute(args, mockContext);
+
+    expect(mockGoto).toHaveBeenCalledWith('https://example.com', { waitUntil: 'load', timeout: 30000 });
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('Navigated to');
+  });
+
   test('should handle navigation errors', async () => {
     const args = {
       url: 'https://example.com'

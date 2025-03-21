@@ -9,6 +9,7 @@ export function createToolDefinitions() {
         type: "object",
         properties: {
           url: { type: "string", description: "URL to navigate to the website specified" },
+          browserType: { type: "string", description: "Browser type to use (chromium, firefox, webkit). Defaults to chromium", enum: ["chromium", "firefox", "webkit"] },
           width: { type: "number", description: "Viewport width in pixels (default: 1280)" },
           height: { type: "number", description: "Viewport height in pixels (default: 720)" },
           timeout: { type: "number", description: "Navigation timeout in milliseconds" },

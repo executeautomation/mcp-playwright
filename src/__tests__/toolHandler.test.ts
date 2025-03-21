@@ -1,5 +1,5 @@
 import { handleToolCall, getConsoleLogs, getScreenshots } from '../toolHandler.js';
-import { Browser, Page, chromium } from 'playwright';
+import { Browser, Page, chromium, firefox, webkit } from 'playwright';
 import { jest } from '@jest/globals';
 
 // Mock the Playwright browser and page
@@ -133,6 +133,12 @@ jest.mock('playwright', () => {
     chromium: {
       launch: mockLaunch
     },
+    firefox: {
+      launch: mockLaunch
+    },
+    webkit: {
+      launch: mockLaunch
+    },
     request: {
       newContext: mockNewApiContext
     },
@@ -178,6 +184,54 @@ describe('Tool Handler', () => {
     const clickResult = await handleToolCall('playwright_click', { selector: '#test-button' }, mockServer);
     expect(clickResult).toBeDefined();
     expect(clickResult.content).toBeDefined();
+  });
+  
+  test('handleToolCall should handle Firefox browser', async () => {
+    const navigateResult = await handleToolCall('playwright_navigate', { 
+      url: 'https://example.com',
+      browserType: 'firefox'
+    }, mockServer);
+    expect(navigateResult).toBeDefined();
+    expect(navigateResult.content).toBeDefined();
+    
+    // Verify browser state is reset
+    await handleToolCall('playwright_close', {}, mockServer);
+  });
+  
+  test('handleToolCall should handle WebKit browser', async () => {
+    const navigateResult = await handleToolCall('playwright_navigate', { 
+      url: 'https://example.com',
+      browserType: 'webkit'
+    }, mockServer);
+    expect(navigateResult).toBeDefined();
+    expect(navigateResult.content).toBeDefined();
+    
+    // Verify browser state is reset
+    await handleToolCall('playwright_close', {}, mockServer);
+  });
+  
+  test('handleToolCall should handle browser type switching', async () => {
+    // Start with default chromium
+    await handleToolCall('playwright_navigate', { url: 'https://example.com' }, mockServer);
+    
+    // Switch to Firefox
+    const firefoxResult = await handleToolCall('playwright_navigate', { 
+      url: 'https://firefox.com',
+      browserType: 'firefox'
+    }, mockServer);
+    expect(firefoxResult).toBeDefined();
+    expect(firefoxResult.content).toBeDefined();
+    
+    // Switch to WebKit
+    const webkitResult = await handleToolCall('playwright_navigate', { 
+      url: 'https://webkit.org',
+      browserType: 'webkit'
+    }, mockServer);
+    expect(webkitResult).toBeDefined();
+    expect(webkitResult.content).toBeDefined();
+    
+    // Clean up
+    await handleToolCall('playwright_close', {}, mockServer);
   });
   
   test('handleToolCall should handle API tools', async () => {
