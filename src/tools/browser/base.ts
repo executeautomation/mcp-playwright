@@ -64,7 +64,7 @@ export abstract class BrowserToolBase implements ToolHandler {
       }
 
       // Check if page is closed
-      if (context.page.isClosed()) {
+      if (context.page && context.page.isClosed()) {
         return createErrorResponse("Page is closed. Please retry the operation.");
       }
 
