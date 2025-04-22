@@ -3,6 +3,29 @@ import { codegenTools } from './tools/codegen';
 
 export function createToolDefinitions() {
   return [
+    // Video Recording tools
+    {
+      name: "playwright_start_video",
+      description: "Start recording video of browser session",
+      inputSchema: {
+        type: "object",
+        properties: {
+          path: { type: "string", description: "Directory path to save video file (default: user's Videos folder)" },
+          width: { type: "number", description: "Video width in pixels (default: 1280)" },
+          height: { type: "number", description: "Video height in pixels (default: 720)" }
+        },
+        required: []
+      }
+    },
+    {
+      name: "playwright_stop_video",
+      description: "Stop video recording and save file",
+      inputSchema: {
+        type: "object",
+        properties: {},
+        required: []
+      }
+    },
     // Codegen tools
     {
       name: "start_codegen_session",
@@ -433,7 +456,9 @@ export const BROWSER_TOOLS = [
   "playwright_drag",
   "playwright_press_key",
   "playwright_save_as_pdf",
-  "playwright_click_and_switch_tab"
+  "playwright_click_and_switch_tab",
+  "playwright_start_video",
+  "playwright_stop_video"
 ];
 
 // API Request tools for conditional launch
