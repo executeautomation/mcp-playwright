@@ -22,7 +22,8 @@ export class StartVideoRecordingTool extends BrowserToolBase {
     try {
       // Ensure directory exists
       const outputPath = args.path || defaultVideosPath;
-      if (!fs.existsSync(outputPath)) {
+      const pathExists = fs.existsSync(outputPath);
+      if (!pathExists) {
         fs.mkdirSync(outputPath, { recursive: true });
       }
 
@@ -30,7 +31,7 @@ export class StartVideoRecordingTool extends BrowserToolBase {
       const browserContext = context.page?.context() as BrowserContext;
 
       // Check if video recording is already active
-      if ((browserContext as any)._options.recordVideo) {
+      if ((browserContext as any)._options?.recordVideo) {
         return createErrorResponse("Video recording is already active for this browser session.");
       }
 
@@ -88,7 +89,7 @@ export class StopVideoRecordingTool extends BrowserToolBase {
         const browserContext = page.context();
         
         // Check if video recording is active
-        if (!(browserContext as any)._options.recordVideo) {
+        if (!(browserContext as any)._options?.recordVideo) {
           return createErrorResponse("No active video recording found.");
         }
 
