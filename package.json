@@ -31,8 +31,9 @@
     "@playwright/browser-chromium": "1.51.1",
     "@playwright/browser-firefox": "1.51.1",
     "@playwright/browser-webkit": "1.51.1",
-    "playwright": "1.51.1",
     "@playwright/test": "^1.51.1",
+    "mcp-evals": "^1.0.18",
+    "playwright": "1.51.1",
     "uuid": "^9.0.1"
   },
   "keywords": [
