@@ -1,0 +1,65 @@
+# Supported Tools
+
+The Playwright MCP server provides the following tools:
+
+## Browser/Page Management
+
+- `playwright_navigate` - Navigate to a URL
+- `playwright_close` - Close the browser and release all resources
+
+## Interactions
+
+- `playwright_click` - Click an element on the page
+- `playwright_iframe_click` - Click an element in an iframe on the page
+- `playwright_fill` - Fill out an input field
+- `playwright_select` - Select an element on the page with Select tag
+- `playwright_hover` - Hover an element on the page
+- `playwright_drag` - Drag an element to a target location
+- `playwright_press_key` - Press a keyboard key
+- `playwright_click_and_switch_tab` - Click a link and switch to the newly opened tab
+
+## JavaScript Execution
+
+- `playwright_evaluate` - Execute JavaScript in the browser console
+- `playwright_console_logs` - Retrieve console logs from the browser with filtering options
+
+## Response Handling
+
+- `playwright_expect_response` - Ask Playwright to start waiting for a HTTP response
+- `playwright_assert_response` - Wait for and validate a previously initiated HTTP response wait operation
+
+## Browser Configuration
+
+- `playwright_custom_user_agent` - Set a custom User Agent for the browser
+
+## Page Content
+
+- `playwright_get_visible_text` - Get the visible text content of the current page
+- `playwright_get_visible_html` - Get the HTML content of the current page
+
+## Navigation
+
+- `playwright_go_back` - Navigate back in browser history
+- `playwright_go_forward` - Navigate forward in browser history
+
+## Media Capture
+
+- `playwright_screenshot` - Take a screenshot of the current page or a specific element
+- `playwright_save_as_pdf` - Save the current page as a PDF file
+- `playwright_start_video` - Start recording video of browser session
+- `playwright_stop_video` - Stop video recording and save file
+
+## API Requests
+
+- `playwright_get` - Perform an HTTP GET request
+- `playwright_post` - Perform an HTTP POST request
+- `playwright_put` - Perform an HTTP PUT request
+- `playwright_patch` - Perform an HTTP PATCH request
+- `playwright_delete` - Perform an HTTP DELETE request
+
+## Code Generation
+
+- `start_codegen_session` - Start a new code generation session to record Playwright actions
+- `end_codegen_session` - End a code generation session and generate the test file
+- `get_codegen_session` - Get information about a code generation session
+- `clear_codegen_session` - Clear a code generation session without generating a test
