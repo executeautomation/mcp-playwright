@@ -341,7 +341,15 @@ export function createToolDefinitions() {
       description: "Get the HTML content of the current page",
       inputSchema: {
         type: "object",
-        properties: {},
+        properties: {
+          selector: { type: "string", description: "CSS selector to limit the HTML to a specific container" },
+          removeScripts: { type: "boolean", description: "Remove all script tags from the HTML (default: false)" },
+          removeComments: { type: "boolean", description: "Remove all HTML comments (default: false)" },
+          removeStyles: { type: "boolean", description: "Remove all style tags from the HTML (default: false)" },
+          removeMeta: { type: "boolean", description: "Remove all meta tags from the HTML (default: false)" },
+          cleanHtml: { type: "boolean", description: "Perform comprehensive HTML cleaning (default: false)" },
+          minify: { type: "boolean", description: "Minify the HTML output (default: false)" }
+        },
         required: [],
       },
     },
