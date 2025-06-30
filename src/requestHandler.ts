@@ -28,10 +28,11 @@ export function setupRequestHandlers(server: Server, tools: Tool[]) {
 
   // List resource templates handler
   server.setRequestHandler(ListResourceTemplatesRequestSchema, async () => ({
-    resources: [
+    resourceTemplates: [
       {
-        uri: `screenshot://{name}.png`,
+        uriTemplate: "screenshot://{name}.png",
         mimeType: "image/png",
+        name: "Screenshot Resource",
         description: "Define the uri for the snapshot."
       },
     ],
