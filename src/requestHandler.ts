@@ -1,6 +1,7 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { 
   ListResourcesRequestSchema, 
+  ListResourceTemplatesRequestSchema,
   ReadResourceRequestSchema, 
   ListToolsRequestSchema, 
   CallToolRequestSchema,
@@ -22,6 +23,18 @@ export function setupRequestHandlers(server: Server, tools: Tool[]) {
         mimeType: "image/png",
         name: `Screenshot: ${name}`,
       })),
+    ],
+  }));
+
+  // List resource templates handler
+  server.setRequestHandler(ListResourceTemplatesRequestSchema, async () => ({
+    resourceTemplates: [
+      {
+        uriTemplate: "screenshot://{name}",
+        mimeType: "image/png",
+        name: "Screenshot Resource",
+        description: "Define the uri for the snapshot."
+      },
     ],
   }));
 
