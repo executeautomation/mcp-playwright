@@ -30,7 +30,7 @@ export function setupRequestHandlers(server: Server, tools: Tool[]) {
   server.setRequestHandler(ListResourceTemplatesRequestSchema, async () => ({
     resourceTemplates: [
       {
-        uriTemplate: "screenshot://{name}.png",
+        uriTemplate: "screenshot://{name}",
         mimeType: "image/png",
         name: "Screenshot Resource",
         description: "Define the uri for the snapshot."
