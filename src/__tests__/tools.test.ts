@@ -88,4 +88,12 @@ describe('Tool Definitions', () => {
     expect(saveAsPdfTool!.inputSchema.properties).toHaveProperty('margin');
     expect(saveAsPdfTool!.inputSchema.required).toEqual(['outputPath']);
   });
+
+  test('should validate upload_file tool schema', () => {
+    const uploadFileTool = toolDefinitions.find(tool => tool.name === 'playwright_upload_file');
+    expect(uploadFileTool).toBeDefined();
+    expect(uploadFileTool!.inputSchema.properties).toHaveProperty('selector');
+    expect(uploadFileTool!.inputSchema.properties).toHaveProperty('filePath');
+    expect(uploadFileTool!.inputSchema.required).toEqual(['selector', 'filePath']);
+  });
 }); 

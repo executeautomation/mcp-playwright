@@ -1,4 +1,4 @@
-import { ClickTool,ClickAndSwitchTabTool, FillTool, SelectTool, HoverTool, EvaluateTool, IframeClickTool } from '../../../tools/browser/interaction.js';
+import { ClickTool,ClickAndSwitchTabTool, FillTool, SelectTool, HoverTool, EvaluateTool, IframeClickTool, UploadFileTool } from '../../../tools/browser/interaction.js';
 import { NavigationTool } from '../../../tools/browser/navigation.js';
 import { ToolContext } from '../../../tools/common/types.js';
 import { Page, Browser } from 'playwright';
@@ -9,6 +9,7 @@ const mockPageClick = jest.fn().mockImplementation(() => Promise.resolve());
 const mockPageFill = jest.fn().mockImplementation(() => Promise.resolve());
 const mockPageSelectOption = jest.fn().mockImplementation(() => Promise.resolve());
 const mockPageHover = jest.fn().mockImplementation(() => Promise.resolve());
+const mockPageSetInputFiles = jest.fn().mockImplementation(() => Promise.resolve());
 const mockPageWaitForSelector = jest.fn().mockImplementation(() => Promise.resolve());
 const mockWaitForEvent = jest.fn().mockImplementation(() => Promise.resolve(mockNewPage));
 const mockWaitForLoadState = jest.fn().mockImplementation(() => Promise.resolve());
@@ -29,13 +30,15 @@ const mockLocatorClick = jest.fn().mockImplementation(() => Promise.resolve());
 const mockLocatorFill = jest.fn().mockImplementation(() => Promise.resolve());
 const mockLocatorSelectOption = jest.fn().mockImplementation(() => Promise.resolve());
 const mockLocatorHover = jest.fn().mockImplementation(() => Promise.resolve());
+const mockLocatorUploadFile = jest.fn().mockImplementation(() => Promise.resolve());
 
 // Mock locator
 const mockLocator = jest.fn().mockReturnValue({
   click: mockLocatorClick,
   fill: mockLocatorFill,
   selectOption: mockLocatorSelectOption,
-  hover: mockLocatorHover
+  hover: mockLocatorHover,
+  uploadFile: mockLocatorUploadFile
 });
 
 // Mock iframe locator
@@ -60,6 +63,7 @@ const mockPage = {
   fill: mockPageFill,
   selectOption: mockPageSelectOption,
   hover: mockPageHover,
+  setInputFiles: mockPageSetInputFiles,
   waitForSelector: mockPageWaitForSelector,
   locator: mockLocator,
   frameLocator: mockFrameLocator,
@@ -97,6 +101,7 @@ describe('Browser Interaction Tools', () => {
   let evaluateTool: EvaluateTool;
   let iframeClickTool: IframeClickTool;
   let clickAndSwitchTabTool: ClickAndSwitchTabTool;
+  let uploadFileTool: UploadFileTool;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -107,6 +112,7 @@ describe('Browser Interaction Tools', () => {
     evaluateTool = new EvaluateTool(mockServer);
     iframeClickTool = new IframeClickTool(mockServer);
     clickAndSwitchTabTool = new ClickAndSwitchTabTool(mockServer);
+    uploadFileTool = new UploadFileTool(mockServer);
   });
 
   describe('ClickTool', () => {
@@ -273,6 +279,22 @@ describe('Browser Interaction Tools', () => {
       expect(mockPageHover).toHaveBeenCalledWith('#test-element');
       expect(result.isError).toBe(false);
       expect(result.content[0].text).toContain('Hovered');
+    });
+  });
+
+  describe('UploadFileTool', () => {
+    test('should upload a file to an input element', async () => {
+      const args = {
+        selector: '#file-input',
+        filePath: '/tmp/testfile.txt'
+      };
+
+      const result = await uploadFileTool.execute(args, mockContext);
+
+      expect(mockPageWaitForSelector).toHaveBeenCalledWith('#file-input');
+      expect(mockPageSetInputFiles).toHaveBeenCalledWith('#file-input', '/tmp/testfile.txt');
+      expect(result.isError).toBe(false);
+      expect(result.content[0].text).toContain("Uploaded file '/tmp/testfile.txt' to '#file-input'");
     });
   });
 

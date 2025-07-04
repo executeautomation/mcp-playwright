@@ -209,6 +209,17 @@ Select an element with the `SELECT` tag.
 
 ---
 
+### playwright_upload_file
+Upload a file to an input[type='file'] element on the page.
+
+- **Inputs:**
+  - **`selector`** *(string, required)*:  
+    CSS selector for the file input element.
+  - **`filePath`** *(string, required)*:  
+    Absolute path to the file to upload.
+
+---
+
 ### Playwright_evaluate
 Execute JavaScript in the browser console.
 
@@ -293,9 +304,25 @@ Get the visible text content of the current page.
 ### playwright_get_visible_html
 Get the HTML content of the current page.
 
+- **Inputs:**
+  - **`selector`** *(string, optional)*:  
+    CSS selector to limit the HTML to a specific container. If provided, only returns the HTML for that element.
+  - **`removeScripts`** *(boolean, optional, default: false)*:  
+    Remove all script tags from the HTML to reduce noise.
+  - **`removeComments`** *(boolean, optional, default: false)*:  
+    Remove all HTML comments to clean up the output.
+  - **`removeStyles`** *(boolean, optional, default: false)*:  
+    Remove all style tags from the HTML.
+  - **`removeMeta`** *(boolean, optional, default: false)*:  
+    Remove all meta tags from the HTML head section.
+  - **`minify`** *(boolean, optional, default: false)*:  
+    Minify the HTML output by removing extra whitespace.
+  - **`cleanHtml`** *(boolean, optional, default: false)*:  
+    Convenience option that combines removeScripts, removeComments, removeStyles, and removeMeta for a cleaner HTML output.
+
 - **Response:**
   - **`content`** *(string)*:  
-    The complete HTML content of the current page.
+    The HTML content of the current page, optionally filtered based on the provided parameters.
 
 ---
 

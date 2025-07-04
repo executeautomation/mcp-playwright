@@ -116,6 +116,26 @@ When I extract the HTML content of the page
 Then I should receive the complete HTML structure of the page
 ```
 
+You can also filter HTML content for easier analysis:
+
+```bdd
+Given I navigate to website "https://example.com/products"
+When I extract the HTML content of the page filtered to remove scripts and styles
+Then I should receive clean HTML without JavaScript or CSS code
+
+Given I navigate to website "https://example.com/products"
+When I extract the HTML content of the page filtered to remove meta tags
+Then I should receive HTML without metadata like charset, viewport, and SEO tags
+
+Given I navigate to website "https://example.com/products"
+When I extract the HTML content using the cleanHtml option
+Then I should receive a clean version of the HTML without scripts, styles, comments, and meta tags
+
+Given I navigate to website "https://example.com/products"
+When I extract only the HTML for the main product container using selector "#product-listings"
+Then I should receive just the HTML for the products section for easier analysis
+```
+
 Example use case for content analysis:
 
 ```bdd

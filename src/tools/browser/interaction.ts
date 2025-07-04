@@ -134,6 +134,22 @@ export class HoverTool extends BrowserToolBase {
 }
 
 /**
+ * Tool for uploading files
+ */
+export class UploadFileTool extends BrowserToolBase {
+  /**
+   * Execute the upload file tool
+   */
+  async execute(args: any, context: ToolContext): Promise<ToolResponse> {
+    return this.safeExecute(context, async (page) => {
+        await page.waitForSelector(args.selector);
+        await page.setInputFiles(args.selector, args.filePath);
+        return createSuccessResponse(`Uploaded file '${args.filePath}' to '${args.selector}'`);
+    });
+  }
+}
+
+/**
  * Tool for executing JavaScript in the browser
  */
 export class EvaluateTool extends BrowserToolBase {

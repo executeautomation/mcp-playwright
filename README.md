@@ -126,12 +126,15 @@ OPENAI_API_KEY=your-key  npx mcp-eval src/evals/evals.ts src/tools/codegen/index
 
 ## Resources 
 
+[![MCP Marketplace User Review Rating Badge](https://www.deepnlp.org/api/marketplace/svg?name=executeautomation/mcp-playwright)](https://www.deepnlp.org/store/ai-agent/mcp-server/pub-executeautomation/mcp-playwright)
+
 <details>
+
 <summary><b>Open MCP Marketplace API Support</b></summary>
 
-![MCP Marketplace User Review Rating Badge](http://www.deepnlp.org/api/marketplace/svg?executeautomation/mcp-playwright)|[Reviews](http://www.deepnlp.org/store/ai-agent/mcp-server/pub-executeautomation/mcp-playwright)|[GitHub](https://github.com/AI-Agent-Hub/mcp-marketplace)|[Doc](http://www.deepnlp.org/doc/mcp_marketplace)|[MCP Marketplace](http://www.deepnlp.org/store/ai-agent/mcp-server)
+[Reviews](https://www.deepnlp.org/store/ai-agent/mcp-server/pub-executeautomation/mcp-playwright)|[GitHub](https://github.com/AI-Agent-Hub/mcp-marketplace)|[Doc](http://www.deepnlp.org/doc/mcp_marketplace)|[MCP Marketplace](http://www.deepnlp.org/store/ai-agent/mcp-server)
 
-Allow AI/Agent/LLM to find this MCP Server via common python/typescript API, search and explore relevant servers and tools
+Allow AI/Agent/LLM to find this MCP Server via common python/typescript API, search and explore relevant server meta and tools
 
 ***Example: Search Server and Tools***
 ```python
@@ -145,6 +148,14 @@ tools = mcpm.list_tools(id="executeautomation/mcp-playwright", config_name="deep
 # client = anthropic.Anthropic()
 # response = client.messages.create(model="claude-opus-4-20250514", max_tokens=1024, tools=tools, messages=[])
 ```
+
+</details>
+
+## Contributing
+
+When adding new tools, please be mindful of the tool name length. Some clients, like Cursor, have a 60-character limit for the combined server and tool name (`server_name:tool_name`).
+
+Our server name is `playwright-mcp`. Please ensure your tool names are short enough to not exceed this limit.
 
 
 ## Star History

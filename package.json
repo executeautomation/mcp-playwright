@@ -1,6 +1,6 @@
 {
   "name": "@executeautomation/playwright-mcp-server",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Model Context Protocol servers for Playwright",
   "license": "MIT",
   "author": "ExecuteAutomation, Ltd (https://executeautomation.com)",
@@ -28,12 +28,12 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.11.1",
-    "@playwright/browser-chromium": "1.52.0",
-    "@playwright/browser-firefox": "1.52.0",
-    "@playwright/browser-webkit": "1.52.0",
-    "@playwright/test": "^1.52.0",
+    "@playwright/browser-chromium": "1.53.1",
+    "@playwright/browser-firefox": "1.53.1",
+    "@playwright/browser-webkit": "1.53.1",
+    "@playwright/test": "^1.53.1",
     "mcp-evals": "^1.0.18",
-    "playwright": "1.52.0",
+    "playwright": "1.53.1",
     "uuid": "11.1.0"
   },
   "keywords": [
@@ -49,6 +49,6 @@
     "jest-playwright-preset": "4.0.0",
     "shx": "^0.3.4",
     "ts-jest": "^29.2.6",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.3"
   }
 }

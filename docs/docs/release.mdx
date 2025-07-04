@@ -5,6 +5,23 @@ import YouTubeVideoEmbed from '@site/src/components/HomepageFeatures/YouTubeVide
 
 # Release Notes
 
+## Version 1.0.6
+- **New Tool: `playwright_upload_file`**: Added a new tool to upload files to an `input[type='file']` element.
+- **Enhanced Content Extraction**:
+  - Significantly improved `playwright_get_visible_text` tool for more accurate text extraction.
+  - Added `playwright_get_visible_html` tool to retrieve the full HTML content of the page.
+  - **By default, all `<script>` tags are now removed from the HTML output for `playwright_get_visible_html` (unless `removeScripts: false` is set). Output is also truncated to a safe length (default 20,000 characters) to prevent issues with LLM clients.**
+- **Improved Interactions**:
+  - Updated `playwright_hover` functionality in the interaction tool.
+- **Browser Support**:
+  - Added support for using locally installed browsers by specifying the Chrome executable path.
+- **Documentation Updates**:
+  - Added a new local setup and installation guide.
+  - Updated examples and documentation for the new and improved tools.
+- **Test Coverage**:
+  - Added and updated tests for the new content extraction and interaction features.
+- **Version bump**: Incremented version to 1.0.6.
+
 ## Version 1.0.5
 - **Removed SSE (Server-Sent Events) Support**: All SSE-related code, endpoints, and documentation have been fully removed. The server now only supports STDIO transport for communication with clients.
 - **Codebase Cleanup**: Removed all references to SseServer, /events endpoint, and related event streaming features from the code and documentation.

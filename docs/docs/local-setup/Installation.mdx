@@ -13,11 +13,13 @@ git clone https://github.com/executeautomation/mcp-playwright.git
 
 ## Step 2: Install Dependencies
 ```bash
+cd mcp-playwright
 npm install
 ```
 
 ## Step 3: Build Code
 ```bash
+npm install --save-dev typescript
 npm run build
 npm link
 ```
@@ -25,6 +27,7 @@ npm link
 ## Step 4: Configuring Playwright MCP in Claude Desktop 
 
 Modify your `claude-desktop-config.json` file as shown below to work with local playwright mcp server
+The file is generally located at `C:\Users\{yourusername}\AppData\Roaming\Claude`
 
 ```json
 {
@@ -41,6 +44,10 @@ Modify your `claude-desktop-config.json` file as shown below to work with local 
   }
 }
 ```
+if you are using windows, and let's say your clone directory is `D:/automation/mcp-playwright`, 
+then you should replace "/your-playwright-mcp-server-clone-directory" with `D:/automation/mcp-playwright` 
+not \ but we have to use / for config file.
+
 
 :::warning Important  
 After modifying the `claude-desktop-config.json` file, you **must** completely close Claude Desktop and **manually terminate** any running processes from **Task Manager** (Windows 10/11).  
@@ -52,3 +59,4 @@ After modifying the `claude-desktop-config.json` file, you **must** completely c
 If your setup is all correct, you should see Playwright MCP Server pointing your local machine source code
 
 ![Playwright MCP Server](./img/mcp-server.png)
+![Playwright MCP Server running](./img/mcp-server-running.png)
