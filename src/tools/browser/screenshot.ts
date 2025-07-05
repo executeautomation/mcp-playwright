@@ -10,7 +10,7 @@ const defaultDownloadsPath = path.join(os.homedir(), 'Downloads');
 /**
  * Tool for taking screenshots of pages or elements
  */
-export class ScreenshotTool extends BrowserToolBase {
+export class AdvancedScreenshotTool extends BrowserToolBase {
   private screenshots = new Map<string, string>();
 
   /**

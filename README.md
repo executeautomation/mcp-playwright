@@ -1,135 +1,378 @@
-<div align="center" markdown="1">
-  <table>
-    <tr>
-      <td align="center" valign="middle">
-        <a href="https://mseep.ai/app/executeautomation-mcp-playwright">
-          <img src="https://mseep.net/pr/executeautomation-mcp-playwright-badge.png" alt="MseeP.ai Security Assessment Badge" height="80"/>
-        </a>
-      </td>
-      <td align="center" valign="middle">
-        <a href="https://www.warp.dev/?utm_source=github&utm_medium=referral&utm_campaign=mcp-playwright">
-          <img alt="Warp sponsorship" width="200" src="https://github.com/user-attachments/assets/ab8dd143-b0fd-4904-bdc5-dd7ecac94eae"/>
-        </a>
-      </td>
-    </tr>
-    <tr>
-      <td align="center"><sub>MseeP.ai Security Assessment</sub></td>
-      <td align="center"><sub>Special thanks to <a href="https://www.warp.dev/?utm_source=github&utm_medium=referral&utm_campaign=mcp-playwright">Warp, the AI terminal for developers</a></sub></td>
-    </tr>
-  </table>
-</div>
-<hr>
 
-# Playwright MCP Server 🎭
+# mcp-playwright_Mod - Extended Playwright MCP Server
 
-[![smithery badge](https://smithery.ai/badge/@executeautomation/playwright-mcp-server)](https://smithery.ai/server/@executeautomation/playwright-mcp-server)
+A comprehensive Model Context Protocol (MCP) server that provides extensive browser automation capabilities using Playwright. This extended version includes advanced features for Shadow DOM interaction, mobile testing, accessibility testing, performance monitoring, and much more.
 
-A Model Context Protocol server that provides browser automation capabilities using Playwright. This server enables LLMs to interact with web pages, take screenshots, generate test code, web scraps the page and execute JavaScript in a real browser environment.
+## 🚀 Features
 
-<a href="https://glama.ai/mcp/servers/yh4lgtwgbe"><img width="380" height="200" src="https://glama.ai/mcp/servers/yh4lgtwgbe/badge" alt="mcp-playwright MCP server" /></a>
+### Core Browser Automation
+- **Navigation**: Go to URLs, back/forward navigation, page reload
+- **Element Interaction**: Click, fill forms, hover, drag & drop, file uploads
+- **Content Extraction**: Get text, HTML, attributes, page title, current URL
+- **Screenshots**: Full page or element-specific screenshots
+- **Waiting**: Wait for elements, timeouts, and custom conditions
 
-## Screenshot
-![Playwright + Claude](image/playwright_claude.png)
+### 🔍 Advanced Shadow DOM Support
+- **Shadow DOM Analysis**: Comprehensive analysis of Shadow DOM structures with CSS and XPath selectors
+- **Shadow DOM Interaction**: Direct interaction with elements inside Shadow DOM
+- **Automatic Piercing**: Leverage Playwright's built-in Shadow DOM piercing capabilities
+- **Extended Selector Support**: Enhanced selectors that work across shadow boundaries
 
-## [Documentation](https://executeautomation.github.io/mcp-playwright/) | [API reference](https://executeautomation.github.io/mcp-playwright/docs/playwright-web/Supported-Tools)
+### 📱 Mobile & Touch Testing
+- **Device Emulation**: Emulate popular mobile devices (iPhone, Android, iPad)
+- **Touch Gestures**: Tap, swipe, pinch, long press, and multi-touch gestures
+- **Mobile Interactions**: Orientation changes, geolocation, network simulation
+- **Responsive Testing**: Custom viewport configurations
 
-## Installation
+### 🎯 Enhanced Dropdown Support
+- **Advanced Dropdowns**: Multiple selection methods (by value, label, index)
+- **Custom Dropdowns**: Support for non-select element dropdowns
+- **Dropdown Analysis**: Comprehensive dropdown structure analysis
+- **Multi-select Support**: Handle multiple selections in dropdowns
 
-You can install the package using either npm, mcp-get, or Smithery:
+### 🌐 Network Control
+- **Request Interception**: Mock, block, modify, or delay network requests
+- **Network Monitoring**: Capture and analyze network traffic
+- **WebSocket Support**: Monitor and mock WebSocket connections
+- **HAR Integration**: Record and replay network interactions
 
-Using npm:
-```bash
-npm install -g @executeautomation/playwright-mcp-server
-```
+### 💾 Storage Management
+- **Cookie Management**: Full CRUD operations for cookies with import/export
+- **Local Storage**: Complete localStorage management
+- **Session Storage**: Full sessionStorage control
+- **Storage State**: Save and restore complete browser state
 
-Using mcp-get:
-```bash
-npx @michaellatman/mcp-get@latest install @executeautomation/playwright-mcp-server
-```
-Using Smithery
+### ♿ Accessibility Testing
+- **axe-core Integration**: Comprehensive accessibility testing with WCAG compliance
+- **Accessibility Tree**: Analyze and navigate the accessibility tree
+- **Keyboard Navigation**: Test tab sequences and focus management
+- **ARIA Support**: Find elements by accessibility roles and properties
 
-To install Playwright MCP for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@executeautomation/playwright-mcp-server):
+### ⚡ Performance Monitoring
+- **Core Web Vitals**: Measure LCP, FID, CLS, and other performance metrics
+- **Resource Timing**: Analyze network resource performance
+- **Memory Monitoring**: Track JavaScript heap usage and memory leaks
+- **Lighthouse Audits**: Basic Lighthouse-style performance audits
 
-```bash
-npx @smithery/cli install @executeautomation/playwright-mcp-server --client claude
-```
-#### Installation in VS Code
+### 🐛 Advanced Debugging
+- **Tracing**: Record detailed execution traces with screenshots
+- **Console Capture**: Monitor and capture console messages and errors
+- **Step Debugging**: Step-by-step execution with visual feedback
+- **DevTools Integration**: Chrome DevTools Protocol integration
+- **Element Inspection**: Detailed element debugging and analysis
 
-Install the Playwright MCP server in VS Code using one of these buttons:
+### 🔧 Code Generation
+- **Test Recording**: Record user interactions and generate Playwright test code
+- **Multiple Formats**: Support for different test frameworks and languages
+- **Smart Selectors**: Generate robust, maintainable selectors
 
-<!--
-// Generate using?:
-const config = JSON.stringify({ name: 'playwright', command: 'npx', args: ["-y", "@executeautomation/playwright-mcp-server"] });
-const urlForWebsites = `vscode:mcp/install?${encodeURIComponent(config)}`;
-// Github markdown does not allow linking to `vscode:` directly, so you can use our redirect:
-const urlForGithub = `https://insiders.vscode.dev/redirect?url=${encodeURIComponent(urlForWebsites)}`;
--->
-
-[<img src="https://img.shields.io/badge/VS_Code-VS_Code?style=flat-square&label=Install%20Server&color=0098FF" alt="Install in VS Code">](https://insiders.vscode.dev/redirect?url=vscode%3Amcp%2Finstall%3F%257B%2522name%2522%253A%2522playwright%2522%252C%2522command%2522%253A%2522npx%2522%252C%2522args%2522%253A%255B%2522-y%2522%252C%2522%2540executeautomation%252Fplaywright-mcp-server%2522%255D%257D) 
-[<img alt="Install in VS Code Insiders" src="https://img.shields.io/badge/VS_Code_Insiders-VS_Code_Insiders?style=flat-square&label=Install%20Server&color=24bfa5">](https://insiders.vscode.dev/redirect?url=vscode-insiders%3Amcp%2Finstall%3F%257B%2522name%2522%253A%2522playwright%2522%252C%2522command%2522%253A%2522npx%2522%252C%2522args%2522%253A%255B%2522-y%2522%252C%2522%2540executeautomation%252Fplaywright-mcp-server%2522%255D%257D)
-
-Alternatively, you can install the Playwright MCP server using the VS Code CLI:
+## 📦 Installation
 
 ```bash
-# For VS Code
-code --add-mcp '{"name":"playwright","command":"npx","args":["@executeautomation/playwright-mcp-server"]}'
+npm install
 ```
 
-```bash
-# For VS Code Insiders
-code-insiders --add-mcp '{"name":"playwright","command":"npx","args":["@executeautomation/playwright-mcp-server"]}'
-```
+## 🔧 Configuration
 
-After installation, the ExecuteAutomation Playwright MCP server will be available for use with your GitHub Copilot agent in VS Code.
-
-## Configuration to use Playwright Server
-Here's the Claude Desktop configuration to use the Playwright server:
+Create or update your MCP configuration file:
 
 ```json
 {
   "mcpServers": {
-    "playwright": {
-      "command": "npx",
-      "args": ["-y", "@executeautomation/playwright-mcp-server"]
+    "playwright_mod": {
+      "command": "node",
+      "args": ["path/to/mcp-playwright_Mod/build/index.js"],
+      "env": {
+        "HEADLESS": "false"
+      }
     }
   }
 }
 ```
 
-## Testing
+### Environment Variables
 
-This project uses Jest for testing. The tests are located in the `src/__tests__` directory.
+- `HEADLESS`: Set to "false" to run browser in headed mode (default: "true")
+- `BROWSER`: Browser to use - "chromium", "firefox", or "webkit" (default: "chromium")
+- `VIEWPORT_WIDTH`: Default viewport width (default: 1280)
+- `VIEWPORT_HEIGHT`: Default viewport height (default: 720)
 
-### Running Tests
+## 🛠️ Usage Examples
 
-You can run the tests using one of the following commands:
+### Basic Navigation and Interaction
 
-```bash
-# Run tests using the custom script (with coverage)
-node run-tests.cjs
+```javascript
+// Navigate to a website
+await goto({ url: "https://example.com" });
 
-# Run tests using npm scripts
-npm test           # Run tests without coverage
-npm run test:coverage  # Run tests with coverage
-npm run test:custom    # Run tests with custom script (same as node run-tests.cjs)
+// Fill a form and submit
+await fill({ selector: "#username", value: "user@example.com" });
+await fill({ selector: "#password", value: "password123" });
+await click({ selector: "button[type='submit']" });
+
+// Take a screenshot
+await screenshot({ path: "result.png", fullPage: true });
 ```
 
-The test coverage report will be generated in the `coverage` directory.
+### Shadow DOM Interaction
 
-### Running evals
+```javascript
+// Analyze Shadow DOM structure
+await analyze_shadow_dom({ tagNames: ["custom-element"] });
 
-The evals package loads an mcp client that then runs the index.ts file, so there is no need to rebuild between tests. You can load environment variables by prefixing the npx command. Full documentation can be found [here](https://www.mcpevals.io/docs).
+// Interact with Shadow DOM elements
+await interact_shadow_dom({
+  hostSelector: "custom-element",
+  shadowSelector: "button.internal",
+  action: "click"
+});
 
-```bash
-OPENAI_API_KEY=your-key  npx mcp-eval src/evals/evals.ts src/tools/codegen/index.ts
+// Use Playwright's automatic piercing
+await pierce_shadow_dom({
+  selector: "custom-element button.internal",
+  action: "click"
+});
 ```
 
-## Contributing
+### Mobile Testing
 
-When adding new tools, please be mindful of the tool name length. Some clients, like Cursor, have a 60-character limit for the combined server and tool name (`server_name:tool_name`).
+```javascript
+// Emulate iPhone
+await mobile_emulation({ device: "iPhone 13" });
 
-Our server name is `playwright-mcp`. Please ensure your tool names are short enough to not exceed this limit.
+// Perform touch gestures
+await touch_gesture({
+  gesture: "swipe",
+  coordinates: {
+    startX: 100, startY: 300,
+    endX: 300, endY: 300
+  }
+});
 
-## Star History
+// Test orientation changes
+await mobile_interaction({
+  action: "setOrientation",
+  options: { orientation: "landscape" }
+});
+```
 
-[![Star History Chart](https://api.star-history.com/svg?repos=executeautomation/mcp-playwright&type=Date)](https://star-history.com/#executeautomation/mcp-playwright&Date)
+### Advanced Dropdown Handling
+
+```javascript
+// Analyze dropdown structure
+await analyze_dropdown({ selector: "#country-select" });
+
+// Select by different methods
+await advanced_dropdown({
+  selector: "#country-select",
+  action: "selectByLabel",
+  options: { label: "United States" }
+});
+
+// Handle custom dropdowns
+await custom_dropdown({
+  triggerSelector: ".custom-dropdown-trigger",
+  optionSelector: ".dropdown-option",
+  optionText: "Option 2"
+});
+```
+
+### Network Control
+
+```javascript
+// Mock API responses
+await network_interception({
+  action: "mock",
+  pattern: "**/api/users",
+  response: {
+    status: 200,
+    body: JSON.stringify({ users: [] }),
+    contentType: "application/json"
+  }
+});
+
+// Monitor network requests
+await network_monitor({ action: "startMonitoring" });
+await network_monitor({
+  action: "waitForRequest",
+  options: { urlPattern: "/api/data" }
+});
+```
+
+### Accessibility Testing
+
+```javascript
+// Run accessibility scan
+await accessibility_test({
+  action: "scan",
+  options: {
+    tags: ["wcag2a", "wcag2aa"],
+    include: "main"
+  }
+});
+
+// Test keyboard navigation
+await keyboard_navigation({ action: "tabSequence" });
+
+// Find elements by accessibility role
+await accessibility_tree({
+  action: "findByRole",
+  role: "button",
+  name: "Submit"
+});
+```
+
+### Performance Monitoring
+
+```javascript
+// Start performance tracing
+await performance_monitor({
+  action: "startTracing",
+  options: { screenshots: true }
+});
+
+// Get Core Web Vitals
+await performance_monitor({ action: "getCoreWebVitals" });
+
+// Monitor memory usage
+await resource_monitor({ action: "memoryUsage" });
+
+// Stop tracing
+await performance_monitor({ action: "stopTracing" });
+```
+
+### Debugging
+
+```javascript
+// Start step-by-step debugging
+await step_debugger({ action: "pause" });
+
+// Inspect an element
+await debug_tracing({
+  action: "debugElement",
+  options: { selector: "#problematic-element" }
+});
+
+// Capture console logs
+await debug_tracing({ action: "captureConsole" });
+await debug_tracing({ action: "getConsoleLogs" });
+```
+
+## 🏗️ Architecture
+
+The server is built with a modular architecture:
+
+```
+src/
+├── tools/
+│   ├── browser/
+│   │   ├── navigation.ts      # Navigation tools
+│   │   ├── interaction.ts     # Basic interactions
+│   │   ├── shadowdom.ts       # Shadow DOM tools
+│   │   ├── dropdown.ts        # Dropdown tools
+│   │   ├── mobile.ts          # Mobile & touch tools
+│   │   ├── network.ts         # Network tools
+│   │   ├── storage.ts         # Storage management
+│   │   ├── accessibility.ts   # Accessibility tools
+│   │   ├── performance.ts     # Performance monitoring
+│   │   ├── debugging.ts       # Debugging tools
+│   │   └── output.ts          # Output & extraction
+│   ├── codegen/              # Code generation
+│   └── common/               # Shared utilities
+├── requestHandler.ts         # Main request handler
+└── tools.ts                 # Tool definitions
+```
+
+## 🔄 Merge Strategy
+
+This extended version is designed to be easily mergeable with updates from the original repository:
+
+1. **Modular Extensions**: New features are in separate files
+2. **Non-Breaking Changes**: Existing APIs remain unchanged
+3. **Additive Approach**: Only adds new tools, doesn't modify existing ones
+4. **Clear Separation**: Extended tools are clearly marked and documented
+
+To merge updates from the original repository:
+
+```bash
+# Add original repository as upstream
+git remote add upstream https://github.com/original/mcp-playwright.git
+
+# Fetch latest changes
+git fetch upstream
+
+# Merge changes (resolve conflicts in favor of extensions)
+git merge upstream/main
+```
+
+## 🧪 Testing
+
+```bash
+# Run all tests
+npm test
+
+# Run specific test suites
+npm run test:browser
+npm run test:mobile
+npm run test:accessibility
+npm run test:performance
+
+# Run with coverage
+npm run test:coverage
+```
+
+## 📚 API Reference
+
+### Tool Categories
+
+1. **Navigation Tools**: `goto`, `go_back`, `go_forward`, `reload`
+2. **Interaction Tools**: `click`, `fill`, `select`, `hover`, `drag`, `upload_file`
+3. **Shadow DOM Tools**: `analyze_shadow_dom`, `interact_shadow_dom`, `pierce_shadow_dom`
+4. **Dropdown Tools**: `advanced_dropdown`, `custom_dropdown`, `analyze_dropdown`
+5. **Mobile Tools**: `mobile_emulation`, `touch_gesture`, `mobile_interaction`
+6. **Network Tools**: `network_interception`, `network_monitor`, `websocket_tool`
+7. **Storage Tools**: `cookie_management`, `local_storage`, `session_storage`, `storage_state`
+8. **Accessibility Tools**: `accessibility_test`, `accessibility_tree`, `keyboard_navigation`
+9. **Performance Tools**: `performance_monitor`, `lighthouse_audit`, `resource_monitor`
+10. **Debugging Tools**: `debug_tracing`, `step_debugger`, `devtools_integration`
+11. **Output Tools**: `screenshot`, `get_page_content`, `get_text_content`, etc.
+
+### Error Handling
+
+All tools include comprehensive error handling with detailed error messages and suggestions for resolution.
+
+### Timeouts
+
+Default timeouts can be configured globally or per-tool:
+- Element interactions: 30 seconds
+- Network requests: 30 seconds
+- Page loads: 30 seconds
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Add tests for new functionality
+4. Ensure all tests pass
+5. Submit a pull request
+
+## 📄 License
+
+MIT License - see LICENSE file for details.
+
+## 🔗 Related Projects
+
+- [Playwright](https://playwright.dev/) - The underlying browser automation library
+- [MCP SDK](https://github.com/modelcontextprotocol/sdk) - Model Context Protocol SDK
+- [axe-core](https://github.com/dequelabs/axe-core) - Accessibility testing engine
+
+## 📞 Support
+
+For issues and questions:
+1. Check the [documentation](./docs/)
+2. Search existing [issues](../../issues)
+3. Create a new issue with detailed reproduction steps
+
+---
+
+**Note**: This is an extended version of the original mcp-playwright server with comprehensive additional features for modern web testing needs.
