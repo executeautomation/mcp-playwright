@@ -1,3 +1,4 @@
+
 import type { Browser, Page } from 'playwright';
 import { chromium, firefox, webkit, request } from 'playwright';
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
@@ -12,8 +13,6 @@ import {
 } from './tools/codegen/index.js';
 import { 
   ScreenshotTool,
-  NavigationTool,
-  CloseBrowserTool,
   ConsoleLogsTool,
   ExpectResponseTool,
   AssertResponseTool,
@@ -40,9 +39,9 @@ import {
   PatchRequestTool,
   DeleteRequestTool
 } from './tools/api/requests.js';
-import { GoBackTool, GoForwardTool } from './tools/browser/navigation.js';
+import { GoBackTool, GoForwardTool, GotoTool, ReloadTool } from './tools/browser/navigation.js';
 import { DragTool, PressKeyTool } from './tools/browser/interaction.js';
-import { SaveAsPdfTool } from './tools/browser/output.js';
+
 import { ClickAndSwitchTabTool } from './tools/browser/interaction.js';
 
 // Global state
@@ -59,6 +58,7 @@ export function resetBrowserState() {
   page = undefined;
   currentBrowserType = 'chromium';
 }
+
 /**
  * Sets the provided page to the global page variable
  * @param newPage The Page object to set as the global page
@@ -68,10 +68,18 @@ export function setGlobalPage(newPage: Page): void {
   page.bringToFront();// Bring the new tab to the front
   console.log("Global page has been updated.");
 }
+
+/**
+ * Gets the global page instance
+ */
+export function getGlobalPage(): Page | undefined {
+  return page;
+}
+
 // Tool instances
 let screenshotTool: ScreenshotTool;
-let navigationTool: NavigationTool;
-let closeBrowserTool: CloseBrowserTool;
+let gotoTool: GotoTool;
+let reloadTool: ReloadTool;
 let consoleLogsTool: ConsoleLogsTool;
 let clickTool: ClickTool;
 let iframeClickTool: IframeClickTool;
@@ -98,7 +106,7 @@ let goBackTool: GoBackTool;
 let goForwardTool: GoForwardTool;
 let dragTool: DragTool;
 let pressKeyTool: PressKeyTool;
-let saveAsPdfTool: SaveAsPdfTool;
+
 let clickAndSwitchTabTool: ClickAndSwitchTabTool;
 
 
@@ -112,7 +120,7 @@ interface BrowserSettings {
   browserType?: 'chromium' | 'firefox' | 'webkit';
 }
 
-async function registerConsoleMessage(page) {
+async function registerConsoleMessage(page: Page) {
   page.on("console", (msg) => {
     if (consoleLogsTool) {
       const type = msg.type();
@@ -315,8 +323,8 @@ async function ensureApiContext(url: string) {
 function initializeTools(server: any) {
   // Browser tools
   if (!screenshotTool) screenshotTool = new ScreenshotTool(server);
-  if (!navigationTool) navigationTool = new NavigationTool(server);
-  if (!closeBrowserTool) closeBrowserTool = new CloseBrowserTool(server);
+  if (!gotoTool) gotoTool = new GotoTool(server);
+  if (!reloadTool) reloadTool = new ReloadTool(server);
   if (!consoleLogsTool) consoleLogsTool = new ConsoleLogsTool(server);
   if (!clickTool) clickTool = new ClickTool(server);
   if (!iframeClickTool) iframeClickTool = new IframeClickTool(server);
@@ -344,7 +352,7 @@ function initializeTools(server: any) {
   if (!goForwardTool) goForwardTool = new GoForwardTool(server);
   if (!dragTool) dragTool = new DragTool(server);
   if (!pressKeyTool) pressKeyTool = new PressKeyTool(server);
-  if (!saveAsPdfTool) saveAsPdfTool = new SaveAsPdfTool(server);
+
   if (!clickAndSwitchTabTool) clickAndSwitchTabTool = new ClickAndSwitchTabTool(server);
 }
 
@@ -470,13 +478,13 @@ export async function handleToolCall(
     switch (name) {
       // Browser tools
       case "playwright_navigate":
-        return await navigationTool.execute(args, context);
+        return await gotoTool.execute(args, context);
         
       case "playwright_screenshot":
         return await screenshotTool.execute(args, context);
         
       case "playwright_close":
-        return await closeBrowserTool.execute(args, context);
+        return await reloadTool.execute(args, context);
         
       case "playwright_console_logs":
         return await consoleLogsTool.execute(args, context);
@@ -546,7 +554,7 @@ export async function handleToolCall(
       case "playwright_press_key":
         return await pressKeyTool.execute(args, context);
       case "playwright_save_as_pdf":
-        return await saveAsPdfTool.execute(args, context);
+        return await screenshotTool.execute(args, context);
       case "playwright_click_and_switch_tab":
         return await clickAndSwitchTabTool.execute(args, context);
       

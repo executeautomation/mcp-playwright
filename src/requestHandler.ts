@@ -1,69 +1,41 @@
+
+import { CallToolRequest, CallToolResult, Tool } from "@modelcontextprotocol/sdk/types.js";
+import { ListToolsRequestSchema, CallToolRequestSchema } from "@modelcontextprotocol/sdk/types.js";
+import { createToolDefinitions } from "./tools.js";
+import { ToolContext, createErrorResponse } from "./tools/common/types.js";
+import { handleToolCall as toolHandlerCall } from "./toolHandler.js";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { 
-  ListResourcesRequestSchema, 
-  ReadResourceRequestSchema, 
-  ListToolsRequestSchema, 
-  CallToolRequestSchema,
-  Tool
-} from "@modelcontextprotocol/sdk/types.js";
-import { handleToolCall, getConsoleLogs, getScreenshots } from "./toolHandler.js";
 
-export function setupRequestHandlers(server: Server, tools: Tool[]) {
-  // List resources handler
-  server.setRequestHandler(ListResourcesRequestSchema, async () => ({
-    resources: [
-      {
-        uri: "console://logs",
-        mimeType: "text/plain",
-        name: "Browser console logs",
-      },
-      ...Array.from(getScreenshots().keys()).map(name => ({
-        uri: `screenshot://${name}`,
-        mimeType: "image/png",
-        name: `Screenshot: ${name}`,
-      })),
-    ],
-  }));
+export async function handleToolCall(request: CallToolRequest): Promise<CallToolResult> {
+  const { name, arguments: args } = request.params;
+  
+  try {
+    // Delegate to the existing tool handler
+    return await toolHandlerCall(name, args || {}, null);
+  } catch (error) {
+    console.error(`Error executing tool ${name}:`, error);
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Error executing tool ${name}: ${error instanceof Error ? error.message : String(error)}`
+        }
+      ],
+      isError: true
+    };
+  }
+}
 
-  // Read resource handler
-  server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
-    const uri = request.params.uri.toString();
+export function getAvailableTools(): Tool[] {
+  return createToolDefinitions();
+}
 
-    if (uri === "console://logs") {
-      const logs = getConsoleLogs().join("\n");
-      return {
-        contents: [{
-          uri,
-          mimeType: "text/plain",
-          text: logs,
-        }],
-      };
-    }
-
-    if (uri.startsWith("screenshot://")) {
-      const name = uri.split("://")[1];
-      const screenshot = getScreenshots().get(name);
-      if (screenshot) {
-        return {
-          contents: [{
-            uri,
-            mimeType: "image/png",
-            blob: screenshot,
-          }],
-        };
-      }
-    }
-
-    throw new Error(`Resource not found: ${uri}`);
-  });
-
-  // List tools handler
+export function setupRequestHandlers(server: Server, tools: Tool[]): void {
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
-    tools: tools,
+    tools: tools
   }));
 
-  // Call tool handler
-  server.setRequestHandler(CallToolRequestSchema, async (request) =>
-    handleToolCall(request.params.name, request.params.arguments ?? {}, server)
-  );
+  server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    return await handleToolCall(request as CallToolRequest);
+  });
 }
