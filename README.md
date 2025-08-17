@@ -22,6 +22,7 @@
 
 # Playwright MCP Server 🎭
 
+[![Trust Score](https://archestra.ai/mcp-catalog/api/badge/quality/executeautomation/mcp-playwright)](https://archestra.ai/mcp-catalog/executeautomation__mcp-playwright)
 [![smithery badge](https://smithery.ai/badge/@executeautomation/playwright-mcp-server)](https://smithery.ai/server/@executeautomation/playwright-mcp-server)
 
 A Model Context Protocol server that provides browser automation capabilities using Playwright. This server enables LLMs to interact with web pages, take screenshots, generate test code, web scraps the page and execute JavaScript in a real browser environment.
