@@ -4,7 +4,8 @@ import {
   ReadResourceRequestSchema,
   ListToolsRequestSchema,
   CallToolRequestSchema,
-  Tool
+  Tool,
+  McpError
 } from "@modelcontextprotocol/sdk/types.js";
 import { handleToolCall, getConsoleLogs, getScreenshots } from "./toolHandler.js";
 
@@ -124,13 +125,11 @@ export function setupRequestHandlers(server: Server, tools: Tool[]) {
     // Validate parameters before execution
     const validation = validateToolParameters(toolName, args, tools);
     if (!validation.valid) {
-      return {
-        content: [{
-          type: "text",
-          text: validation.error || "Parameter validation failed",
-        }],
-        isError: true,
-      };
+      // Throw McpError with Invalid params error code (-32602)
+      throw new McpError(
+        -32602,
+        validation.error || "Parameter validation failed"
+      );
     }
 
     return handleToolCall(toolName, args, server);
