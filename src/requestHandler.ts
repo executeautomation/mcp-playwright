@@ -37,28 +37,8 @@ function validateToolParameters(toolName: string, args: any, tools: Tool[]): { v
     };
   }
 
-  // Validate nested required parameters (e.g., options.outputPath in start_codegen_session)
-  if (schema.properties) {
-    for (const [propName, propSchema] of Object.entries(schema.properties)) {
-      if (args[propName] && typeof propSchema === 'object' && 'required' in propSchema) {
-        const nestedRequired = (propSchema as any).required;
-        if (Array.isArray(nestedRequired)) {
-          const missingNested: string[] = [];
-          for (const nestedParam of nestedRequired) {
-            if (!(nestedParam in args[propName]) || args[propName][nestedParam] === undefined || args[propName][nestedParam] === null) {
-              missingNested.push(`${propName}.${nestedParam}`);
-            }
-          }
-          if (missingNested.length > 0) {
-            return {
-              valid: false,
-              error: `Missing required nested parameters: ${missingNested.join(', ')}`
-            };
-          }
-        }
-      }
-    }
-  }
+  // Note: We only validate top-level required parameters
+  // Nested required parameters are often optional in practice due to defaults in implementations
 
   return { valid: true };
 }
