@@ -155,7 +155,7 @@ To use the Dockerized server with Claude Desktop or other MCP clients, you can c
 }
 ```
 
-**Note**: The Docker image uses Alpine Linux and includes only the core dependencies. Playwright browsers are not pre-installed in the container to keep the image size small. The browsers will be downloaded on first use if needed.
+**Note**: The Docker image uses a Debian-based slim Node.js image and includes only the core dependencies. Playwright browsers are not pre-installed in the container to keep the image size small. The browsers will be downloaded on first use if needed.
 
 ## Testing
 

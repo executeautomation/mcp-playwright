@@ -225,8 +225,8 @@ services:
 ## Image Size Optimization
 
 The current Dockerfile is optimized for size:
-- Uses Alpine Linux base image (~50MB)
-- Multi-stage build support (when building from source)
+- Uses Debian-based slim Node.js image (~200MB)
+- Copies pre-built artifacts from host
 - Production dependencies only
 - Skips browser downloads by default
 
