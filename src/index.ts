@@ -27,15 +27,15 @@ async function runServer() {
 
   // Graceful shutdown logic
   function shutdown() {
-    console.log('Shutdown signal received');
     process.exit(0);
   }
 
   process.on('SIGINT', shutdown);
   process.on('SIGTERM', shutdown);
   process.on('exit', shutdown);
-  process.on('uncaughtException', (err) => {
-    console.error('Uncaught Exception:', err);
+  process.on('uncaughtException', () => {
+    // Silent handling to avoid STDIO interference
+    process.exit(1);
   });
 
   // Create transport and connect
@@ -43,7 +43,6 @@ async function runServer() {
   await server.connect(transport);
 }
 
-runServer().catch((error) => {
-  console.error("Fatal error in main():", error);
+runServer().catch(() => {
   process.exit(1);
 });

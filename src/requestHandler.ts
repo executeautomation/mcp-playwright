@@ -1,12 +1,47 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { 
-  ListResourcesRequestSchema, 
-  ReadResourceRequestSchema, 
-  ListToolsRequestSchema, 
+import {
+  ListResourcesRequestSchema,
+  ReadResourceRequestSchema,
+  ListToolsRequestSchema,
   CallToolRequestSchema,
-  Tool
+  Tool,
+  McpError
 } from "@modelcontextprotocol/sdk/types.js";
 import { handleToolCall, getConsoleLogs, getScreenshots } from "./toolHandler.js";
+
+/**
+ * Validates that required parameters are present in the arguments
+ */
+function validateToolParameters(toolName: string, args: any, tools: Tool[]): { valid: boolean; error?: string } {
+  const tool = tools.find(t => t.name === toolName);
+  if (!tool) {
+    return { valid: false, error: `Unknown tool: ${toolName}` };
+  }
+
+  const schema = tool.inputSchema;
+  if (!schema || !schema.required || !Array.isArray(schema.required) || schema.required.length === 0) {
+    return { valid: true };
+  }
+
+  const missingParams: string[] = [];
+  for (const requiredParam of schema.required) {
+    if (!(requiredParam in args) || args[requiredParam] === undefined || args[requiredParam] === null) {
+      missingParams.push(String(requiredParam));
+    }
+  }
+
+  if (missingParams.length > 0) {
+    return {
+      valid: false,
+      error: `Missing required parameters: ${missingParams.join(', ')}`
+    };
+  }
+
+  // Note: We only validate top-level required parameters
+  // Nested required parameters are often optional in practice due to defaults in implementations
+
+  return { valid: true };
+}
 
 export function setupRequestHandlers(server: Server, tools: Tool[]) {
   // List resources handler
@@ -63,7 +98,20 @@ export function setupRequestHandlers(server: Server, tools: Tool[]) {
   }));
 
   // Call tool handler
-  server.setRequestHandler(CallToolRequestSchema, async (request) =>
-    handleToolCall(request.params.name, request.params.arguments ?? {}, server)
-  );
+  server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    const toolName = request.params.name;
+    const args = request.params.arguments ?? {};
+
+    // Validate parameters before execution
+    const validation = validateToolParameters(toolName, args, tools);
+    if (!validation.valid) {
+      // Throw McpError with Invalid params error code (-32602)
+      throw new McpError(
+        -32602,
+        validation.error || "Parameter validation failed"
+      );
+    }
+
+    return handleToolCall(toolName, args, server);
+  });
 }
