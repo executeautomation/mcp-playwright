@@ -17,7 +17,9 @@ import {
   ConsoleLogsTool,
   ExpectResponseTool,
   AssertResponseTool,
-  CustomUserAgentTool
+  CustomUserAgentTool,
+  StartVideoRecordingTool,
+  StopVideoRecordingTool
 } from './tools/browser/index.js';
 import {
   ClickTool,
@@ -100,6 +102,8 @@ let dragTool: DragTool;
 let pressKeyTool: PressKeyTool;
 let saveAsPdfTool: SaveAsPdfTool;
 let clickAndSwitchTabTool: ClickAndSwitchTabTool;
+let startVideoRecordingTool: StartVideoRecordingTool;
+let stopVideoRecordingTool: StopVideoRecordingTool;
 
 
 interface BrowserSettings {
@@ -346,6 +350,8 @@ function initializeTools(server: any) {
   if (!pressKeyTool) pressKeyTool = new PressKeyTool(server);
   if (!saveAsPdfTool) saveAsPdfTool = new SaveAsPdfTool(server);
   if (!clickAndSwitchTabTool) clickAndSwitchTabTool = new ClickAndSwitchTabTool(server);
+  if (!startVideoRecordingTool) startVideoRecordingTool = new StartVideoRecordingTool(server);
+  if (!stopVideoRecordingTool) stopVideoRecordingTool = new StopVideoRecordingTool(server);
 }
 
 /**
@@ -550,6 +556,12 @@ export async function handleToolCall(
       case "playwright_click_and_switch_tab":
         return await clickAndSwitchTabTool.execute(args, context);
       
+      case "playwright_start_video":
+        return await startVideoRecordingTool.execute(args, context);
+        
+      case "playwright_stop_video":
+        return await stopVideoRecordingTool.execute(args, context);
+        
       default:
         return {
           content: [{

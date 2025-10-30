@@ -1,0 +1,95 @@
+# Recording Videos
+
+The MCP Playwright server supports recording videos of browser sessions. This feature is useful for debugging, documentation, and creating demos.
+
+## Starting Video Recording
+
+To start recording a video, use the `playwright_start_video` tool:
+
+```json
+{
+  "name": "playwright_start_video",
+  "parameters": {
+    "path": "/path/to/save/videos", // Optional - defaults to user's Videos folder
+    "width": 1280,                  // Optional - defaults to 1280
+    "height": 720                   // Optional - defaults to 720
+  }
+}
+```
+
+When you start video recording:
+
+1. The current browser session is closed
+2. A new browser session with video recording enabled is created
+3. If you were on a specific URL, the new session will navigate back to it
+
+## Stopping Video Recording
+
+To stop recording and save the video file, use the `playwright_stop_video` tool:
+
+```json
+{
+  "name": "playwright_stop_video",
+  "parameters": {}
+}
+```
+
+When you stop video recording:
+
+1. The current browser context is closed, which automatically saves the video
+2. A new browser context without video recording is created
+3. If you were on a specific URL, the new session will navigate back to it
+
+## Video Format and Location
+
+- Videos are saved in the WebM format
+- By default, videos are saved to the user's Videos folder
+- Each page in a browser context creates its own video file
+- Video files are named automatically with a timestamp
+- The resolution is determined by the width and height parameters (default: 1280x720)
+
+## Example Usage
+
+Here's a complete example of starting a browser session, recording a video, and then stopping the recording:
+
+```json
+// First, navigate to a website
+{
+  "name": "playwright_navigate",
+  "parameters": {
+    "url": "https://example.com"
+  }
+}
+
+// Start video recording
+{
+  "name": "playwright_start_video",
+  "parameters": {
+    "path": "/my/videos/folder",
+    "width": 1920,
+    "height": 1080
+  }
+}
+
+// Perform some actions...
+{
+  "name": "playwright_click",
+  "parameters": {
+    "selector": "#my-button"
+  }
+}
+
+// Stop recording
+{
+  "name": "playwright_stop_video",
+  "parameters": {}
+}
+```
+
+## Technical Notes
+
+- Video recording uses Playwright's built-in video recording capabilities
+- Starting a recording requires creating a new browser context
+- Stopping a recording requires closing the browser context
+- Video files are saved when the context is closed
+- The feature works in headless and headful browser modes
