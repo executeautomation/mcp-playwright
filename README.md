@@ -96,6 +96,67 @@ Here's the Claude Desktop configuration to use the Playwright server:
 }
 ```
 
+## Docker Support
+
+The Playwright MCP Server can be run in Docker for isolated and containerized execution.
+
+### Building the Docker Image
+
+Before building the Docker image, you need to build the TypeScript project with production dependencies:
+
+```bash
+# Install production dependencies and build
+npm install --omit=dev
+npm run build
+
+# Build the Docker image
+docker build -t mcp-playwright .
+```
+
+Or use the provided convenience script:
+
+```bash
+chmod +x docker-build.sh
+./docker-build.sh
+```
+
+### Running with Docker
+
+You can run the MCP server using Docker in several ways:
+
+#### Using Docker directly
+
+```bash
+# Run the server (stdin/stdout communication)
+docker run -i mcp-playwright
+```
+
+#### Using Docker Compose
+
+A `docker-compose.yml` file is provided for easier management:
+
+```bash
+# Run the server with docker-compose
+docker compose run --rm playwright-mcp
+```
+
+### Using Docker with MCP Clients
+
+To use the Dockerized server with Claude Desktop or other MCP clients, you can configure them to use Docker:
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "docker",
+      "args": ["run", "-i", "--rm", "mcp-playwright"]
+    }
+  }
+}
+```
+
+**Note**: The Docker image uses a Debian-based slim Node.js image and includes only the core dependencies. Playwright browsers are not pre-installed in the container to keep the image size small. The browsers will be downloaded on first use if needed.
+
 ## Testing
 
 This project uses Jest for testing. The tests are located in the `src/__tests__` directory.

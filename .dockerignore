@@ -1,0 +1,45 @@
+# Node modules - commented out to allow copying from host
+# node_modules
+npm-debug.log
+
+# Build output - commented out to allow copying pre-built dist
+# dist
+
+# Test and coverage
+coverage
+*.test.ts
+__tests__
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# GitHub
+.github
+
+# Documentation
+docs
+*.md
+!README.md
+
+# IDE
+.vscode
+.idea
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.log
+
+# Test files
+test-import.js
+run-tests.cjs
+run-tests.js
+jest.config.cjs
+
+# Config files not needed in container
+tsconfig.test.json
