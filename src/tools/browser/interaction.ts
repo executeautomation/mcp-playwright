@@ -137,14 +137,34 @@ export class HoverTool extends BrowserToolBase {
  * Tool for uploading files
  */
 export class UploadFileTool extends BrowserToolBase {
-  /**
-   * Execute the upload file tool
-   */
   async execute(args: any, context: ToolContext): Promise<ToolResponse> {
     return this.safeExecute(context, async (page) => {
-        await page.waitForSelector(args.selector);
-        await page.setInputFiles(args.selector, args.filePath);
-        return createSuccessResponse(`Uploaded file '${args.filePath}' to '${args.selector}'`);
+      await page.waitForSelector(args.selector, { state: 'attached' });
+
+      // Only make the input visible if it is currently display:none
+      await page.evaluate((selector) => {
+        const el = document.querySelector(selector) as HTMLElement | null;
+        if (el) {
+          const style = window.getComputedStyle(el);
+          if (style.display === 'none') {
+            el.setAttribute('data-upload-temp-visible', 'true');
+            el.style.display = 'block';
+          }
+        }
+      }, args.selector);
+
+      await page.setInputFiles(args.selector, args.filePath);
+
+      // Make the input invisible again only if we made it visible
+      await page.evaluate((selector) => {
+        const el = document.querySelector(selector) as HTMLElement | null;
+        if (el && el.getAttribute('data-upload-temp-visible') === 'true') {
+          el.style.display = 'none';
+          el.removeAttribute('data-upload-temp-visible');
+        }
+      }, args.selector);
+
+      return createSuccessResponse(`Uploaded file '${args.filePath}' to '${args.selector}'`);
     });
   }
 }
