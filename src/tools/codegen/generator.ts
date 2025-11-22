@@ -1,10 +1,10 @@
-import * as path from 'path';
-import { CodegenAction, CodegenOptions, CodegenResult, CodegenSession, PlaywrightTestCase } from './types.js';
+import * as path from "node:path";
+import type { CodegenAction, CodegenOptions, CodegenResult, CodegenSession, PlaywrightTestCase } from "./types.js";
 
 export class PlaywrightGenerator {
   private static readonly DEFAULT_OPTIONS: Required<CodegenOptions> = {
-    outputPath: 'tests',
-    testNamePrefix: 'MCP',
+    outputPath: "tests",
+    testNamePrefix: "MCP",
     includeComments: true,
   };
 
@@ -16,20 +16,20 @@ export class PlaywrightGenerator {
   }
 
   private validateOptions(options: CodegenOptions): void {
-    if (options.outputPath && typeof options.outputPath !== 'string') {
-      throw new Error('outputPath must be a string');
+    if (options.outputPath && typeof options.outputPath !== "string") {
+      throw new Error("outputPath must be a string");
     }
-    if (options.testNamePrefix && typeof options.testNamePrefix !== 'string') {
-      throw new Error('testNamePrefix must be a string');
+    if (options.testNamePrefix && typeof options.testNamePrefix !== "string") {
+      throw new Error("testNamePrefix must be a string");
     }
-    if (options.includeComments !== undefined && typeof options.includeComments !== 'boolean') {
-      throw new Error('includeComments must be a boolean');
+    if (options.includeComments !== undefined && typeof options.includeComments !== "boolean") {
+      throw new Error("includeComments must be a boolean");
     }
   }
 
   async generateTest(session: CodegenSession): Promise<CodegenResult> {
     if (!session || !Array.isArray(session.actions)) {
-      throw new Error('Invalid session data');
+      throw new Error("Invalid session data");
     }
 
     const testCase = this.createTestCase(session);
@@ -45,9 +45,9 @@ export class PlaywrightGenerator {
 
   private createTestCase(session: CodegenSession): PlaywrightTestCase {
     const testCase: PlaywrightTestCase = {
-      name: `${this.options.testNamePrefix}_${new Date(session.startTime).toISOString().split('T')[0]}`,
+      name: `${this.options.testNamePrefix}_${new Date(session.startTime).toISOString().split("T")[0]}`,
       steps: [],
-      imports: new Set(['test', 'expect']),
+      imports: new Set(["test", "expect"]),
     };
 
     for (const action of session.actions) {
@@ -64,23 +64,23 @@ export class PlaywrightGenerator {
     const { toolName, parameters } = action;
 
     switch (toolName) {
-      case 'playwright_navigate':
+      case "playwright_navigate":
         return this.generateNavigateStep(parameters);
-      case 'playwright_fill':
+      case "playwright_fill":
         return this.generateFillStep(parameters);
-      case 'playwright_click':
+      case "playwright_click":
         return this.generateClickStep(parameters);
-      case 'playwright_screenshot':
+      case "playwright_screenshot":
         return this.generateScreenshotStep(parameters);
-      case 'playwright_expect_response':
+      case "playwright_expect_response":
         return this.generateExpectResponseStep(parameters);
-      case 'playwright_assert_response':
+      case "playwright_assert_response":
         return this.generateAssertResponseStep(parameters);
-      case 'playwright_hover':
+      case "playwright_hover":
         return this.generateHoverStep(parameters);
-      case 'playwright_select':
+      case "playwright_select":
         return this.generateSelectStep(parameters);
-      case 'playwright_custom_user_agent':
+      case "playwright_custom_user_agent":
         return this.generateCustomUserAgentStep(parameters);
       default:
         console.warn(`Unsupported tool: ${toolName}`);
@@ -90,7 +90,7 @@ export class PlaywrightGenerator {
 
   private generateNavigateStep(parameters: Record<string, unknown>): string {
     const { url, waitUntil } = parameters;
-    const options = waitUntil ? `, { waitUntil: '${waitUntil}' }` : '';
+    const options = waitUntil ? `, { waitUntil: '${waitUntil}' }` : "";
     return `
     // Navigate to URL
     await page.goto('${url}'${options});`;
@@ -113,10 +113,10 @@ export class PlaywrightGenerator {
   private generateScreenshotStep(parameters: Record<string, unknown>): string {
     const { name, fullPage = false, path } = parameters;
     const options = [];
-    if (fullPage) options.push('fullPage: true');
+    if (fullPage) options.push("fullPage: true");
     if (path) options.push(`path: '${path}'`);
-    
-    const optionsStr = options.length > 0 ? `, { ${options.join(', ')} }` : '';
+
+    const optionsStr = options.length > 0 ? `, { ${options.join(", ")} }` : "";
     return `
     // Take screenshot
     await page.screenshot({ path: '${name}.png'${optionsStr} });`;
@@ -131,7 +131,7 @@ export class PlaywrightGenerator {
 
   private generateAssertResponseStep(parameters: Record<string, unknown>): string {
     const { id, value } = parameters;
-    const assertion = value 
+    const assertion = value
       ? `\n    const responseText = await ${id}Response.text();\n    expect(responseText).toContain('${value}');`
       : `\n    expect(${id}Response.ok()).toBeTruthy();`;
     return `
@@ -161,24 +161,24 @@ export class PlaywrightGenerator {
 
   private generateTestCode(testCase: PlaywrightTestCase): string {
     const imports = Array.from(testCase.imports)
-      .map(imp => `import { ${imp} } from '@playwright/test';`)
-      .join('\n');
+      .map((imp) => `import { ${imp} } from '@playwright/test';`)
+      .join("\n");
 
     return `
 ${imports}
 
 test('${testCase.name}', async ({ page, context }) => {
-  ${testCase.steps.join('\n')}
+  ${testCase.steps.join("\n")}
 });`;
   }
 
   private getOutputFilePath(session: CodegenSession): string {
     if (!session.id) {
-      throw new Error('Session ID is required');
+      throw new Error("Session ID is required");
     }
 
-    const sanitizedPrefix = this.options.testNamePrefix.toLowerCase().replace(/[^a-z0-9_]/g, '_');
+    const sanitizedPrefix = this.options.testNamePrefix.toLowerCase().replace(/[^a-z0-9_]/g, "_");
     const fileName = `${sanitizedPrefix}_${session.id}.spec.ts`;
     return path.resolve(this.options.outputPath, fileName);
   }
-} 
+}

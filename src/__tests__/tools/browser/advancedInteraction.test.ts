@@ -1,7 +1,8 @@
 import { DragTool, PressKeyTool } from '../../../tools/browser/interaction.js';
-import { ToolContext } from '../../../tools/common/types.js';
-import { Page, Browser, ElementHandle } from 'playwright';
+import type { ToolContext } from '../../../tools/common/types.js';
+import type { Page, Browser, ElementHandle } from 'playwright';
 import { jest } from '@jest/globals';
+import { getTextContent } from '../../testUtils';
 
 // Mock page functions
 const mockWaitForSelector = jest.fn();
@@ -90,7 +91,7 @@ describe('Advanced Browser Interaction Tools', () => {
       expect(mockMouseMove).toHaveBeenCalledWith(60, 35); // Target center (same mock values)
       expect(mockMouseUp).toHaveBeenCalled();
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('Dragged element from');
+      expect(getTextContent(result)).toContain('Dragged element from');
     });
 
     test('should handle errors when element positions cannot be determined', async () => {
@@ -108,7 +109,7 @@ describe('Advanced Browser Interaction Tools', () => {
       expect(mockBoundingBox).toHaveBeenCalled();
       expect(mockMouseMove).not.toHaveBeenCalled();
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('Could not get element positions');
+      expect(getTextContent(result)).toContain('Could not get element positions');
     });
 
     test('should handle drag errors', async () => {
@@ -128,7 +129,7 @@ describe('Advanced Browser Interaction Tools', () => {
       expect(mockMouseMove).toHaveBeenCalled();
       expect(mockMouseDown).toHaveBeenCalled();
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('Operation failed');
+      expect(getTextContent(result)).toContain('Operation failed');
     });
 
     test('should handle missing page', async () => {
@@ -141,7 +142,7 @@ describe('Advanced Browser Interaction Tools', () => {
 
       expect(mockWaitForSelector).not.toHaveBeenCalled();
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('Browser page not initialized');
+      expect(getTextContent(result)).toContain('Browser page not initialized');
     });
   });
 
@@ -155,7 +156,7 @@ describe('Advanced Browser Interaction Tools', () => {
 
       expect(mockKeyboardPress).toHaveBeenCalledWith('Enter');
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('Pressed key: Enter');
+      expect(getTextContent(result)).toContain('Pressed key: Enter');
     });
 
     test('should focus an element before pressing a key if selector provided', async () => {
@@ -170,7 +171,7 @@ describe('Advanced Browser Interaction Tools', () => {
       expect(mockFocus).toHaveBeenCalledWith('#input-field');
       expect(mockKeyboardPress).toHaveBeenCalledWith('Enter');
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('Pressed key: Enter');
+      expect(getTextContent(result)).toContain('Pressed key: Enter');
     });
 
     test('should handle key press errors', async () => {
@@ -185,7 +186,7 @@ describe('Advanced Browser Interaction Tools', () => {
 
       expect(mockKeyboardPress).toHaveBeenCalledWith('Enter');
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('Operation failed');
+      expect(getTextContent(result)).toContain('Operation failed');
     });
 
     test('should handle missing page', async () => {
@@ -197,7 +198,7 @@ describe('Advanced Browser Interaction Tools', () => {
 
       expect(mockKeyboardPress).not.toHaveBeenCalled();
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('Browser page not initialized');
+      expect(getTextContent(result)).toContain('Browser page not initialized');
     });
   });
 }); 

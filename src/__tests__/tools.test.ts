@@ -94,6 +94,7 @@ describe('Tool Definitions', () => {
     expect(uploadFileTool).toBeDefined();
     expect(uploadFileTool!.inputSchema.properties).toHaveProperty('selector');
     expect(uploadFileTool!.inputSchema.properties).toHaveProperty('filePath');
-    expect(uploadFileTool!.inputSchema.required).toEqual(['selector', 'filePath']);
+    expect(uploadFileTool!.inputSchema.properties).toHaveProperty('uploadResourceUri');
+    expect(uploadFileTool!.inputSchema.required).toEqual(['selector']);
   });
 }); 

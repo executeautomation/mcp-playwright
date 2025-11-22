@@ -1,5 +1,5 @@
-import { v4 as uuidv4 } from 'uuid';
-import { CodegenAction, CodegenSession } from './types';
+import { v4 as uuidv4 } from "uuid";
+import type { CodegenAction, CodegenSession } from "./types";
 
 export class ActionRecorder {
   private static instance: ActionRecorder;
@@ -75,4 +75,4 @@ export class ActionRecorder {
     }
     return this.sessions.delete(sessionId);
   }
-} 
+}

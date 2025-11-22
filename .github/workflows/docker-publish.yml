@@ -1,0 +1,84 @@
+name: Docker Image Build/Push
+
+on:
+  push:
+    branches: ["**"]
+    paths:
+      - "Dockerfile"
+      - "docker-compose.yml"
+      - "docker-compose.yaml"
+      - ".dockerignore"
+  pull_request:
+    branches: ["**"]
+    paths:
+      - "Dockerfile"
+      - "docker-compose.yml"
+      - "docker-compose.yaml"
+      - ".dockerignore"
+  workflow_dispatch: {}
+  workflow_call: {}
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push:
+    name: Docker Image (build/push)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    env:
+      PUSH_IMAGE: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64,amd64
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch,branch=main
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=raw,value=latest,enable=${{ github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '-') }}
+            type=ref,event=pr
+            type=raw,value={{branch}}-manual,enable=${{ github.event_name == 'workflow_dispatch' }}
+
+      - name: Log in to GitHub Container Registry (main/tags only)
+        uses: docker/login-action@v3
+        if: env.PUSH_IMAGE == 'true'
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Image build/push (GHCR)
+        uses: docker/build-push-action@v5
+        env:
+          DOCS_ORG: ${{ github.repository_owner }}
+          DOCS_PROJECT: ${{ github.event.repository.name }}
+          DOCS_URL: https://${{ github.repository_owner }}.github.io
+          DOCS_BASE_URL: /${{ github.event.repository.name }}/
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: ${{ env.PUSH_IMAGE == 'true' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

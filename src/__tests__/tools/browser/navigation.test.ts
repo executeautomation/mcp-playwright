@@ -1,7 +1,8 @@
 import { NavigationTool } from '../../../tools/browser/navigation.js';
-import { ToolContext } from '../../../tools/common/types.js';
-import { Page, Browser } from 'playwright';
+import type { ToolContext } from '../../../tools/common/types.js';
+import type { Page, Browser } from 'playwright';
 import { jest } from '@jest/globals';
+import { getTextContent } from '../../testUtils';
 
 // Mock the Page object
 const mockGoto = jest.fn();
@@ -52,7 +53,7 @@ describe('NavigationTool', () => {
 
     expect(mockGoto).toHaveBeenCalledWith('https://example.com', { waitUntil: 'networkidle', timeout: 30000 });
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toContain('Navigated to');
+    expect(getTextContent(result)).toContain('Navigated to');
   });
 
   test('should handle navigation with specific browser type', async () => {
@@ -66,7 +67,7 @@ describe('NavigationTool', () => {
 
     expect(mockGoto).toHaveBeenCalledWith('https://example.com', { waitUntil: 'networkidle', timeout: 30000 });
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toContain('Navigated to');
+    expect(getTextContent(result)).toContain('Navigated to');
   });
 
   test('should handle navigation with webkit browser type', async () => {
@@ -79,7 +80,7 @@ describe('NavigationTool', () => {
 
     expect(mockGoto).toHaveBeenCalledWith('https://example.com', { waitUntil: 'load', timeout: 30000 });
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toContain('Navigated to');
+    expect(getTextContent(result)).toContain('Navigated to');
   });
 
   test('should handle navigation errors', async () => {
@@ -94,7 +95,7 @@ describe('NavigationTool', () => {
 
     expect(mockGoto).toHaveBeenCalledWith('https://example.com', { waitUntil: 'load', timeout: 30000 });
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Operation failed');
+    expect(getTextContent(result)).toContain('Operation failed');
   });
 
   test('should handle missing page', async () => {
@@ -112,7 +113,7 @@ describe('NavigationTool', () => {
 
     expect(mockGoto).not.toHaveBeenCalled();
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Page is not available');
+    expect(getTextContent(result)).toContain('Page is not available');
   });
   
   test('should handle disconnected browser', async () => {
@@ -127,7 +128,7 @@ describe('NavigationTool', () => {
     
     expect(mockGoto).not.toHaveBeenCalled();
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Browser is not connected');
+    expect(getTextContent(result)).toContain('Browser is not connected');
   });
   
   test('should handle closed page', async () => {
@@ -142,6 +143,6 @@ describe('NavigationTool', () => {
     
     expect(mockGoto).not.toHaveBeenCalled();
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Page is not available or has been closed');
+    expect(getTextContent(result)).toContain('Page is not available or has been closed');
   });
-}); 
+});

@@ -1,5 +1,5 @@
-import { ApiToolBase } from './base.js';
-import { ToolContext, ToolResponse, createSuccessResponse, createErrorResponse } from '../common/types.js';
+import { createErrorResponse, createSuccessResponse, type ToolContext, type ToolResponse } from "../common/types.js";
+import { ApiToolBase } from "./base.js";
 
 /**
  * Tool for making GET requests
@@ -11,18 +11,18 @@ export class GetRequestTool extends ApiToolBase {
   async execute(args: any, context: ToolContext): Promise<ToolResponse> {
     return this.safeExecute(context, async (apiContext) => {
       const response = await apiContext.get(args.url);
-      
-      let responseText;
+
+      let responseText: string;
       try {
         responseText = await response.text();
-      } catch (error) {
+      } catch (_error) {
         responseText = "Unable to get response text";
       }
-      
+
       return createSuccessResponse([
         `GET request to ${args.url}`,
         `Status: ${response.status()} ${response.statusText()}`,
-        `Response: ${responseText.substring(0, 1000)}${responseText.length > 1000 ? '...' : ''}`
+        `Response: ${responseText.substring(0, 1000)}${responseText.length > 1000 ? "..." : ""}`,
       ]);
     });
   }
@@ -38,35 +38,34 @@ export class PostRequestTool extends ApiToolBase {
   async execute(args: any, context: ToolContext): Promise<ToolResponse> {
     return this.safeExecute(context, async (apiContext) => {
       // Check if the value is valid JSON if it starts with { or [
-      if (args.value && typeof args.value === 'string' && 
-          (args.value.startsWith('{') || args.value.startsWith('['))) {
+      if (args.value && typeof args.value === "string" && (args.value.startsWith("{") || args.value.startsWith("["))) {
         try {
           JSON.parse(args.value);
         } catch (error) {
           return createErrorResponse(`Failed to parse request body: ${(error as Error).message}`);
         }
       }
-      
+
       const response = await apiContext.post(args.url, {
-        data: typeof args.value === 'string' ? JSON.parse(args.value) : args.value,
+        data: typeof args.value === "string" ? JSON.parse(args.value) : args.value,
         headers: {
-          'Content-Type': 'application/json',
-          ...(args.token ? { 'Authorization': `Bearer ${args.token}` } : {}),
-          ...(args.headers || {})
-        }
+          "Content-Type": "application/json",
+          ...(args.token ? { Authorization: `Bearer ${args.token}` } : {}),
+          ...(args.headers || {}),
+        },
       });
-      
-      let responseText;
+
+      let responseText: string;
       try {
         responseText = await response.text();
-      } catch (error) {
+      } catch (_error) {
         responseText = "Unable to get response text";
       }
-      
+
       return createSuccessResponse([
         `POST request to ${args.url}`,
         `Status: ${response.status()} ${response.statusText()}`,
-        `Response: ${responseText.substring(0, 1000)}${responseText.length > 1000 ? '...' : ''}`
+        `Response: ${responseText.substring(0, 1000)}${responseText.length > 1000 ? "..." : ""}`,
       ]);
     });
   }
@@ -82,30 +81,29 @@ export class PutRequestTool extends ApiToolBase {
   async execute(args: any, context: ToolContext): Promise<ToolResponse> {
     return this.safeExecute(context, async (apiContext) => {
       // Check if the value is valid JSON if it starts with { or [
-      if (args.value && typeof args.value === 'string' && 
-          (args.value.startsWith('{') || args.value.startsWith('['))) {
+      if (args.value && typeof args.value === "string" && (args.value.startsWith("{") || args.value.startsWith("["))) {
         try {
           JSON.parse(args.value);
         } catch (error) {
           return createErrorResponse(`Failed to parse request body: ${(error as Error).message}`);
         }
       }
-      
+
       const response = await apiContext.put(args.url, {
-        data: args.value
+        data: args.value,
       });
-      
-      let responseText;
+
+      let responseText: string;
       try {
         responseText = await response.text();
-      } catch (error) {
+      } catch (_error) {
         responseText = "Unable to get response text";
       }
-      
+
       return createSuccessResponse([
         `PUT request to ${args.url}`,
         `Status: ${response.status()} ${response.statusText()}`,
-        `Response: ${responseText.substring(0, 1000)}${responseText.length > 1000 ? '...' : ''}`
+        `Response: ${responseText.substring(0, 1000)}${responseText.length > 1000 ? "..." : ""}`,
       ]);
     });
   }
@@ -121,30 +119,29 @@ export class PatchRequestTool extends ApiToolBase {
   async execute(args: any, context: ToolContext): Promise<ToolResponse> {
     return this.safeExecute(context, async (apiContext) => {
       // Check if the value is valid JSON if it starts with { or [
-      if (args.value && typeof args.value === 'string' && 
-          (args.value.startsWith('{') || args.value.startsWith('['))) {
+      if (args.value && typeof args.value === "string" && (args.value.startsWith("{") || args.value.startsWith("["))) {
         try {
           JSON.parse(args.value);
         } catch (error) {
           return createErrorResponse(`Failed to parse request body: ${(error as Error).message}`);
         }
       }
-      
+
       const response = await apiContext.patch(args.url, {
-        data: args.value
+        data: args.value,
       });
-      
-      let responseText;
+
+      let responseText: string;
       try {
         responseText = await response.text();
-      } catch (error) {
+      } catch (_error) {
         responseText = "Unable to get response text";
       }
-      
+
       return createSuccessResponse([
         `PATCH request to ${args.url}`,
         `Status: ${response.status()} ${response.statusText()}`,
-        `Response: ${responseText.substring(0, 1000)}${responseText.length > 1000 ? '...' : ''}`
+        `Response: ${responseText.substring(0, 1000)}${responseText.length > 1000 ? "..." : ""}`,
       ]);
     });
   }
@@ -160,19 +157,19 @@ export class DeleteRequestTool extends ApiToolBase {
   async execute(args: any, context: ToolContext): Promise<ToolResponse> {
     return this.safeExecute(context, async (apiContext) => {
       const response = await apiContext.delete(args.url);
-      
-      let responseText;
+
+      let responseText: string;
       try {
         responseText = await response.text();
-      } catch (error) {
+      } catch (_error) {
         responseText = "Unable to get response text";
       }
-      
+
       return createSuccessResponse([
         `DELETE request to ${args.url}`,
         `Status: ${response.status()} ${response.statusText()}`,
-        `Response: ${responseText.substring(0, 1000)}${responseText.length > 1000 ? '...' : ''}`
+        `Response: ${responseText.substring(0, 1000)}${responseText.length > 1000 ? "..." : ""}`,
       ]);
     });
   }
-} 
+}

@@ -1,13 +1,9 @@
-import { SaveAsPdfTool } from '../../../tools/browser/output.js';
-import { ToolContext } from '../../../tools/common/types.js';
-import { Page, Browser } from 'playwright';
 import { jest } from '@jest/globals';
-import * as path from 'path';
-
-// Mock path.resolve to test path handling
-jest.mock('path', () => ({
-  resolve: jest.fn().mockImplementation((dir, file) => `${dir}/${file}`)
-}));
+import * as path from 'node:path';
+import type { Page, Browser } from 'playwright';
+import { SaveAsPdfTool } from '../../../tools/browser/output.js';
+import type { ToolContext } from '../../../tools/common/types.js';
+import { getTextContent } from '../../testUtils';
 
 // Mock page functions
 const mockPdf = jest.fn().mockImplementation(() => Promise.resolve());
@@ -55,9 +51,10 @@ describe('Browser Output Tools', () => {
       };
 
       const result = await saveAsPdfTool.execute(args, mockContext);
+      const expectedPath = path.resolve('/downloads', 'page.pdf');
 
       expect(mockPdf).toHaveBeenCalledWith({
-        path: '/downloads/page.pdf',
+        path: expectedPath,
         format: 'A4',
         printBackground: true,
         margin: {
@@ -68,7 +65,7 @@ describe('Browser Output Tools', () => {
         }
       });
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('Saved page as PDF');
+      expect(getTextContent(result)).toContain('Saved page as PDF');
     });
 
     test('should save page as PDF with custom options', async () => {
@@ -86,9 +83,10 @@ describe('Browser Output Tools', () => {
       };
 
       const result = await saveAsPdfTool.execute(args, mockContext);
+      const expectedPath = path.resolve('/downloads', 'custom.pdf');
 
       expect(mockPdf).toHaveBeenCalledWith({
-        path: '/downloads/custom.pdf',
+        path: expectedPath,
         format: 'Letter',
         printBackground: false,
         margin: {
@@ -99,7 +97,7 @@ describe('Browser Output Tools', () => {
         }
       });
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('Saved page as PDF');
+      expect(getTextContent(result)).toContain('Saved page as PDF');
     });
 
     test('should handle PDF generation errors', async () => {
@@ -114,7 +112,7 @@ describe('Browser Output Tools', () => {
 
       expect(mockPdf).toHaveBeenCalled();
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('Operation failed');
+      expect(getTextContent(result)).toContain('Operation failed');
     });
 
     test('should handle missing page', async () => {
@@ -126,7 +124,7 @@ describe('Browser Output Tools', () => {
 
       expect(mockPdf).not.toHaveBeenCalled();
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('Browser page not initialized');
+      expect(getTextContent(result)).toContain('Browser page not initialized');
     });
   });
-}); 
+});
