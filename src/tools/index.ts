@@ -1,6 +1,6 @@
-export * from './common/types.js';
-export * from './browser/index.js';
-export * from './api/index.js';
+export * from "./api/index.js";
+export * from "./browser/index.js";
+export * from "./common/types.js";
 
 // Tool type constants
 export const BROWSER_TOOLS = [
@@ -16,7 +16,7 @@ export const BROWSER_TOOLS = [
   "playwright_console_logs",
   "playwright_close",
   "playwright_get_visible_text",
-  "playwright_get_visible_html"
+  "playwright_get_visible_html",
 ];
 
 export const API_TOOLS = [
@@ -24,5 +24,5 @@ export const API_TOOLS = [
   "playwright_post",
   "playwright_put",
   "playwright_patch",
-  "playwright_delete"
-]; 
+  "playwright_delete",
+];

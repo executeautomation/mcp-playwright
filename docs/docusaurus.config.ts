@@ -4,21 +4,26 @@ import type * as Preset from '@docusaurus/preset-classic';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
+const siteUrl = process.env.DOCS_URL ?? 'https://executeautomation.github.io/';
+const siteBaseUrl = process.env.DOCS_BASE_URL ?? '/mcp-playwright/';
+const orgName = process.env.DOCS_ORG ?? 'executeautomation';
+const projectName = process.env.DOCS_PROJECT ?? 'mcp-playwright';
+
 const config: Config = {
   title: 'Playwright MCP Server',
   tagline: 'Fastest way to test your APIs and UI in Playwright with AI 🤖',
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
-  url: 'https://executeautomation.github.io/',
+  url: siteUrl,
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/mcp-playwright/',
+  baseUrl: siteBaseUrl,
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'executeautomation', // Usually your GitHub org/user name.
-  projectName: 'mcp-playwright', // Usually your repo name.
+  organizationName: orgName, // Usually your GitHub org/user name.
+  projectName: projectName, // Usually your repo name.
 
   onBrokenLinks: 'ignore',
   onBrokenMarkdownLinks: 'warn',
@@ -67,7 +72,7 @@ const config: Config = {
           label: 'Tutorial',
         },
         {
-          href: 'https://github.com/executeautomation/mcp-playwright',
+          href: 'https://github.com/aakashh242/mcp-playwright',
           label: 'GitHub',
           position: 'right',
         },
@@ -121,3 +126,4 @@ const config: Config = {
 };
 
 export default config;
+

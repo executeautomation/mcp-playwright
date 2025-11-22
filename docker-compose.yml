@@ -1,18 +1,18 @@
+# Recommended production deployment (Streamable HTTP mode)
 services:
   playwright-mcp:
     build:
       context: .
       dockerfile: Dockerfile
-    image: mcp-playwright:latest
+    image: ghcr.io/aakashh242/mcp-playwright:latest
     container_name: playwright-mcp-server
     stdin_open: true
     tty: true
-    # MCP servers communicate via stdio
-    # You can interact with this container using:
-    # docker compose run --rm playwright-mcp
+    command: ["--http", "--listen", "0.0.0.0", "--port", "8000", "--path", "/mcp", "--host-name", "<your-dockerhost-host-name>"]
+    ports:
+      - "8000:8000"
     environment:
-      # Skip browser download in container
       - PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
-    # Optionally mount a volume for persistent data
-    # volumes:
-    #   - ./data:/app/data
+    volumes:
+      - ./data/app-data:/app/data
+      - ./data/resource-data:/data

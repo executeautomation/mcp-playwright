@@ -1,5 +1,5 @@
-import type { APIRequestContext } from 'playwright';
-import { ToolHandler, ToolContext, ToolResponse, createErrorResponse } from '../common/types.js';
+import type { APIRequestContext } from "playwright";
+import { createErrorResponse, type ToolContext, type ToolHandler, type ToolResponse } from "../common/types.js";
 
 /**
  * Base class for all API-based tools
@@ -49,7 +49,7 @@ export abstract class ApiToolBase implements ToolHandler {
    */
   protected async safeExecute(
     context: ToolContext,
-    operation: (apiContext: APIRequestContext) => Promise<ToolResponse>
+    operation: (apiContext: APIRequestContext) => Promise<ToolResponse>,
   ): Promise<ToolResponse> {
     const apiError = this.validateApiContextAvailable(context);
     if (apiError) return apiError;
@@ -60,4 +60,4 @@ export abstract class ApiToolBase implements ToolHandler {
       return createErrorResponse(`API operation failed: ${(error as Error).message}`);
     }
   }
-} 
+}

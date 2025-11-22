@@ -16,24 +16,28 @@
   ],
   "scripts": {
     "build": "tsc && shx chmod +x dist/*.js",
-    "prepare": "npm run build",
+    "prepare": "husky",
     "watch": "tsc --watch",
     "test": "jest --testMatch=\"<rootDir>/src/__tests__/**/*.test.ts\"",
     "test:coverage": "jest --coverage --testMatch=\"<rootDir>/src/__tests__/**/*.test.ts\"",
-    "test:custom": "node run-tests.cjs"
+    "test:custom": "node run-tests.cjs",
+    "lint": "biome check src/index.ts src/requestHandler.ts src/resourceManager.ts src/toolHandler.ts src/tools.ts src/types.ts src/uploadManager.ts src/tools src/evals --diagnostic-level=error --max-diagnostics 512",
+    "lint:fix": "biome check --write src/index.ts src/requestHandler.ts src/resourceManager.ts src/toolHandler.ts src/tools.ts src/types.ts src/uploadManager.ts src/tools src/evals  --diagnostic-level=error --max-diagnostics 512",
+    "lint:fix:unsafe": "biome check --write --unsafe src/index.ts src/requestHandler.ts src/resourceManager.ts src/toolHandler.ts src/tools.ts src/types.ts src/uploadManager.ts src/tools src/evals  --diagnostic-level=error --max-diagnostics 512"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/executeautomation/mcp-playwright.git"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "1.11.1",
-    "@playwright/browser-chromium": "1.53.1",
-    "@playwright/browser-firefox": "1.53.1",
-    "@playwright/browser-webkit": "1.53.1",
-    "@playwright/test": "^1.53.1",
+    "@modelcontextprotocol/sdk": "^1.19.1",
+    "@playwright/browser-chromium": "1.56.1",
+    "@playwright/browser-firefox": "1.56.1",
+    "@playwright/browser-webkit": "1.56.1",
+    "@playwright/test": "^1.56.1",
+    "busboy": "^1.6.0",
     "mcp-evals": "^1.0.18",
-    "playwright": "1.53.1",
+    "playwright": "^1.56.1",
     "uuid": "11.1.0"
   },
   "keywords": [
@@ -43,8 +47,12 @@
     "Claude MCP"
   ],
   "devDependencies": {
+    "@biomejs/biome": "^2.3.7",
+    "@commitlint/cli": "^19.4.0",
+    "@commitlint/config-conventional": "^19.4.0",
     "@types/jest": "^29.5.14",
     "@types/node": "^20.10.5",
+    "husky": "^9.1.7",
     "jest": "^29.7.0",
     "jest-playwright-preset": "4.0.0",
     "shx": "^0.3.4",

@@ -1,0 +1,36 @@
+---
+sidebar_position: 3
+title: CLI Flags
+---
+
+# CLI Flags
+
+| Flag | Description |
+| --- | --- |
+| `--http` | Enable Streamable HTTP transport instead of STDIO. |
+| `--port <number>` | HTTP port (default `8000`). |
+| `--path <path>` | Base HTTP path (default `/mcp`). |
+| `--host-name <name>` | Host used in download URLs (defaults to system hostname). |
+| `--listen <address>` | Address to bind (default `0.0.0.0`). |
+| `--insecure` | Use `http` scheme for resource links instead of `https`. |
+| `--resource-ttl <seconds>` | TTL for generated resources (default 600s). |
+| `--host-name` | Hostname embedded in URLs. |
+| `--static-user-agent` | Disable randomized user-agents. |
+
+## Examples
+
+### NPX
+
+```bash
+npx @executeautomation/playwright-mcp-server --http --port 9000 --path /gateway
+```
+
+### Docker
+
+```bash
+docker run --rm -p 9000:9000 ghcr.io/executeautomation/mcp-playwright:latest \
+  node dist/index.js --http --port 9000 --host-name example.com
+```
+
+Remember that HTTP mode requires CLI access to upload files (curl / `Invoke-WebRequest`) before calling `playwright_upload_file`.
+

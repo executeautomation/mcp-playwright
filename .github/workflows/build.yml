@@ -1,0 +1,109 @@
+name: Lint/Test/Build
+
+on:
+  push:
+    branches: ["**"]
+    tags: [ 'v*.*.*' ]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  test-and-build:
+    name: Lint/Test/Build (Node 20)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect file changes
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            docker:
+              - 'Dockerfile'
+              - 'docker-compose.yml'
+              - 'docker-compose.yaml'
+              - '.dockerignore'
+            docs:
+              - 'docs/**'
+
+      - name: Show change filters
+        run: |
+          echo "Docker files changed: ${{ steps.changes.outputs.docker }}"
+          echo "Docs files changed: ${{ steps.changes.outputs.docs }}"
+
+      - name: Use Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check commit message (conventional commits)
+        run: npx commitlint --from=HEAD~1 --to=HEAD
+
+      - name: Run lint (Node 20)
+        run: npm run lint
+
+      - name: Run tests (Node 20)
+        run: npm test
+
+      - name: Run coverage (Node 20)
+        run: npm run test:coverage
+
+      - name: Upload coverage to CodeCov
+        uses: codecov/codecov-action@v5
+        with:
+          fail_ci_if_error: false
+
+      - name: Build (Node 20)
+        run: npm run build
+
+      - name: Build Docker image (no push, on Docker changes)
+        if: steps.changes.outputs.docker == 'true'
+        run: docker build -t mcp-playwright-ci:latest .
+
+  docs-build:
+    name: Docs Build (Docusaurus)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect docs changes
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            docs:
+              - 'docs/**'
+
+      - name: Show change filters
+        run: |
+          echo "Docker files changed: ${{ steps.changes.outputs.docker }}"
+          echo "Docs files changed: ${{ steps.changes.outputs.docs }}"
+
+      - name: Use Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Build docs (Docusaurus)
+        if: steps.changes.outputs.docs == 'true'
+        env:
+          DOCS_ORG: ${{ github.repository_owner }}
+          DOCS_PROJECT: ${{ github.event.repository.name }}
+          DOCS_URL: https://${{ github.repository_owner }}.github.io
+          DOCS_BASE_URL: /${{ github.event.repository.name }}/
+        run: |
+          cd docs
+          npm ci
+          npm run build

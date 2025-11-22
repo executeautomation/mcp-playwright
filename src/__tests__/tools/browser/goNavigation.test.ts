@@ -1,7 +1,8 @@
 import { GoBackTool, GoForwardTool } from '../../../tools/browser/navigation.js';
-import { ToolContext } from '../../../tools/common/types.js';
-import { Page, Browser } from 'playwright';
+import type { ToolContext } from '../../../tools/common/types.js';
+import type { Page, Browser } from 'playwright';
 import { jest } from '@jest/globals';
+import { getTextContent } from '../../testUtils';
 
 // Mock page functions
 const mockGoBack = jest.fn().mockImplementation(() => Promise.resolve());
@@ -54,7 +55,7 @@ describe('Browser Navigation History Tools', () => {
 
       expect(mockGoBack).toHaveBeenCalled();
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('Navigated back');
+      expect(getTextContent(result)).toContain('Navigated back');
     });
 
     test('should handle navigation back errors', async () => {
@@ -67,7 +68,7 @@ describe('Browser Navigation History Tools', () => {
 
       expect(mockGoBack).toHaveBeenCalled();
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('Operation failed');
+      expect(getTextContent(result)).toContain('Operation failed');
     });
 
     test('should handle missing page', async () => {
@@ -77,7 +78,7 @@ describe('Browser Navigation History Tools', () => {
 
       expect(mockGoBack).not.toHaveBeenCalled();
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('Browser page not initialized');
+      expect(getTextContent(result)).toContain('Browser page not initialized');
     });
   });
 
@@ -89,7 +90,7 @@ describe('Browser Navigation History Tools', () => {
 
       expect(mockGoForward).toHaveBeenCalled();
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('Navigated forward');
+      expect(getTextContent(result)).toContain('Navigated forward');
     });
 
     test('should handle navigation forward errors', async () => {
@@ -102,7 +103,7 @@ describe('Browser Navigation History Tools', () => {
 
       expect(mockGoForward).toHaveBeenCalled();
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('Operation failed');
+      expect(getTextContent(result)).toContain('Operation failed');
     });
 
     test('should handle missing page', async () => {
@@ -112,7 +113,7 @@ describe('Browser Navigation History Tools', () => {
 
       expect(mockGoForward).not.toHaveBeenCalled();
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('Browser page not initialized');
+      expect(getTextContent(result)).toContain('Browser page not initialized');
     });
   });
 }); 

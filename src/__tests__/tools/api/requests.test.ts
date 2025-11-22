@@ -1,7 +1,8 @@
 import { GetRequestTool, PostRequestTool, PutRequestTool, PatchRequestTool, DeleteRequestTool } from '../../../tools/api/requests.js';
-import { ToolContext } from '../../../tools/common/types.js';
-import { APIRequestContext } from 'playwright';
+import type { ToolContext } from '../../../tools/common/types.js';
+import type { APIRequestContext } from 'playwright';
 import { jest } from '@jest/globals';
+import { getTextContent } from '../../testUtils';
 
 // Mock response
 const mockStatus200 = jest.fn().mockReturnValue(200);
@@ -70,7 +71,7 @@ describe('API Request Tools', () => {
 
       expect(mockGet).toHaveBeenCalledWith('https://api.example.com');
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('GET request to');
+      expect(getTextContent(result)).toContain('GET request to');
     });
 
     test('should handle GET request errors', async () => {
@@ -85,7 +86,7 @@ describe('API Request Tools', () => {
 
       expect(mockGet).toHaveBeenCalledWith('https://api.example.com');
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('API operation failed');
+      expect(getTextContent(result)).toContain('API operation failed');
     });
 
     test('should handle missing API context', async () => {
@@ -97,7 +98,7 @@ describe('API Request Tools', () => {
 
       expect(mockGet).not.toHaveBeenCalled();
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('API context not initialized');
+      expect(getTextContent(result)).toContain('API context not initialized');
     });
   });
 
@@ -117,7 +118,7 @@ describe('API Request Tools', () => {
         }
       });
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('POST request to');
+      expect(getTextContent(result)).toContain('POST request to');
     });
 
     test('should make a POST request with Bearer token', async () => {
@@ -137,7 +138,7 @@ describe('API Request Tools', () => {
         }
       });
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('POST request to');
+      expect(getTextContent(result)).toContain('POST request to');
     });
 
     test('should make a POST request with Bearer token and custom headers', async () => {
@@ -161,7 +162,7 @@ describe('API Request Tools', () => {
         }
       });
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('POST request to');
+      expect(getTextContent(result)).toContain('POST request to');
     });
   });
 
@@ -176,7 +177,7 @@ describe('API Request Tools', () => {
 
       expect(mockPut).toHaveBeenCalledWith('https://api.example.com', { data: args.value });
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('PUT request to');
+      expect(getTextContent(result)).toContain('PUT request to');
     });
   });
 
@@ -191,7 +192,7 @@ describe('API Request Tools', () => {
 
       expect(mockPatch).toHaveBeenCalledWith('https://api.example.com', { data: args.value });
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('PATCH request to');
+      expect(getTextContent(result)).toContain('PATCH request to');
     });
   });
 
@@ -205,7 +206,7 @@ describe('API Request Tools', () => {
 
       expect(mockDelete).toHaveBeenCalledWith('https://api.example.com/1');
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('DELETE request to');
+      expect(getTextContent(result)).toContain('DELETE request to');
     });
   });
 }); 

@@ -1,6 +1,7 @@
 import { handleToolCall, getConsoleLogs, getScreenshots, registerConsoleMessage } from '../toolHandler.js';
 import { Browser, Page, chromium, firefox, webkit } from 'playwright';
 import { jest } from '@jest/globals';
+import { getTextContent } from './testUtils';
 
 // Mock the Playwright browser and page
 jest.mock('playwright', () => {
@@ -172,7 +173,7 @@ describe('Tool Handler', () => {
   test('handleToolCall should handle unknown tool', async () => {
     const result = await handleToolCall('unknown_tool', {}, mockServer);
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Unknown tool');
+    expect(getTextContent(result)).toContain('Unknown tool');
   });
 
   // In the actual implementation, the tools might succeed or fail depending on how the mocks are set up
@@ -386,7 +387,7 @@ describe('Tool Handler', () => {
     // A more direct test would require exporting ensureBrowser and spying on it.
     // For now, we will just check if the tool call succeeds.
     const result = await handleToolCall('playwright_navigate', { url: 'about:blank' }, mockServer);
-    expect(result.content[0].text).toContain('Navigated to');
+    expect(getTextContent(result)).toContain('Navigated to');
 
     // Clean up
     delete process.env.CHROME_EXECUTABLE_PATH;

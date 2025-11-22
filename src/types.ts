@@ -1,4 +1,4 @@
-import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
+import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 
 export interface Tool {
   name: string;
@@ -8,7 +8,7 @@ export interface Tool {
     properties: Record<string, unknown>;
     required?: string[];
   };
-  handler: (args: any) => Promise<any>;
+  handler: (args: any, context?: any) => Promise<any>;
 }
 
 export interface ToolCall {
