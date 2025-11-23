@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch: {}
 
 jobs:
   release-please:
@@ -16,5 +17,6 @@ jobs:
         uses: googleapis/release-please-action@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          command: manifest-pr
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json

@@ -3,23 +3,18 @@ name: Docker Image Build/Push
 on:
   push:
     branches: ["**"]
-    paths:
-      - "Dockerfile"
-      - "docker-compose.yml"
-      - "docker-compose.yaml"
-      - ".dockerignore"
     tags:
-      - 'v*.*.*'
+      - "v*.*.*"
   pull_request:
     branches: ["**"]
-    paths:
-      - "Dockerfile"
-      - "docker-compose.yml"
-      - "docker-compose.yaml"
-      - ".dockerignore"
   release:
     types: [published, created]
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      push_image:
+        description: "Set to true to force a push on manual runs"
+        required: false
+        default: "false"
   workflow_call: {}
 
 env:
@@ -35,7 +30,7 @@ jobs:
       packages: write
 
     env:
-      PUSH_IMAGE: ${{ github.event_name == 'release' || github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') }}
+      PUSH_IMAGE: ${{ github.event_name == 'release' || startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main' || github.event.inputs.push_image == 'true' }}
 
     steps:
       - name: Checkout repository
@@ -43,6 +38,20 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ github.event.release.tag_name || github.ref }}
+
+      - name: Detect docker file changes
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            docker:
+              - 'Dockerfile'
+              - 'docker-compose.yml'
+              - 'docker-compose.yaml'
+              - '.dockerignore'
+
+      - name: Show docker change filters
+        run: 'echo "Docker files changed: ${{ steps.changes.outputs.docker }}"'
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -75,6 +84,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Image build/push (GHCR)
+        if: ${{ steps.changes.outputs.docker == 'true' || env.PUSH_IMAGE == 'true' || github.event_name == 'release' || startsWith(github.ref, 'refs/tags/v') }}
         uses: docker/build-push-action@v5
         env:
           DOCS_ORG: ${{ github.repository_owner }}
