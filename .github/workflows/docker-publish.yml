@@ -8,6 +8,8 @@ on:
       - "docker-compose.yml"
       - "docker-compose.yaml"
       - ".dockerignore"
+    tags:
+      - 'v*.*.*'
   pull_request:
     branches: ["**"]
     paths:
@@ -16,7 +18,7 @@ on:
       - "docker-compose.yaml"
       - ".dockerignore"
   release:
-    types: [published]
+    types: [published, created]
   workflow_dispatch: {}
   workflow_call: {}
 

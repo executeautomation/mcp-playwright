@@ -4,9 +4,9 @@ import type * as Preset from '@docusaurus/preset-classic';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
-const siteUrl = process.env.DOCS_URL ?? 'https://executeautomation.github.io/';
+const siteUrl = process.env.DOCS_URL ?? 'https://aakashh242.github.io/';
 const siteBaseUrl = process.env.DOCS_BASE_URL ?? '/mcp-playwright/';
-const orgName = process.env.DOCS_ORG ?? 'executeautomation';
+const orgName = process.env.DOCS_ORG ?? 'aakashh242';
 const projectName = process.env.DOCS_PROJECT ?? 'mcp-playwright';
 
 const config: Config = {
@@ -103,7 +103,7 @@ const config: Config = {
           items: [
             {
               label: 'Youtube',
-              href: 'https://youtube.com/executeautomation',
+              href: 'https://youtube.com/aakashh242',
             },
             {
               label: 'Udemy',

@@ -16,20 +16,20 @@ This is the quickest way to run the Playwright MCP server locally.
 ## Install & Run
 
 ```bash
-npx @executeautomation/playwright-mcp-server
+npx @aakashh242/playwright-mcp-server
 ```
 
 To keep a global install:
 
 ```bash
-npm install -g @executeautomation/playwright-mcp-server
+npm install -g @aakashh242/playwright-mcp-server
 playwright-mcp-server
 ```
 
 ## Streamable HTTP mode
 
 ```bash
-npx @executeautomation/playwright-mcp-server --http \
+npx @aakashh242/playwright-mcp-server --http \
   --port 8000 \
   --path /mcp \
   --host-name localhost \
@@ -47,7 +47,7 @@ Add the server to `mcp.json`:
   "mcpServers": {
     "playwright": {
       "command": "npx",
-      "args": ["-y", "@executeautomation/playwright-mcp-server"]
+      "args": ["-y", "@aakashh242/playwright-mcp-server"]
     }
   }
 }

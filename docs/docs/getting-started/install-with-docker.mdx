@@ -15,22 +15,38 @@ Use the prebuilt container image for isolated or server deployments.
 ## Pull & Run
 
 ```bash
-docker pull ghcr.io/executeautomation/mcp-playwright:latest
-docker run -i --rm ghcr.io/executeautomation/mcp-playwright:latest
+docker pull ghcr.io/aakashh242/mcp-playwright:latest
+docker run -i --rm ghcr.io/aakashh242/mcp-playwright:latest
 ```
 
 ### Streamable HTTP mode
 
 ```bash
 docker run --rm -p 8000:8000 \
-  ghcr.io/executeautomation/mcp-playwright:latest \
+  ghcr.io/aakashh242/mcp-playwright:latest \
   node dist/index.js --http --listen 0.0.0.0 --host-name localhost
 ```
 
 Mount `/data` if you want to persist generated resources:
 
 ```bash
-docker run --rm -p 8000:8000 -v /data:/data ghcr.io/executeautomation/mcp-playwright:latest ...
+docker run --rm -p 8000:8000 -v /data:/data ghcr.io/aakashh242/mcp-playwright:latest ...
+```
+
+## Running with Docker Compose (recommended for production HTTP)
+
+Use the provided `docker-compose.yml` for streamable HTTP with sensible defaults:
+
+```bash
+docker compose up -d
+```
+
+This exposes `http://localhost:8000/mcp`, binds to `0.0.0.0:8000`, and mounts `./data/app-data` → `/app/data` plus `./data/resource-data` → `/data` for persisted resources. Replace the `--host-name` placeholder in the compose file with your public hostname.
+
+import composeYml from '!!raw-loader!@site/docker-compose.yml';
+
+```yaml title="docker-compose.yml"
+{composeYml}
 ```
 
 ## VS Code configuration
@@ -42,7 +58,7 @@ docker run --rm -p 8000:8000 -v /data:/data ghcr.io/executeautomation/mcp-playwr
   "mcpServers": {
     "playwright": {
       "command": "docker",
-      "args": ["run", "-i", "--rm", "ghcr.io/executeautomation/mcp-playwright:latest"]
+      "args": ["run", "-i", "--rm", "ghcr.io/aakashh242/mcp-playwright:latest"]
     }
   }
 }

@@ -10,13 +10,13 @@ Streamable HTTP allows the server to run behind gateways and lets clients downlo
 ## Enabling
 
 ```bash
-npx @executeautomation/playwright-mcp-server --http --port 8000 --path /mcp --host-name your.host
+npx @aakashh242/playwright-mcp-server --http --port 8000 --path /mcp --host-name your.host
 ```
 
 Or Docker:
 
 ```bash
-docker run --rm -p 8000:8000 ghcr.io/executeautomation/mcp-playwright:latest \
+docker run --rm -p 8000:8000 ghcr.io/aakashh242/mcp-playwright:latest \
   node dist/index.js --http --listen 0.0.0.0 --host-name your.host
 ```
 
