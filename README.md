@@ -196,32 +196,28 @@ Adjust `url` to match your host/port/path and use `https` if terminated by a pro
 
 ## Docker Support
 
-The Playwright MCP Server ships with a multi-stage Dockerfile that builds the app inside the container and uses the official Playwright base image. Browsers and system dependencies are already present, which avoids slow first-run downloads and version drift you can hit with slim Node images plus ad-hoc installs.
+The Playwright MCP Server is available as a pre-built Docker image with all browsers and system dependencies included. This avoids slow first-run downloads and version drift.
 
-### Building the Docker Image
+### Using Docker
 
-The Docker build handles dependencies and the TypeScript build for you:
+To use Docker, pull the latest image from GitHub Container Registry:
 
 ```bash
-docker build -t mcp-playwright .
+docker pull ghcr.io/aakashh242/mcp-playwright:latest
 ```
 
-### Running with Docker
-
-You can run the MCP server using Docker in several ways:
-
-#### Using Docker directly
+#### Running with Docker directly
 
 ```bash
 # Run the server (stdin/stdout communication)
-docker run -i mcp-playwright
+docker run -i --rm ghcr.io/aakashh242/mcp-playwright:latest
 ```
 
 #### Streamable HTTP mode in Docker
 
 ```bash
 docker run --rm -p 8000:8000 -v /data:/data \
-  mcp-playwright \
+  ghcr.io/aakashh242/mcp-playwright:latest \
   node dist/index.js --http --insecure --host-name localhost --listen 0.0.0.0 --path /mcp
 ```
 
@@ -237,6 +233,7 @@ Use the provided `docker-compose.yml` to run streamable HTTP with sensible defau
 ```bash
 docker compose up -d
 ```
+
 Defaults:
 - HTTP mode with `--path=/mcp`, `--listen=0.0.0.0`, `--port=8000`, and a `--host-name` placeholder (replace with your public hostname).
 - Ports: `8000:8000`
@@ -251,11 +248,24 @@ To use the Dockerized server with Claude Desktop or other MCP clients, you can c
   "mcpServers": {
     "playwright": {
       "command": "docker",
-      "args": ["run", "-i", "--rm", "mcp-playwright"]
+      "args": ["run", "-i", "--rm", "ghcr.io/aakashh242/mcp-playwright:latest"]
     }
   }
 }
 ```
+
+### Building Locally
+
+If you need to build the Docker image locally:
+
+The Docker build handles dependencies and the TypeScript build for you:
+
+```bash
+docker build -t mcp-playwright .
+```
+
+Then use `mcp-playwright` instead of `ghcr.io/aakashh242/mcp-playwright:latest` in the commands above.
+
 
 ## Testing
 
