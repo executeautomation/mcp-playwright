@@ -2,7 +2,11 @@
 
 ## 0.1.0 (2025-11-23)
 
+## What's Changed
+* feat: #1 add streamable HTTP support  by @aakashH242 in https://github.com/aakashH242/mcp-playwright/pull/2
 
-### Features
+## New Contributors
+* @aakashH242 made their first contribution in https://github.com/aakashH242/mcp-playwright/pull/2
+* @github-actions[bot] made their first contribution in https://github.com/aakashH242/mcp-playwright/pull/10
 
-* [#1](https://github.com/aakashH242/mcp-playwright/issues/1) add streamable HTTP support  ([#2](https://github.com/aakashH242/mcp-playwright/issues/2)) ([8ff68df](https://github.com/aakashH242/mcp-playwright/commit/8ff68df09a133668a67549499438fdf12b26f36c))
+**Full Changelog**: https://github.com/aakashH242/mcp-playwright/commits/v0.1.0
