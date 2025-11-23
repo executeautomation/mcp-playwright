@@ -1,6 +1,10 @@
-import { BrowserToolBase } from './base.js';
-import { ToolContext, ToolResponse, createSuccessResponse, createErrorResponse } from '../common/types.js';
-import { setGlobalPage } from '../../toolHandler.js';
+import { promises as fs } from "node:fs";
+import path from "node:path";
+import { getSessionIdForServer } from "../../resourceManager.js";
+import { setGlobalPage } from "../../toolHandler.js";
+import { getUploadEndpointUrl, parseUploadResourceUri, resolveUploadResource } from "../../uploadManager.js";
+import { createErrorResponse, createSuccessResponse, type ToolContext, type ToolResponse } from "../common/types.js";
+import { BrowserToolBase } from "./base.js";
 /**
  * Tool for clicking elements on the page
  */
@@ -10,7 +14,7 @@ export class ClickTool extends BrowserToolBase {
    */
   async execute(args: any, context: ToolContext): Promise<ToolResponse> {
     return this.safeExecute(context, async (page) => {
-      await page.click(args.selector);      
+      await page.click(args.selector);
       return createSuccessResponse(`Clicked element: ${args.selector}`);
     });
   }
@@ -23,17 +27,18 @@ export class ClickAndSwitchTabTool extends BrowserToolBase {
    * Execute the click and switch tab tool
    */
   async execute(args: any, context: ToolContext): Promise<ToolResponse> {
-    
     return this.safeExecute(context, async (page) => {
       // Listen for a new tab to open
       const [newPage] = await Promise.all([
         //context.browser.waitForEvent('page'), // Wait for a new page (tab) to open
-        page.context().waitForEvent('page'),// Wait for a new page (tab) to open
+        page
+          .context()
+          .waitForEvent("page"), // Wait for a new page (tab) to open
         page.click(args.selector), // Click the link that opens the new tab
       ]);
 
       // Wait for the new page to load
-      await newPage.waitForLoadState('domcontentloaded');
+      await newPage.waitForLoadState("domcontentloaded");
 
       // Switch control to the new tab
       setGlobalPage(newPage);
@@ -58,7 +63,7 @@ export class IframeClickTool extends BrowserToolBase {
       if (!frame) {
         return createErrorResponse(`Iframe not found: ${args.iframeSelector}`);
       }
-      
+
       await frame.locator(args.selector).click();
       return createSuccessResponse(`Clicked element ${args.selector} inside iframe ${args.iframeSelector}`);
     });
@@ -78,9 +83,11 @@ export class IframeFillTool extends BrowserToolBase {
       if (!frame) {
         return createErrorResponse(`Iframe not found: ${args.iframeSelector}`);
       }
-      
+
       await frame.locator(args.selector).fill(args.value);
-      return createSuccessResponse(`Filled element ${args.selector} inside iframe ${args.iframeSelector} with: ${args.value}`);
+      return createSuccessResponse(
+        `Filled element ${args.selector} inside iframe ${args.iframeSelector} with: ${args.value}`,
+      );
     });
   }
 }
@@ -137,14 +144,88 @@ export class HoverTool extends BrowserToolBase {
  * Tool for uploading files
  */
 export class UploadFileTool extends BrowserToolBase {
+  private async prepareUploadFile(
+    args: any,
+    server: any,
+    _context: ToolContext,
+  ): Promise<{ path: string; cleanup: () => Promise<void>; displayName: string } | { error: string }> {
+    const sessionId = getSessionIdForServer(server);
+    const uploadResourceUri = args.uploadResourceUri ?? args.fileResourceUri;
+    const inHttpMode = Boolean(sessionId);
+
+    if (uploadResourceUri) {
+      const parsed = parseUploadResourceUri(uploadResourceUri);
+      const targetSession = parsed?.sessionId ?? sessionId;
+      if (!parsed || !targetSession) {
+        return { error: "Invalid upload resource URI" };
+      }
+      const meta = await resolveUploadResource({
+        resourceUri: uploadResourceUri,
+        sessionId: targetSession,
+      });
+      if (!meta) {
+        return { error: "Uploaded file could not be resolved for this session" };
+      }
+      const cleanup = async () => {};
+      return { path: meta.filePath, cleanup, displayName: meta.name };
+    }
+
+    if (args.filePath) {
+      const resolvedPath = path.resolve(args.filePath);
+      try {
+        await fs.access(resolvedPath);
+        return {
+          path: resolvedPath,
+          cleanup: async () => {},
+          displayName: args.filePath,
+        };
+      } catch {
+        if (inHttpMode) {
+          return {
+            error: `File not found at path: ${resolvedPath}. In HTTP mode, first call construct_upload_url, upload the file, then call playwright_upload_file with uploadResourceUri.`,
+          };
+        }
+        return { error: `File not found at path: ${resolvedPath}` };
+      }
+    }
+
+    if (inHttpMode) {
+      const uploadUrl = getUploadEndpointUrl();
+      const hint = uploadUrl
+        ? ` Call construct_upload_url to obtain the upload endpoint for this session (e.g., ${uploadUrl}/<sessionId>).`
+        : "";
+      return {
+        error: `No file provided. In HTTP mode, first upload a file and provide uploadResourceUri.${hint}`,
+      };
+    }
+
+    return {
+      error: "filePath is required in stdio mode.",
+    };
+  }
+
   /**
    * Execute the upload file tool
    */
   async execute(args: any, context: ToolContext): Promise<ToolResponse> {
     return this.safeExecute(context, async (page) => {
+      if (!args.selector) {
+        return createErrorResponse("Selector is required to upload a file");
+      }
+
+      const prepared = await this.prepareUploadFile(args, context.server, context);
+      if ("error" in prepared) {
+        return createErrorResponse(prepared.error);
+      }
+
+      const { path: uploadPath, cleanup, displayName } = prepared;
+      try {
         await page.waitForSelector(args.selector);
-        await page.setInputFiles(args.selector, args.filePath);
-        return createSuccessResponse(`Uploaded file '${args.filePath}' to '${args.selector}'`);
+        await page.setInputFiles(args.selector, uploadPath);
+        return createSuccessResponse(`Uploaded file '${displayName}' to '${args.selector}'`);
+      } finally {
+        await cleanup().catch(() => {});
+      }
     });
   }
 }
@@ -159,21 +240,16 @@ export class EvaluateTool extends BrowserToolBase {
   async execute(args: any, context: ToolContext): Promise<ToolResponse> {
     return this.safeExecute(context, async (page) => {
       const result = await page.evaluate(args.script);
-      
+
       // Convert result to string for display
       let resultStr: string;
       try {
         resultStr = JSON.stringify(result, null, 2);
-      } catch (error) {
+      } catch (_error) {
         resultStr = String(result);
       }
-      
-      return createSuccessResponse([
-        `Executed JavaScript:`,
-        `${args.script}`,
-        `Result:`,
-        `${resultStr}`
-      ]);
+
+      return createSuccessResponse([`Executed JavaScript:`, `${args.script}`, `Result:`, `${resultStr}`]);
     });
   }
 }
@@ -189,25 +265,19 @@ export class DragTool extends BrowserToolBase {
     return this.safeExecute(context, async (page) => {
       const sourceElement = await page.waitForSelector(args.sourceSelector);
       const targetElement = await page.waitForSelector(args.targetSelector);
-      
+
       const sourceBound = await sourceElement.boundingBox();
       const targetBound = await targetElement.boundingBox();
-      
+
       if (!sourceBound || !targetBound) {
         return createErrorResponse("Could not get element positions for drag operation");
       }
 
-      await page.mouse.move(
-        sourceBound.x + sourceBound.width / 2,
-        sourceBound.y + sourceBound.height / 2
-      );
+      await page.mouse.move(sourceBound.x + sourceBound.width / 2, sourceBound.y + sourceBound.height / 2);
       await page.mouse.down();
-      await page.mouse.move(
-        targetBound.x + targetBound.width / 2,
-        targetBound.y + targetBound.height / 2
-      );
+      await page.mouse.move(targetBound.x + targetBound.width / 2, targetBound.y + targetBound.height / 2);
       await page.mouse.up();
-      
+
       return createSuccessResponse(`Dragged element from ${args.sourceSelector} to ${args.targetSelector}`);
     });
   }
@@ -226,13 +296,12 @@ export class PressKeyTool extends BrowserToolBase {
         await page.waitForSelector(args.selector);
         await page.focus(args.selector);
       }
-      
+
       await page.keyboard.press(args.key);
       return createSuccessResponse(`Pressed key: ${args.key}`);
     });
   }
-} 
-
+}
 
 /**
  * Tool for switching browser tabs
@@ -243,7 +312,7 @@ export class PressKeyTool extends BrowserToolBase {
 //    */
 //   async execute(args: any, context: ToolContext): Promise<ToolResponse> {
 //     return this.safeExecute(context, async (page) => {
-//       const tabs = await browser.page;      
+//       const tabs = await browser.page;
 
 //       // Validate the tab index
 //       const tabIndex = Number(args.index);

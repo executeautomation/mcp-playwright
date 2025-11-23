@@ -1,9 +1,10 @@
-import { ScreenshotTool } from '../../../tools/browser/screenshot.js';
-import { ToolContext } from '../../../tools/common/types.js';
-import { Page, Browser } from 'playwright';
-import { jest } from '@jest/globals';
 import fs from 'node:fs';
 import path from 'node:path';
+import { jest } from '@jest/globals';
+import type { Browser, Page } from 'playwright';
+import { ScreenshotTool } from '../../../tools/browser/screenshot.js';
+import type { ToolContext } from '../../../tools/common/types.js';
+import { getTextContent } from '../../testUtils';
 
 // Mock fs module
 jest.mock('node:fs', () => ({
@@ -92,7 +93,8 @@ describe('ScreenshotTool', () => {
     
     // Check that the result contains success message
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toContain('Screenshot saved to');
+    expect(getTextContent(result)).toContain('Screenshot saved to');
+    expect(getTextContent(result)).not.toContain('stored in memory');
   });
 
   test('should handle element screenshot', async () => {
@@ -109,7 +111,8 @@ describe('ScreenshotTool', () => {
 
     // Check that the result contains success message
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toContain('Screenshot saved to');
+    expect(getTextContent(result)).toContain('Screenshot saved to');
+    expect(getTextContent(result)).not.toContain('stored in memory');
   });
 
   test('should handle screenshot errors', async () => {
@@ -124,7 +127,7 @@ describe('ScreenshotTool', () => {
 
     expect(mockScreenshot).toHaveBeenCalled();
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Operation failed');
+    expect(getTextContent(result)).toContain('Operation failed');
   });
 
   test('should handle missing page', async () => {
@@ -142,7 +145,7 @@ describe('ScreenshotTool', () => {
 
     expect(mockScreenshot).not.toHaveBeenCalled();
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Browser page not initialized');
+    expect(getTextContent(result)).toContain('Browser page not initialized');
   });
 
   test('should store screenshots in a map', async () => {
@@ -173,6 +176,7 @@ describe('ScreenshotTool', () => {
     
     expect(mockScreenshot).toHaveBeenCalled();
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toContain('Screenshot saved to');
+    expect(getTextContent(result)).toContain('Screenshot saved to');
+    expect(getTextContent(result)).not.toContain('stored in memory');
   });
-}); 
+});

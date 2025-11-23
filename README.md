@@ -22,9 +22,18 @@
 
 # Playwright MCP Server 🎭
 
-[![smithery badge](https://smithery.ai/badge/@executeautomation/playwright-mcp-server)](https://smithery.ai/server/@executeautomation/playwright-mcp-server)
+> 🚀 Active Fork of executeautomation/mcp-playwright  
+>  This repository is an actively maintained continuation of the original MCP Playwright server:
+> 👉 https://github.com/executeautomation/mcp-playwright
+
+![Release](https://img.shields.io/github/v/release/aakashh242/mcp-playwright?sort=semver)
+![Build](https://img.shields.io/github/actions/workflow/status/aakashh242/mcp-playwright/build.yml?branch=main&label=build)
+![Lint](https://img.shields.io/github/actions/workflow/status/aakashh242/mcp-playwright/build.yml?branch=main&label=lint)
+![Unit Tests](https://img.shields.io/github/actions/workflow/status/aakashh242/mcp-playwright/build.yml?branch=main&label=tests)
+[![Coverage](https://codecov.io/gh/aakashh242/mcp-playwright/graph/badge.svg)](https://codecov.io/gh/aakashh242/mcp-playwright)
 
 A Model Context Protocol server that provides browser automation capabilities using Playwright. This server enables LLMs to interact with web pages, take screenshots, generate test code, web scraps the page and execute JavaScript in a real browser environment.
+It is optimized for QA and E2E automation: screenshots, logs, assertions, API testing, plus full MCP HTTP/gateway support — built on the same Playwright foundations, complementary to Microsoft’s server.
 
 <a href="https://glama.ai/mcp/servers/yh4lgtwgbe"><img width="380" height="200" src="https://glama.ai/mcp/servers/yh4lgtwgbe/badge" alt="mcp-playwright MCP server" /></a>
 
@@ -96,28 +105,102 @@ Here's the Claude Desktop configuration to use the Playwright server:
 }
 ```
 
+## Streamable HTTP mode
+
+The server supports the MCP Streamable HTTP transport so it can run behind gateways.
+
+- Start in HTTP mode (defaults to port `8000` and path `/mcp`):
+  ```bash
+  npx @executeautomation/playwright-mcp-server --http
+  ```
+- Override the port or path:
+  ```bash
+  npx @executeautomation/playwright-mcp-server --http --port 3000 --path /custom-mcp
+  ```
+
+### How files are shared in HTTP mode
+- Generated artifacts (screenshots, PDFs, console logs, generated tests) are written into `/data/<session>/<resourceId>.<ext>` on the server.
+- Each Streamable HTTP session gets its own isolated resource namespace; links are only valid for that session and expire after the configured TTL (`--resource-ttl`, default 600s). Session close or TTL expiry removes the files and their directories.
+- Tool results return `resourceLinks` pointing to download URLs:  
+  `{scheme}://{host}:{port}{path}/resources/{sessionId}/{resourceId}/{filename}`  
+  (host from `--host-name`, scheme from `--insecure`, path from `--path`, default `/mcp`).
+- In stdio mode, resource linking is disabled; tools only emit local paths.
+
+This scope-based sharing prevents content leakage between sessions/clients while still giving HTTP clients and gateways stable download URIs.
+
+### Uploads in HTTP mode
+- The `playwright_upload_file` tool accepts a local `filePath` only in stdio mode. In HTTP mode, you must first upload the file and pass `uploadResourceUri`.
+- Get the session-scoped upload URL by calling `construct_upload_url` (HTTP mode only). It returns a POST multipart endpoint like `{path}/uploads/{sessionId}`; the session ID is embedded in the URL so no header is usually needed.
+- Upload with `multipart/form-data` (field `file`). On success, the server responds with a session-scoped `resourceUri` such as `mcp-uploads://<session>/<id>`.
+- Then call `playwright_upload_file` with `uploadResourceUri` to attach the uploaded file to the file input. Uploads are isolated per session/client like other resources.
+- Agents must be able to run terminal/CLI commands (curl on Linux/macOS, `Invoke-WebRequest`/`iwr` on Windows) to upload the file before calling `playwright_upload_file` in HTTP mode.
+- Stdio mode continues to use local `filePath`; HTTP mode prefers uploaded resources.
+
+### Client Configuration
+
+Claude Desktop / VS Code (`mcp.json`):
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "transport": {
+        "type": "http",
+        "url": "http://localhost:8000/mcp"
+      }
+    }
+  }
+}
+```
+Adjust `url` to match your host/port/path and use `https` if terminated by a proxy.
+
+
+## CLI flags
+- `--http`: Enable Streamable HTTP transport (default: off; stdio is used when omitted).
+- `--port <number>`: HTTP port (default: `8000`, only relevant when `--http` is set).
+- `--path <path>`: Base HTTP path (default: `/mcp`, only relevant when `--http` is set).
+- `--host-name <hostname>`: Hostname used in generated download URLs (default: system hostname, only relevant when `--http` is set).
+- `--listen <address>`: Bind address for the HTTP server (default: `0.0.0.0`, only relevant when `--http` is set).
+- `--insecure`: Use `http` scheme for download links; omit to use `https` (only relevant when `--http` is set).
+- `--resource-ttl <seconds>`: TTL for generated resources (default: `600` seconds; only affects HTTP mode).
+- `--static-user-agent`: Disable the default randomized User-Agent rotation (by default, each new browser launch picks a modern UA to reduce bot detection/CAPTCHAs).
+
+## Agents / Prompts
+- A starter agent prompt is provided in [`AGENTS.md`](AGENTS.md). Create an agent in VS Code (or your client) using that prompt as a template; customize as needed.
+- For file uploads in HTTP mode, ensure the agent has permission to run terminal/CLI commands (curl on Linux/macOS, `Invoke-WebRequest`/`iwr` on Windows) because uploads are performed via the session-specific HTTP endpoint before calling `playwright_upload_file`.
+
+## Contributing
+- Read the [CONTRIBUTING.md](CONTRIBUTING.md) guidelines for required tooling (pre-commit hooks, lint/test/build steps, conventional commits, documentation updates).
+- The CI workflow enforces the same standards; please mirror them locally before opening a PR.
+
+## Available Tools
+| Tool | Purpose | Notes |
+| --- | --- | --- |
+| `playwright_navigate` | Open a URL with optional viewport/headless/browser type | Browser launched if needed |
+| `playwright_screenshot` | Capture screenshot of page/element | HTTP mode returns resource link |
+| `playwright_save_as_pdf` | Save page as PDF | HTTP mode returns resource link |
+| `playwright_console_logs` | Retrieve browser console logs with filters | Log file registered when saved |
+| `playwright_upload_file` | Set a file into an `<input type="file">` | In HTTP mode, upload file via `construct_upload_url` then pass `uploadResourceUri`; stdio uses `filePath` |
+| `construct_upload_url` (HTTP) | Return session-scoped upload URL/instructions | Use POST multipart (`file` field) to get `uploadResourceUri` |
+| `playwright_click` / `playwright_fill` / `playwright_select` / `playwright_hover` / `playwright_drag` / `playwright_press_key` | Core page interactions | Browser required |
+| `playwright_iframe_click` / `playwright_iframe_fill` | Interact inside iframes | Provide iframe selector |
+| `playwright_get_visible_text` / `playwright_get_visible_html` | Read visible page content | HTML tool supports cleaning options |
+| `playwright_custom_user_agent` | Override User-Agent for browser context | |
+| `playwright_go_back` / `playwright_go_forward` / `playwright_close` | Navigation or close browser | |
+| `playwright_evaluate` | Execute JS in page | |
+| `playwright_expect_response` / `playwright_assert_response` | Wait for and assert network responses | |
+| `playwright_get` / `playwright_post` / `playwright_put` / `playwright_patch` / `playwright_delete` | HTTP API helpers | |
+| `start_codegen_session` / `end_codegen_session` / `get_codegen_session` / `clear_codegen_session` | Record and generate Playwright tests | Generated tests are exposed as resources in HTTP mode |
+
 ## Docker Support
 
-The Playwright MCP Server can be run in Docker for isolated and containerized execution.
+The Playwright MCP Server ships with a multi-stage Dockerfile that builds the app inside the container and uses the official Playwright base image. Browsers and system dependencies are already present, which avoids slow first-run downloads and version drift you can hit with slim Node images plus ad-hoc installs.
 
 ### Building the Docker Image
 
-Before building the Docker image, you need to build the TypeScript project with production dependencies:
+The Docker build handles dependencies and the TypeScript build for you:
 
 ```bash
-# Install production dependencies and build
-npm install --omit=dev
-npm run build
-
-# Build the Docker image
 docker build -t mcp-playwright .
-```
-
-Or use the provided convenience script:
-
-```bash
-chmod +x docker-build.sh
-./docker-build.sh
 ```
 
 ### Running with Docker
@@ -131,14 +214,30 @@ You can run the MCP server using Docker in several ways:
 docker run -i mcp-playwright
 ```
 
-#### Using Docker Compose
-
-A `docker-compose.yml` file is provided for easier management:
+#### Streamable HTTP mode in Docker
 
 ```bash
-# Run the server with docker-compose
-docker compose run --rm playwright-mcp
+docker run --rm -p 8000:8000 -v /data:/data \
+  mcp-playwright \
+  node dist/index.js --http --insecure --host-name localhost --listen 0.0.0.0 --path /mcp
 ```
+
+- Mount `/data` to persist session-scoped artifacts if desired.
+- Adjust `--host-name` to the public hostname your clients/gateways use. Use `--insecure` for `http`; omit it for `https` behind a terminating proxy.
+- Resource download URLs will be `http://<host>:8000/mcp/resources/<session>/<resourceId>/<filename>` by default.
+- The container default is headless (`PLAYWRIGHT_HEADLESS=1`) and the Playwright base image already includes browsers.
+
+#### Using Docker Compose (recommended for production HTTP)
+
+Use the provided `docker-compose.yml` to run streamable HTTP with sensible defaults:
+
+```bash
+docker compose up -d
+```
+Defaults:
+- HTTP mode with `--path=/mcp`, `--listen=0.0.0.0`, `--port=8000`, and a `--host-name` placeholder (replace with your public hostname).
+- Ports: `8000:8000`
+- Volumes: `./data/app-data:/app/data` and `./data/resource-data:/data` for persisted session artifacts.
 
 ### Using Docker with MCP Clients
 
@@ -154,8 +253,6 @@ To use the Dockerized server with Claude Desktop or other MCP clients, you can c
   }
 }
 ```
-
-**Note**: The Docker image uses a Debian-based slim Node.js image and includes only the core dependencies. Playwright browsers are not pre-installed in the container to keep the image size small. The browsers will be downloaded on first use if needed.
 
 ## Testing
 
@@ -193,4 +290,4 @@ Our server name is `playwright-mcp`. Please ensure your tool names are short eno
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=executeautomation/mcp-playwright&type=Date)](https://star-history.com/#executeautomation/mcp-playwright&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=aakashh242/mcp-playwright&type=Date)](https://star-history.com/#aakashh242/mcp-playwright&Date)

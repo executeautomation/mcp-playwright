@@ -1,0 +1,65 @@
+---
+sidebar_position: 2
+title: Install with Docker
+---
+
+# Install with Docker
+
+Use the prebuilt container image for isolated or server deployments.
+
+## Prerequisites
+
+- Docker Engine (desktop or server)
+- Optional: ability to map volumes for `/data`
+
+## Pull & Run
+
+```bash
+docker pull ghcr.io/executeautomation/mcp-playwright:latest
+docker run -i --rm ghcr.io/executeautomation/mcp-playwright:latest
+```
+
+### Streamable HTTP mode
+
+```bash
+docker run --rm -p 8000:8000 \
+  ghcr.io/executeautomation/mcp-playwright:latest \
+  node dist/index.js --http --listen 0.0.0.0 --host-name localhost
+```
+
+Mount `/data` if you want to persist generated resources:
+
+```bash
+docker run --rm -p 8000:8000 -v /data:/data ghcr.io/executeautomation/mcp-playwright:latest ...
+```
+
+## VS Code configuration
+
+### STDIO transport
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "docker",
+      "args": ["run", "-i", "--rm", "ghcr.io/executeautomation/mcp-playwright:latest"]
+    }
+  }
+}
+```
+
+### HTTP transport
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "transport": {
+        "type": "http",
+        "url": "http://localhost:8000/mcp"
+      }
+    }
+  }
+}
+```
+

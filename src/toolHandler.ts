@@ -1,54 +1,53 @@
-import type { Browser, Page } from 'playwright';
-import { chromium, firefox, webkit, request } from 'playwright';
-import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
-import { BROWSER_TOOLS, API_TOOLS } from './tools.js';
-import type { ToolContext } from './tools/common/types.js';
-import { ActionRecorder } from './tools/codegen/recorder.js';
-import { 
-  startCodegenSession,
-  endCodegenSession,
-  getCodegenSession,
-  clearCodegenSession
-} from './tools/codegen/index.js';
-import { 
-  ScreenshotTool,
-  NavigationTool,
-  CloseBrowserTool,
-  ConsoleLogsTool,
-  ExpectResponseTool,
-  AssertResponseTool,
-  CustomUserAgentTool
-} from './tools/browser/index.js';
+import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import type { Browser, Page } from "playwright";
+import { chromium, firefox, request, webkit } from "playwright";
 import {
-  ClickTool,
-  IframeClickTool,
-  FillTool,
-  SelectTool,
-  HoverTool,
-  EvaluateTool,
-  IframeFillTool,
-  UploadFileTool
-} from './tools/browser/interaction.js';
-import { 
-  VisibleTextTool, 
-  VisibleHtmlTool 
-} from './tools/browser/visiblePage.js';
-import {
+  DeleteRequestTool,
   GetRequestTool,
+  PatchRequestTool,
   PostRequestTool,
   PutRequestTool,
-  PatchRequestTool,
-  DeleteRequestTool
-} from './tools/api/requests.js';
-import { GoBackTool, GoForwardTool } from './tools/browser/navigation.js';
-import { DragTool, PressKeyTool } from './tools/browser/interaction.js';
-import { SaveAsPdfTool } from './tools/browser/output.js';
-import { ClickAndSwitchTabTool } from './tools/browser/interaction.js';
+} from "./tools/api/requests.js";
+import {
+  AssertResponseTool,
+  CloseBrowserTool,
+  ConsoleLogsTool,
+  CustomUserAgentTool,
+  ExpectResponseTool,
+  NavigationTool,
+  ScreenshotTool,
+} from "./tools/browser/index.js";
+import {
+  ClickAndSwitchTabTool,
+  ClickTool,
+  DragTool,
+  EvaluateTool,
+  FillTool,
+  HoverTool,
+  IframeClickTool,
+  IframeFillTool,
+  PressKeyTool,
+  SelectTool,
+  UploadFileTool,
+} from "./tools/browser/interaction.js";
+import { GoBackTool, GoForwardTool } from "./tools/browser/navigation.js";
+import { SaveAsPdfTool } from "./tools/browser/output.js";
+import { VisibleHtmlTool, VisibleTextTool } from "./tools/browser/visiblePage.js";
+import {
+  clearCodegenSession,
+  endCodegenSession,
+  getCodegenSession,
+  startCodegenSession,
+} from "./tools/codegen/index.js";
+import { ActionRecorder } from "./tools/codegen/recorder.js";
+import type { ToolContext } from "./tools/common/types.js";
+import { API_TOOLS, BROWSER_TOOLS } from "./tools.js";
+import { getUploadEndpointUrl } from "./uploadManager.js";
 
 // Global state
 let browser: Browser | undefined;
 let page: Page | undefined;
-let currentBrowserType: 'chromium' | 'firefox' | 'webkit' = 'chromium';
+let currentBrowserType: "chromium" | "firefox" | "webkit" = "chromium";
 
 /**
  * Resets browser and page variables
@@ -57,7 +56,7 @@ let currentBrowserType: 'chromium' | 'firefox' | 'webkit' = 'chromium';
 export function resetBrowserState() {
   browser = undefined;
   page = undefined;
-  currentBrowserType = 'chromium';
+  currentBrowserType = "chromium";
 }
 /**
  * Sets the provided page to the global page variable
@@ -65,7 +64,7 @@ export function resetBrowserState() {
  */
 export function setGlobalPage(newPage: Page): void {
   page = newPage;
-  page.bringToFront();// Bring the new tab to the front
+  page.bringToFront(); // Bring the new tab to the front
   console.log("Global page has been updated.");
 }
 // Tool instances
@@ -101,6 +100,35 @@ let pressKeyTool: PressKeyTool;
 let saveAsPdfTool: SaveAsPdfTool;
 let clickAndSwitchTabTool: ClickAndSwitchTabTool;
 
+let staticUserAgent = false;
+
+const USER_AGENTS = [
+  // Modern Chrome on Windows
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
+  // Modern Chrome on macOS
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/605.1.15",
+  // Modern Firefox on Windows
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:131.0) Gecko/20100101 Firefox/131.0",
+  // Modern Firefox on macOS
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 14.5; rv:131.0) Gecko/20100101 Firefox/131.0",
+  // Modern Safari on macOS (Playwright-compatible string)
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.15",
+];
+
+function getRandomUserAgent(): string {
+  const idx = Math.floor(Math.random() * USER_AGENTS.length);
+  return USER_AGENTS[idx];
+}
+
+function resolveUserAgent(requested?: string): string | undefined {
+  if (requested) return requested;
+  if (staticUserAgent) return undefined;
+  return getRandomUserAgent();
+}
+
+export function setUserAgentConfig({ staticUserAgent: value }: { staticUserAgent: boolean }) {
+  staticUserAgent = value;
+}
 
 interface BrowserSettings {
   viewport?: {
@@ -109,7 +137,7 @@ interface BrowserSettings {
   };
   userAgent?: string;
   headless?: boolean;
-  browserType?: 'chromium' | 'firefox' | 'webkit';
+  browserType?: "chromium" | "firefox" | "webkit";
 }
 
 async function registerConsoleMessage(page) {
@@ -141,9 +169,8 @@ async function registerConsoleMessage(page) {
   await page.addInitScript(() => {
     window.addEventListener("unhandledrejection", (event) => {
       const reason = event.reason;
-      const message = typeof reason === "object" && reason !== null
-          ? reason.message || JSON.stringify(reason)
-          : String(reason);
+      const message =
+        typeof reason === "object" && reason !== null ? reason.message || JSON.stringify(reason) : String(reason);
 
       const stack = reason?.stack || "";
       // Use console.error get "Unhandled Rejection In Promise"
@@ -161,8 +188,8 @@ export async function ensureBrowser(browserSettings?: BrowserSettings) {
     if (browser && !browser.isConnected()) {
       console.error("Browser exists but is disconnected. Cleaning up...");
       try {
-        await browser.close().catch(err => console.error("Error closing disconnected browser:", err));
-      } catch (e) {
+        await browser.close().catch((err) => console.error("Error closing disconnected browser:", err));
+      } catch (_e) {
         // Ignore errors when closing disconnected browser
       }
       // Reset browser and page references
@@ -171,53 +198,55 @@ export async function ensureBrowser(browserSettings?: BrowserSettings) {
 
     // Launch new browser if needed
     if (!browser) {
-      const { viewport, userAgent, headless = false, browserType = 'chromium' } = browserSettings ?? {};
-      
+      const envHeadlessDefault = ["1", "true"].includes(String(process.env.PLAYWRIGHT_HEADLESS ?? "").toLowerCase());
+      const { viewport, userAgent, headless = envHeadlessDefault, browserType = "chromium" } = browserSettings ?? {};
+
       // If browser type is changing, force a new browser instance
       if (browser && currentBrowserType !== browserType) {
         try {
-          await browser.close().catch(err => console.error("Error closing browser on type change:", err));
-        } catch (e) {
+          await browser.close().catch((err) => console.error("Error closing browser on type change:", err));
+        } catch (_e) {
           // Ignore errors
         }
         resetBrowserState();
       }
-      
+
       console.error(`Launching new ${browserType} browser instance...`);
-      
+
       // Use the appropriate browser engine
-      let browserInstance;
+      let browserInstance: typeof chromium | typeof firefox | typeof webkit;
       switch (browserType) {
-        case 'firefox':
+        case "firefox":
           browserInstance = firefox;
           break;
-        case 'webkit':
+        case "webkit":
           browserInstance = webkit;
           break;
-        case 'chromium':
         default:
           browserInstance = chromium;
           break;
       }
-      
+
       const executablePath = process.env.CHROME_EXECUTABLE_PATH;
+
+      const resolvedUserAgent = resolveUserAgent(userAgent);
 
       browser = await browserInstance.launch({
         headless,
-        executablePath: executablePath
+        executablePath: executablePath,
       });
-      
+
       currentBrowserType = browserType;
 
       // Add cleanup logic when browser is disconnected
-      browser.on('disconnected', () => {
+      browser.on("disconnected", () => {
         console.error("Browser disconnected event triggered");
         browser = undefined;
         page = undefined;
       });
 
       const context = await browser.newContext({
-        ...userAgent && { userAgent },
+        ...(resolvedUserAgent ? { userAgent: resolvedUserAgent } : {}),
         viewport: {
           width: viewport?.width ?? 1280,
           height: viewport?.height ?? 720,
@@ -230,18 +259,18 @@ export async function ensureBrowser(browserSettings?: BrowserSettings) {
       // Register console message handler
       await registerConsoleMessage(page);
     }
-    
+
     // Verify page is still valid
     if (!page || page.isClosed()) {
       console.error("Page is closed or invalid. Creating new page...");
       // Create a new page if the current one is invalid
-      const context = browser.contexts()[0] || await browser.newContext();
+      const context = browser.contexts()[0] || (await browser.newContext());
       page = await context.newPage();
-      
+
       // Re-register console message handler
       await registerConsoleMessage(page);
     }
-    
+
     return page!;
   } catch (error) {
     console.error("Error ensuring browser:", error);
@@ -250,41 +279,42 @@ export async function ensureBrowser(browserSettings?: BrowserSettings) {
       if (browser) {
         await browser.close().catch(() => {});
       }
-    } catch (e) {
+    } catch (_e) {
       // Ignore errors during cleanup
     }
-    
+
     resetBrowserState();
-    
+
     // Try one more time from scratch
-    const { viewport, userAgent, headless = false, browserType = 'chromium' } = browserSettings ?? {};
-    
+    const envHeadlessDefault = ["1", "true"].includes(String(process.env.PLAYWRIGHT_HEADLESS ?? "").toLowerCase());
+    const { viewport, userAgent, headless = envHeadlessDefault, browserType = "chromium" } = browserSettings ?? {};
+
     // Use the appropriate browser engine
-    let browserInstance;
+    let browserInstance: typeof chromium | typeof firefox | typeof webkit;
     switch (browserType) {
-      case 'firefox':
+      case "firefox":
         browserInstance = firefox;
         break;
-      case 'webkit':
+      case "webkit":
         browserInstance = webkit;
         break;
-      case 'chromium':
       default:
         browserInstance = chromium;
         break;
     }
-    
+
     browser = await browserInstance.launch({ headless });
     currentBrowserType = browserType;
-    
-    browser.on('disconnected', () => {
+
+    browser.on("disconnected", () => {
       console.error("Browser disconnected event triggered (retry)");
       browser = undefined;
       page = undefined;
     });
 
+    const retryUserAgent = resolveUserAgent(userAgent);
     const context = await browser.newContext({
-      ...userAgent && { userAgent },
+      ...(retryUserAgent ? { userAgent: retryUserAgent } : {}),
       viewport: {
         width: viewport?.width ?? 1280,
         height: viewport?.height ?? 720,
@@ -293,9 +323,9 @@ export async function ensureBrowser(browserSettings?: BrowserSettings) {
     });
 
     page = await context.newPage();
-    
+
     await registerConsoleMessage(page);
-    
+
     return page!;
   }
 }
@@ -331,7 +361,7 @@ function initializeTools(server: any) {
   if (!customUserAgentTool) customUserAgentTool = new CustomUserAgentTool(server);
   if (!visibleTextTool) visibleTextTool = new VisibleTextTool(server);
   if (!visibleHtmlTool) visibleHtmlTool = new VisibleHtmlTool(server);
-  
+
   // API tools
   if (!getRequestTool) getRequestTool = new GetRequestTool(server);
   if (!postRequestTool) postRequestTool = new PostRequestTool(server);
@@ -351,31 +381,27 @@ function initializeTools(server: any) {
 /**
  * Main handler for tool calls
  */
-export async function handleToolCall(
-  name: string,
-  args: any,
-  server: any
-): Promise<CallToolResult> {
+export async function handleToolCall(name: string, args: any, server: any, extra?: any): Promise<CallToolResult> {
   // Initialize tools
   initializeTools(server);
 
   try {
     // Handle codegen tools
     switch (name) {
-      case 'start_codegen_session':
-        return await handleCodegenResult(startCodegenSession.handler(args));
-      case 'end_codegen_session':
-        return await handleCodegenResult(endCodegenSession.handler(args));
-      case 'get_codegen_session':
-        return await handleCodegenResult(getCodegenSession.handler(args));
-      case 'clear_codegen_session':
-        return await handleCodegenResult(clearCodegenSession.handler(args));
+      case "start_codegen_session":
+        return await handleCodegenResult(startCodegenSession.handler(args, { server }));
+      case "end_codegen_session":
+        return await handleCodegenResult(endCodegenSession.handler(args, { server }));
+      case "get_codegen_session":
+        return await handleCodegenResult(getCodegenSession.handler(args, { server }));
+      case "clear_codegen_session":
+        return await handleCodegenResult(clearCodegenSession.handler(args, { server }));
     }
 
     // Record tool action if there's an active session
     const recorder = ActionRecorder.getInstance();
     const activeSession = recorder.getActiveSession();
-    if (activeSession && name !== 'playwright_close') {
+    if (activeSession && name !== "playwright_close") {
       recorder.recordAction(name, args);
     }
 
@@ -384,7 +410,7 @@ export async function handleToolCall(
       if (browser) {
         try {
           if (browser.isConnected()) {
-            await browser.close().catch(e => console.error("Error closing browser:", e));
+            await browser.close().catch((e) => console.error("Error closing browser:", e));
           }
         } catch (error) {
           console.error("Error during browser close in handler:", error);
@@ -392,18 +418,22 @@ export async function handleToolCall(
           resetBrowserState();
         }
         return {
-          content: [{
-            type: "text",
-            text: "Browser closed successfully",
-          }],
+          content: [
+            {
+              type: "text",
+              text: "Browser closed successfully",
+            },
+          ],
           isError: false,
         };
       }
       return {
-        content: [{
-          type: "text",
-          text: "No browser instance to close",
-        }],
+        content: [
+          {
+            type: "text",
+            text: "No browser instance to close",
+          },
+        ],
         isError: false,
       };
     }
@@ -413,43 +443,47 @@ export async function handleToolCall(
       console.error("Detected disconnected browser before tool execution, cleaning up...");
       try {
         await browser.close().catch(() => {}); // Ignore errors
-      } catch (e) {
+      } catch (_e) {
         // Ignore any errors during cleanup
       }
       resetBrowserState();
     }
 
-  // Prepare context based on tool requirements
-  const context: ToolContext = {
-    server
-  };
-  
-  // Set up browser if needed
-  if (BROWSER_TOOLS.includes(name)) {
-    const browserSettings = {
-      viewport: {
-        width: args.width,
-        height: args.height
-      },
-      userAgent: name === "playwright_custom_user_agent" ? args.userAgent : undefined,
-      headless: args.headless,
-      browserType: args.browserType || 'chromium'
+    // Prepare context based on tool requirements
+    const context: ToolContext = {
+      server,
+      sessionId: extra?.sessionId,
+      sendRequest: extra?.sendRequest,
     };
-    
-    try {
-      context.page = await ensureBrowser(browserSettings);
-      context.browser = browser;
-    } catch (error) {
-      console.error("Failed to ensure browser:", error);
-      return {
-        content: [{
-          type: "text",
-          text: `Failed to initialize browser: ${(error as Error).message}. Please try again.`,
-        }],
-        isError: true,
+
+    // Set up browser if needed
+    if (BROWSER_TOOLS.includes(name)) {
+      const browserSettings = {
+        viewport: {
+          width: args.width,
+          height: args.height,
+        },
+        userAgent: name === "playwright_custom_user_agent" ? args.userAgent : undefined,
+        headless: args.headless,
+        browserType: args.browserType || "chromium",
       };
+
+      try {
+        context.page = await ensureBrowser(browserSettings);
+        context.browser = browser;
+      } catch (error) {
+        console.error("Failed to ensure browser:", error);
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Failed to initialize browser: ${(error as Error).message}. Please try again.`,
+            },
+          ],
+          isError: true,
+        };
+      }
     }
-  }
 
     // Set up API context if needed
     if (API_TOOLS.includes(name)) {
@@ -457,10 +491,12 @@ export async function handleToolCall(
         context.apiContext = await ensureApiContext(args.url);
       } catch (error) {
         return {
-          content: [{
-            type: "text",
-            text: `Failed to initialize API context: ${(error as Error).message}`,
-          }],
+          content: [
+            {
+              type: "text",
+              text: `Failed to initialize API context: ${(error as Error).message}`,
+            },
+          ],
           isError: true,
         };
       }
@@ -468,40 +504,64 @@ export async function handleToolCall(
 
     // Route to appropriate tool
     switch (name) {
+      case "construct_upload_url": {
+        const uploadUrl = buildUploadUrl(context.sessionId);
+        if (!uploadUrl) {
+          return {
+            content: [
+              {
+                type: "text",
+                text: "Upload URL unavailable (requires HTTP mode and an active session).",
+              },
+            ],
+            isError: true,
+          };
+        }
+        const instructions = [
+          `Use POST multipart/form-data to this URL (field "file"): ${uploadUrl}`,
+          `Include header X-MCP-Session-ID: ${context.sessionId} (if not already in the URL)`,
+          `After upload, you'll receive a resourceUri (mcp-uploads://<session>/<id>). Pass that to playwright_upload_file.`,
+        ].join("\n");
+        return {
+          content: [{ type: "text", text: instructions }],
+          isError: false,
+        };
+      }
+
       // Browser tools
       case "playwright_navigate":
         return await navigationTool.execute(args, context);
-        
+
       case "playwright_screenshot":
         return await screenshotTool.execute(args, context);
-        
+
       case "playwright_close":
         return await closeBrowserTool.execute(args, context);
-        
+
       case "playwright_console_logs":
         return await consoleLogsTool.execute(args, context);
-        
+
       case "playwright_click":
         return await clickTool.execute(args, context);
-        
+
       case "playwright_iframe_click":
         return await iframeClickTool.execute(args, context);
 
       case "playwright_iframe_fill":
         return await iframeFillTool.execute(args, context);
-        
+
       case "playwright_fill":
         return await fillTool.execute(args, context);
-        
+
       case "playwright_select":
         return await selectTool.execute(args, context);
-        
+
       case "playwright_hover":
         return await hoverTool.execute(args, context);
 
       case "playwright_upload_file":
         return await uploadFileTool.execute(args, context);
-        
+
       case "playwright_evaluate":
         return await evaluateTool.execute(args, context);
 
@@ -513,29 +573,29 @@ export async function handleToolCall(
 
       case "playwright_custom_user_agent":
         return await customUserAgentTool.execute(args, context);
-        
+
       case "playwright_get_visible_text":
         return await visibleTextTool.execute(args, context);
-      
+
       case "playwright_get_visible_html":
         return await visibleHtmlTool.execute(args, context);
-        
+
       // API tools
       case "playwright_get":
         return await getRequestTool.execute(args, context);
-        
+
       case "playwright_post":
         return await postRequestTool.execute(args, context);
-        
+
       case "playwright_put":
         return await putRequestTool.execute(args, context);
-        
+
       case "playwright_patch":
         return await patchRequestTool.execute(args, context);
-        
+
       case "playwright_delete":
         return await deleteRequestTool.execute(args, context);
-      
+
       // New tools
       case "playwright_go_back":
         return await goBackTool.execute(args, context);
@@ -549,24 +609,26 @@ export async function handleToolCall(
         return await saveAsPdfTool.execute(args, context);
       case "playwright_click_and_switch_tab":
         return await clickAndSwitchTabTool.execute(args, context);
-      
+
       default:
         return {
-          content: [{
-            type: "text",
-            text: `Unknown tool: ${name}`,
-          }],
+          content: [
+            {
+              type: "text",
+              text: `Unknown tool: ${name}`,
+            },
+          ],
           isError: true,
         };
     }
   } catch (error) {
     console.error(`Error handling tool ${name}:`, error);
-    
+
     // Handle browser-specific errors at the top level
     if (BROWSER_TOOLS.includes(name)) {
       const errorMessage = (error as Error).message;
       if (
-        errorMessage.includes("Target page, context or browser has been closed") || 
+        errorMessage.includes("Target page, context or browser has been closed") ||
         errorMessage.includes("Browser has been disconnected") ||
         errorMessage.includes("Target closed") ||
         errorMessage.includes("Protocol error") ||
@@ -575,20 +637,24 @@ export async function handleToolCall(
         // Reset browser state if it's a connection issue
         resetBrowserState();
         return {
-          content: [{
-            type: "text",
-            text: `Browser connection error: ${errorMessage}. Browser state has been reset, please try again.`,
-          }],
+          content: [
+            {
+              type: "text",
+              text: `Browser connection error: ${errorMessage}. Browser state has been reset, please try again.`,
+            },
+          ],
           isError: true,
         };
       }
     }
 
     return {
-      content: [{
-        type: "text",
-        text: error instanceof Error ? error.message : String(error),
-      }],
+      content: [
+        {
+          type: "text",
+          text: error instanceof Error ? error.message : String(error),
+        },
+      ],
       isError: true,
     };
   }
@@ -601,18 +667,22 @@ async function handleCodegenResult(resultPromise: Promise<any>): Promise<CallToo
   try {
     const result = await resultPromise;
     return {
-      content: [{
-        type: "text",
-        text: JSON.stringify(result),
-      }],
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify(result),
+        },
+      ],
       isError: false,
     };
   } catch (error) {
     return {
-      content: [{
-        type: "text",
-        text: error instanceof Error ? error.message : String(error),
-      }],
+      content: [
+        {
+          type: "text",
+          text: error instanceof Error ? error.message : String(error),
+        },
+      ],
       isError: true,
     };
   }
@@ -633,3 +703,9 @@ export function getScreenshots(): Map<string, string> {
 }
 
 export { registerConsoleMessage };
+
+function buildUploadUrl(sessionId?: string): string | null {
+  const base = getUploadEndpointUrl();
+  if (!base || !sessionId) return null;
+  return `${base}/${sessionId}`;
+}

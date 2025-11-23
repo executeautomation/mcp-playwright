@@ -1,7 +1,7 @@
-import type { Response } from 'playwright';
-import { BrowserToolBase } from './base.js';
-import type { ToolContext, ToolResponse } from '../common/types.js';
-import { createSuccessResponse, createErrorResponse } from '../common/types.js';
+import type { Response } from "playwright";
+import type { ToolContext, ToolResponse } from "../common/types.js";
+import { createErrorResponse, createSuccessResponse } from "../common/types.js";
+import { BrowserToolBase } from "./base.js";
 
 const responsePromises = new Map<string, Promise<Response>>();
 
@@ -63,9 +63,9 @@ export class AssertResponseTool extends BrowserToolBase {
           if (!bodyStr.includes(args.value)) {
             const messages = [
               `Response body does not contain expected value: ${args.value}`,
-              `Actual body: ${bodyStr}`
+              `Actual body: ${bodyStr}`,
             ];
-            return createErrorResponse(messages.join('\n'));
+            return createErrorResponse(messages.join("\n"));
           }
         }
 
@@ -73,9 +73,9 @@ export class AssertResponseTool extends BrowserToolBase {
           `Response assertion for ID ${args.id} successful`,
           `URL: ${response.url()}`,
           `Status: ${response.status()}`,
-          `Body: ${JSON.stringify(body, null, 2)}`
+          `Body: ${JSON.stringify(body, null, 2)}`,
         ];
-        return createSuccessResponse(messages.join('\n'));
+        return createSuccessResponse(messages.join("\n"));
       } catch (error) {
         return createErrorResponse(`Failed to assert response: ${(error as Error).message}`);
       } finally {
@@ -83,4 +83,4 @@ export class AssertResponseTool extends BrowserToolBase {
       }
     });
   }
-} 
+}

@@ -1,5 +1,3 @@
-import { ToolCall } from '../../types.js';
-
 export interface CodegenAction {
   toolName: string;
   parameters: Record<string, unknown>;
@@ -31,4 +29,4 @@ export interface CodegenResult {
   testCode: string;
   filePath: string;
   sessionId: string;
-} 
+}

@@ -1,6 +1,6 @@
-import { BrowserToolBase } from './base.js';
-import type { ToolContext, ToolResponse } from '../common/types.js';
-import { createSuccessResponse, createErrorResponse } from '../common/types.js';
+import type { ToolContext, ToolResponse } from "../common/types.js";
+import { createErrorResponse, createSuccessResponse } from "../common/types.js";
+import { BrowserToolBase } from "./base.js";
 
 interface CustomUserAgentArgs {
   userAgent: string;
@@ -21,14 +21,14 @@ export class CustomUserAgentTool extends BrowserToolBase {
 
       try {
         const currentUserAgent = await page.evaluate(() => navigator.userAgent);
-        
+
         if (currentUserAgent !== args.userAgent) {
           const messages = [
             "Page was already initialized with a different User Agent.",
             `Requested: ${args.userAgent}`,
-            `Current: ${currentUserAgent}`
+            `Current: ${currentUserAgent}`,
           ];
-          return createErrorResponse(messages.join('\n'));
+          return createErrorResponse(messages.join("\n"));
         }
 
         return createSuccessResponse("User Agent validation successful");
@@ -37,4 +37,4 @@ export class CustomUserAgentTool extends BrowserToolBase {
       }
     });
   }
-} 
+}

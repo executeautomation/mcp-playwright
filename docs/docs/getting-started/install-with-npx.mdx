@@ -1,0 +1,70 @@
+---
+sidebar_position: 1
+title: Install with npx
+---
+
+# Install with npx
+
+This is the quickest way to run the Playwright MCP server locally.
+
+## Prerequisites
+
+- Node.js 18+ (20+ recommended)
+- `npx` (bundled with recent Node.js releases)
+- Playwright browsers (installed automatically on first run or via `npx playwright install`)
+
+## Install & Run
+
+```bash
+npx @executeautomation/playwright-mcp-server
+```
+
+To keep a global install:
+
+```bash
+npm install -g @executeautomation/playwright-mcp-server
+playwright-mcp-server
+```
+
+## Streamable HTTP mode
+
+```bash
+npx @executeautomation/playwright-mcp-server --http \
+  --port 8000 \
+  --path /mcp \
+  --host-name localhost \
+  --listen 0.0.0.0
+```
+
+This enables the server to run behind MCP gateways. When HTTP mode is on, file uploads must go through the `construct_upload_url` tool before calling `playwright_upload_file`.
+
+## VS Code configuration
+
+Add the server to `mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@executeautomation/playwright-mcp-server"]
+    }
+  }
+}
+```
+
+For HTTP transport:
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "transport": {
+        "type": "http",
+        "url": "http://localhost:8000/mcp"
+      }
+    }
+  }
+}
+```
+

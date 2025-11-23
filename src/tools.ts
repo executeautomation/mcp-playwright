@@ -1,7 +1,7 @@
 import type { Tool } from "@modelcontextprotocol/sdk/types.js";
-import { codegenTools } from './tools/codegen';
 
-export function createToolDefinitions() {
+export function createToolDefinitions(options?: { httpMode?: boolean; uploadEndpoint?: string }) {
+  const { httpMode = false, uploadEndpoint } = options ?? {};
   return [
     // Codegen tools
     {
@@ -14,24 +14,24 @@ export function createToolDefinitions() {
             type: "object",
             description: "Code generation options",
             properties: {
-              outputPath: { 
-                type: "string", 
-                description: "Directory path where generated tests will be saved (use absolute path)" 
+              outputPath: {
+                type: "string",
+                description: "Directory path where generated tests will be saved (use absolute path)",
               },
-              testNamePrefix: { 
-                type: "string", 
-                description: "Prefix to use for generated test names (default: 'GeneratedTest')" 
+              testNamePrefix: {
+                type: "string",
+                description: "Prefix to use for generated test names (default: 'GeneratedTest')",
               },
-              includeComments: { 
-                type: "boolean", 
-                description: "Whether to include descriptive comments in generated tests" 
-              }
+              includeComments: {
+                type: "boolean",
+                description: "Whether to include descriptive comments in generated tests",
+              },
             },
-            required: ["outputPath"]
-          }
+            required: ["outputPath"],
+          },
         },
-        required: ["options"]
-      }
+        required: ["options"],
+      },
     },
     {
       name: "end_codegen_session",
@@ -39,13 +39,13 @@ export function createToolDefinitions() {
       inputSchema: {
         type: "object",
         properties: {
-          sessionId: { 
-            type: "string", 
-            description: "ID of the session to end" 
-          }
+          sessionId: {
+            type: "string",
+            description: "ID of the session to end",
+          },
         },
-        required: ["sessionId"]
-      }
+        required: ["sessionId"],
+      },
     },
     {
       name: "get_codegen_session",
@@ -53,13 +53,13 @@ export function createToolDefinitions() {
       inputSchema: {
         type: "object",
         properties: {
-          sessionId: { 
-            type: "string", 
-            description: "ID of the session to retrieve" 
-          }
+          sessionId: {
+            type: "string",
+            description: "ID of the session to retrieve",
+          },
         },
-        required: ["sessionId"]
-      }
+        required: ["sessionId"],
+      },
     },
     {
       name: "clear_codegen_session",
@@ -67,13 +67,13 @@ export function createToolDefinitions() {
       inputSchema: {
         type: "object",
         properties: {
-          sessionId: { 
-            type: "string", 
-            description: "ID of the session to clear" 
-          }
+          sessionId: {
+            type: "string",
+            description: "ID of the session to clear",
+          },
         },
-        required: ["sessionId"]
-      }
+        required: ["sessionId"],
+      },
     },
     {
       name: "playwright_navigate",
@@ -82,12 +82,16 @@ export function createToolDefinitions() {
         type: "object",
         properties: {
           url: { type: "string", description: "URL to navigate to the website specified" },
-          browserType: { type: "string", description: "Browser type to use (chromium, firefox, webkit). Defaults to chromium", enum: ["chromium", "firefox", "webkit"] },
+          browserType: {
+            type: "string",
+            description: "Browser type to use (chromium, firefox, webkit). Defaults to chromium",
+            enum: ["chromium", "firefox", "webkit"],
+          },
           width: { type: "number", description: "Viewport width in pixels (default: 1280)" },
           height: { type: "number", description: "Viewport height in pixels (default: 720)" },
           timeout: { type: "number", description: "Navigation timeout in milliseconds" },
           waitUntil: { type: "string", description: "Navigation wait condition" },
-          headless: { type: "boolean", description: "Run browser in headless mode (default: false)" }
+          headless: { type: "boolean", description: "Run browser in headless mode (default: false)" },
         },
         required: ["url"],
       },
@@ -105,7 +109,10 @@ export function createToolDefinitions() {
           storeBase64: { type: "boolean", description: "Store screenshot in base64 format (default: true)" },
           fullPage: { type: "boolean", description: "Store screenshot of the entire page (default: false)" },
           savePng: { type: "boolean", description: "Save screenshot as PNG file (default: false)" },
-          downloadsDir: { type: "string", description: "Custom downloads directory path (default: user's Downloads folder)" },
+          downloadsDir: {
+            type: "string",
+            description: "Custom downloads directory path (default: user's Downloads folder)",
+          },
         },
         required: ["name"],
       },
@@ -127,7 +134,10 @@ export function createToolDefinitions() {
       inputSchema: {
         type: "object",
         properties: {
-          iframeSelector: { type: "string", description: "CSS selector for the iframe containing the element to click" },
+          iframeSelector: {
+            type: "string",
+            description: "CSS selector for the iframe containing the element to click",
+          },
           selector: { type: "string", description: "CSS selector for the element to click" },
         },
         required: ["iframeSelector", "selector"],
@@ -183,16 +193,36 @@ export function createToolDefinitions() {
     },
     {
       name: "playwright_upload_file",
-      description: "Upload a file to an input[type='file'] element on the page",
+      description: `Upload a file to an input[type='file'] element on the page. In HTTP mode (${httpMode ? "enabled" : "disabled"}), provide an uploadResourceUri from construct_upload_url (preferred) or a reachable filePath.`,
       inputSchema: {
         type: "object",
         properties: {
           selector: { type: "string", description: "CSS selector for the file input element" },
-          filePath: { type: "string", description: "Absolute path to the file to upload" }
+          filePath: {
+            type: "string",
+            description: "Absolute path to the file to upload (stdio mode only; ignored in HTTP mode)",
+          },
+          uploadResourceUri: {
+            type: "string",
+            description: "Resource URI returned from the upload endpoint (HTTP mode)",
+          },
         },
-        required: ["selector", "filePath"],
+        required: ["selector"],
       },
     },
+    ...(httpMode
+      ? ([
+          {
+            name: "construct_upload_url",
+            description: `Return the upload URL and instructions for uploading a file to this session. Use this before calling playwright_upload_file.`,
+            inputSchema: {
+              type: "object" as const,
+              properties: {},
+              required: [] as string[],
+            },
+          },
+        ] as Tool[])
+      : []),
     {
       name: "playwright_evaluate",
       description: "Execute JavaScript in the browser console",
@@ -213,20 +243,20 @@ export function createToolDefinitions() {
           type: {
             type: "string",
             description: "Type of logs to retrieve (all, error, warning, log, info, debug, exception)",
-            enum: ["all", "error", "warning", "log", "info", "debug", "exception"]
+            enum: ["all", "error", "warning", "log", "info", "debug", "exception"],
           },
           search: {
             type: "string",
-            description: "Text to search for in logs (handles text with square brackets)"
+            description: "Text to search for in logs (handles text with square brackets)",
           },
           limit: {
             type: "number",
-            description: "Maximum number of logs to return"
+            description: "Maximum number of logs to return",
           },
           clear: {
             type: "boolean",
-            description: "Whether to clear logs after retrieval (default: false)"
-          }
+            description: "Whether to clear logs after retrieval (default: false)",
+          },
         },
         required: [],
       },
@@ -246,7 +276,7 @@ export function createToolDefinitions() {
       inputSchema: {
         type: "object",
         properties: {
-          url: { type: "string", description: "URL to perform GET operation" }
+          url: { type: "string", description: "URL to perform GET operation" },
         },
         required: ["url"],
       },
@@ -260,11 +290,11 @@ export function createToolDefinitions() {
           url: { type: "string", description: "URL to perform POST operation" },
           value: { type: "string", description: "Data to post in the body" },
           token: { type: "string", description: "Bearer token for authorization" },
-          headers: { 
-            type: "object", 
+          headers: {
+            type: "object",
             description: "Additional headers to include in the request",
-            additionalProperties: { type: "string" }
-          }
+            additionalProperties: { type: "string" },
+          },
         },
         required: ["url", "value"],
       },
@@ -299,19 +329,24 @@ export function createToolDefinitions() {
       inputSchema: {
         type: "object",
         properties: {
-          url: { type: "string", description: "URL to perform DELETE operation" }
+          url: { type: "string", description: "URL to perform DELETE operation" },
         },
         required: ["url"],
       },
     },
     {
       name: "playwright_expect_response",
-      description: "Ask Playwright to start waiting for a HTTP response. This tool initiates the wait operation but does not wait for its completion.",
+      description:
+        "Ask Playwright to start waiting for a HTTP response. This tool initiates the wait operation but does not wait for its completion.",
       inputSchema: {
         type: "object",
         properties: {
-          id: { type: "string", description: "Unique & arbitrary identifier to be used for retrieving this response later with `Playwright_assert_response`." },
-          url: { type: "string", description: "URL pattern to match in the response." }
+          id: {
+            type: "string",
+            description:
+              "Unique & arbitrary identifier to be used for retrieving this response later with `Playwright_assert_response`.",
+          },
+          url: { type: "string", description: "URL pattern to match in the response." },
         },
         required: ["id", "url"],
       },
@@ -322,8 +357,15 @@ export function createToolDefinitions() {
       inputSchema: {
         type: "object",
         properties: {
-          id: { type: "string", description: "Identifier of the HTTP response initially expected using `Playwright_expect_response`." },
-          value: { type: "string", description: "Data to expect in the body of the HTTP response. If provided, the assertion will fail if this value is not found in the response body." }
+          id: {
+            type: "string",
+            description: "Identifier of the HTTP response initially expected using `Playwright_expect_response`.",
+          },
+          value: {
+            type: "string",
+            description:
+              "Data to expect in the body of the HTTP response. If provided, the assertion will fail if this value is not found in the response body.",
+          },
         },
         required: ["id"],
       },
@@ -334,7 +376,7 @@ export function createToolDefinitions() {
       inputSchema: {
         type: "object",
         properties: {
-          userAgent: { type: "string", description: "Custom User Agent for the Playwright browser instance" }
+          userAgent: { type: "string", description: "Custom User Agent for the Playwright browser instance" },
         },
         required: ["userAgent"],
       },
@@ -350,7 +392,8 @@ export function createToolDefinitions() {
     },
     {
       name: "playwright_get_visible_html",
-      description: "Get the HTML content of the current page. By default, all <script> tags are removed from the output unless removeScripts is explicitly set to false.",
+      description:
+        "Get the HTML content of the current page. By default, all <script> tags are removed from the output unless removeScripts is explicitly set to false.",
       inputSchema: {
         type: "object",
         properties: {
@@ -361,7 +404,7 @@ export function createToolDefinitions() {
           removeMeta: { type: "boolean", description: "Remove all meta tags from the HTML (default: false)" },
           cleanHtml: { type: "boolean", description: "Perform comprehensive HTML cleaning (default: false)" },
           minify: { type: "boolean", description: "Minify the HTML output (default: false)" },
-          maxLength: { type: "number", description: "Maximum number of characters to return (default: 20000)" }
+          maxLength: { type: "number", description: "Maximum number of characters to return (default: 20000)" },
         },
         required: [],
       },
@@ -391,7 +434,7 @@ export function createToolDefinitions() {
         type: "object",
         properties: {
           sourceSelector: { type: "string", description: "CSS selector for the element to drag" },
-          targetSelector: { type: "string", description: "CSS selector for the target location" }
+          targetSelector: { type: "string", description: "CSS selector for the target location" },
         },
         required: ["sourceSelector", "targetSelector"],
       },
@@ -403,7 +446,7 @@ export function createToolDefinitions() {
         type: "object",
         properties: {
           key: { type: "string", description: "Key to press (e.g. 'Enter', 'ArrowDown', 'a')" },
-          selector: { type: "string", description: "Optional CSS selector to focus before pressing key" }
+          selector: { type: "string", description: "Optional CSS selector to focus before pressing key" },
         },
         required: ["key"],
       },
@@ -425,9 +468,9 @@ export function createToolDefinitions() {
               top: { type: "string" },
               right: { type: "string" },
               bottom: { type: "string" },
-              left: { type: "string" }
-            }
-          }
+              left: { type: "string" },
+            },
+          },
         },
         required: ["outputPath"],
       },
@@ -469,7 +512,7 @@ export const BROWSER_TOOLS = [
   "playwright_drag",
   "playwright_press_key",
   "playwright_save_as_pdf",
-  "playwright_click_and_switch_tab"
+  "playwright_click_and_switch_tab",
 ];
 
 // API Request tools for conditional launch
@@ -478,20 +521,16 @@ export const API_TOOLS = [
   "playwright_post",
   "playwright_put",
   "playwright_delete",
-  "playwright_patch"
+  "playwright_patch",
 ];
 
 // Codegen tools
 export const CODEGEN_TOOLS = [
-  'start_codegen_session',
-  'end_codegen_session',
-  'get_codegen_session',
-  'clear_codegen_session'
+  "start_codegen_session",
+  "end_codegen_session",
+  "get_codegen_session",
+  "clear_codegen_session",
 ];
 
 // All available tools
-export const tools = [
-  ...BROWSER_TOOLS,
-  ...API_TOOLS,
-  ...CODEGEN_TOOLS
-];
+export const tools = [...BROWSER_TOOLS, ...API_TOOLS, ...CODEGEN_TOOLS, "construct_upload_url"];

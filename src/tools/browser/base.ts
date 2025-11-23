@@ -1,5 +1,5 @@
-import type { Browser, Page } from 'playwright';
-import { ToolHandler, ToolContext, ToolResponse, createErrorResponse } from '../common/types.js';
+import type { Page } from "playwright";
+import { createErrorResponse, type ToolContext, type ToolHandler, type ToolResponse } from "../common/types.js";
 
 /**
  * Base class for all browser-based tools
@@ -49,7 +49,7 @@ export abstract class BrowserToolBase implements ToolHandler {
    */
   protected async safeExecute(
     context: ToolContext,
-    operation: (page: Page) => Promise<ToolResponse>
+    operation: (page: Page) => Promise<ToolResponse>,
   ): Promise<ToolResponse> {
     const pageError = this.validatePageAvailable(context);
     if (pageError) return pageError;
@@ -58,7 +58,7 @@ export abstract class BrowserToolBase implements ToolHandler {
       // Verify browser is connected before proceeding
       if (context.browser && !context.browser.isConnected()) {
         // If browser exists but is disconnected, reset state
-        const { resetBrowserState } = await import('../../toolHandler.js');
+        const { resetBrowserState } = await import("../../toolHandler.js");
         resetBrowserState();
         return createErrorResponse("Browser is disconnected. Please retry the operation.");
       }
@@ -71,7 +71,7 @@ export abstract class BrowserToolBase implements ToolHandler {
       return await operation(context.page!);
     } catch (error) {
       const errorMessage = (error as Error).message;
-      
+
       // Check for common browser disconnection errors
       if (
         errorMessage.includes("Target page, context or browser has been closed") ||
@@ -81,12 +81,14 @@ export abstract class BrowserToolBase implements ToolHandler {
         errorMessage.includes("Connection closed")
       ) {
         // Reset browser state on connection issues
-        const { resetBrowserState } = await import('../../toolHandler.js');
+        const { resetBrowserState } = await import("../../toolHandler.js");
         resetBrowserState();
-        return createErrorResponse(`Browser connection error: ${errorMessage}. Connection has been reset - please retry the operation.`);
+        return createErrorResponse(
+          `Browser connection error: ${errorMessage}. Connection has been reset - please retry the operation.`,
+        );
       }
-      
+
       return createErrorResponse(`Operation failed: ${errorMessage}`);
     }
   }
-} 
+}

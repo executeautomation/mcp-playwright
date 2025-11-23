@@ -1,0 +1,53 @@
+---
+sidebar_position: 10
+title: Streamable HTTP Mode
+---
+
+# Streamable HTTP Mode
+
+Streamable HTTP allows the server to run behind gateways and lets clients download generated artifacts through signed URLs.
+
+## Enabling
+
+```bash
+npx @executeautomation/playwright-mcp-server --http --port 8000 --path /mcp --host-name your.host
+```
+
+Or Docker:
+
+```bash
+docker run --rm -p 8000:8000 ghcr.io/executeautomation/mcp-playwright:latest \
+  node dist/index.js --http --listen 0.0.0.0 --host-name your.host
+```
+
+Or with Docker Compose (recommended for production HTTP):
+```bash
+docker compose up -d
+```
+The provided `docker-compose.yml` exposes `http://localhost:8000/mcp`, binds to `0.0.0.0:8000`, persists data to `./data` → `/app/data`, and runs streamable HTTP mode by default.
+
+import composeYml from '!!raw-loader!@site/docker-compose.yml';
+
+```yaml title="docker-compose.yml"
+{composeYml}
+```
+
+## Remote resources
+
+When HTTP mode is enabled, tools that create files register session-scoped resources and return download URLs:
+
+- `playwright_screenshot`
+- `playwright_save_as_pdf`
+- Codegen outputs (`end_codegen_session`)
+- `playwright_console_logs`
+
+Resources live under `/resources/{sessionId}/{resourceId}/{filename}` and expire after the configured TTL (default 600 seconds).
+
+## File uploads
+
+1. Call `construct_upload_url` to get a session-specific HTTP endpoint (e.g. `http://host:8000/mcp/uploads/{sessionId}`).
+2. The MCP client uploads the file via `multipart/form-data` (field `file`). CLI permissions are required (curl or `Invoke-WebRequest`).
+3. The server responds with `resourceUri` such as `mcp-uploads://{sessionId}/{id}`.
+4. Call `playwright_upload_file` with `uploadResourceUri`. If no URI/path is provided the tool returns an error instructing the agent to upload first.
+
+This loop prevents large base64 payloads in tool arguments and keeps uploads isolated per session.

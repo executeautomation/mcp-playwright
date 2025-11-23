@@ -1,7 +1,8 @@
-import { VisibleTextTool, VisibleHtmlTool } from '../../../tools/browser/visiblePage.js';
-import { ToolContext } from '../../../tools/common/types.js';
-import { Page, Browser, ElementHandle } from 'playwright';
 import { jest } from '@jest/globals';
+import type { Browser, ElementHandle, Page } from 'playwright';
+import { VisibleHtmlTool, VisibleTextTool } from '../../../tools/browser/visiblePage.js';
+import type { ToolContext } from '../../../tools/common/types.js';
+import { getTextContent } from '../../testUtils';
 
 // Mock the Page object
 const mockEvaluate = jest.fn() as jest.MockedFunction<(pageFunction: Function | string, arg?: any) => Promise<any>>;
@@ -53,8 +54,8 @@ describe('VisibleTextTool', () => {
 
     expect(mockEvaluate).toHaveBeenCalled();
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toContain('Visible text content');
-    expect(result.content[0].text).toContain('Sample visible text content');
+    expect(getTextContent(result)).toContain('Visible text content');
+    expect(getTextContent(result)).toContain('Sample visible text content');
   });
 
   test('should handle missing page', async () => {
@@ -70,7 +71,7 @@ describe('VisibleTextTool', () => {
 
     expect(mockEvaluate).not.toHaveBeenCalled();
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Page is not available');
+    expect(getTextContent(result)).toContain('Page is not available');
   });
   
   test('should handle disconnected browser', async () => {
@@ -83,7 +84,7 @@ describe('VisibleTextTool', () => {
     
     expect(mockEvaluate).not.toHaveBeenCalled();
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Browser is not connected');
+    expect(getTextContent(result)).toContain('Browser is not connected');
   });
   
   test('should handle closed page', async () => {
@@ -96,7 +97,7 @@ describe('VisibleTextTool', () => {
     
     expect(mockEvaluate).not.toHaveBeenCalled();
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Page is not available or has been closed');
+    expect(getTextContent(result)).toContain('Page is not available or has been closed');
   });
 
   test('should handle evaluation errors', async () => {
@@ -109,8 +110,8 @@ describe('VisibleTextTool', () => {
 
     expect(mockEvaluate).toHaveBeenCalled();
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Failed to get visible text content');
-    expect(result.content[0].text).toContain('Evaluation failed');
+    expect(getTextContent(result)).toContain('Failed to get visible text content');
+    expect(getTextContent(result)).toContain('Evaluation failed');
   });
 });
 
@@ -133,8 +134,8 @@ describe('VisibleHtmlTool', () => {
 
     expect(mockContent).toHaveBeenCalled();
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toContain('HTML content');
-    expect(result.content[0].text).toContain('<html><body>Sample HTML content</body></html>');
+    expect(getTextContent(result)).toContain('HTML content');
+    expect(getTextContent(result)).toContain('<html><body>Sample HTML content</body></html>');
   });
 
   test('should supply the correct filters', async () => {
@@ -165,8 +166,8 @@ describe('VisibleHtmlTool', () => {
     expect(mockContent).toHaveBeenCalled();
     expect(mockEvaluate).toHaveBeenCalled();
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toContain('HTML content');
-    expect(result.content[0].text).toContain('Processed HTML content');
+    expect(getTextContent(result)).toContain('HTML content');
+    expect(getTextContent(result)).toContain('Processed HTML content');
   });
 
   test('should handle individual filter combinations', async () => {
@@ -194,7 +195,7 @@ describe('VisibleHtmlTool', () => {
 
     const result = await visibleHtmlTool.execute(args, mockContext);
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toContain('Filtered content');
+    expect(getTextContent(result)).toContain('Filtered content');
   });
 
   test('should handle selector parameter', async () => {
@@ -217,7 +218,7 @@ describe('VisibleHtmlTool', () => {
     const result = await visibleHtmlTool.execute(args, mockContext);
     expect(mock$).toHaveBeenCalledWith('#main-content');
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toContain('Processed selected content');
+    expect(getTextContent(result)).toContain('Processed selected content');
   });
 
   test('should handle empty HTML content', async () => {
@@ -235,7 +236,7 @@ describe('VisibleHtmlTool', () => {
 
     const result = await visibleHtmlTool.execute(args, mockContext);
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toContain('HTML content');
+    expect(getTextContent(result)).toContain('HTML content');
   });
 
   test('should handle cleanHtml flag setting all filters', async () => {
@@ -272,7 +273,7 @@ describe('VisibleHtmlTool', () => {
 
     expect(mockContent).not.toHaveBeenCalled();
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Page is not available');
+    expect(getTextContent(result)).toContain('Page is not available');
   });
   
   test('should handle disconnected browser', async () => {
@@ -285,7 +286,7 @@ describe('VisibleHtmlTool', () => {
     
     expect(mockContent).not.toHaveBeenCalled();
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Browser is not connected');
+    expect(getTextContent(result)).toContain('Browser is not connected');
   });
   
   test('should handle closed page', async () => {
@@ -298,7 +299,7 @@ describe('VisibleHtmlTool', () => {
     
     expect(mockContent).not.toHaveBeenCalled();
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Page is not available or has been closed');
+    expect(getTextContent(result)).toContain('Page is not available or has been closed');
   });
 
   test('should handle content retrieval errors', async () => {
@@ -311,7 +312,7 @@ describe('VisibleHtmlTool', () => {
 
     expect(mockContent).toHaveBeenCalled();
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Failed to get visible HTML content');
-    expect(result.content[0].text).toContain('Content retrieval failed');
+    expect(getTextContent(result)).toContain('Failed to get visible HTML content');
+    expect(getTextContent(result)).toContain('Content retrieval failed');
   });
 });
