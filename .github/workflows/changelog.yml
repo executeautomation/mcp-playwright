@@ -19,12 +19,15 @@ jobs:
       - name: Conventional Changelog
         uses: TriPSs/conventional-changelog-action@v5
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           git-message: "chore: update changelog"
           preset: angular
           release-count: 0
           skip-version-file: true
           skip-tag: true
           output-file: CHANGELOG.md
+          git-user-name: github-actions[bot]
+          git-user-email: 41898282+github-actions[bot]@users.noreply.github.com
 
       - name: Commit changelog
         if: steps.conventional-changelog.outputs.skipped != 'true'
