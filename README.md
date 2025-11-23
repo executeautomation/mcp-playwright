@@ -40,7 +40,7 @@ It is optimized for QA and E2E automation: screenshots, logs, assertions, API te
 ## Screenshot
 ![Playwright + Claude](image/playwright_claude.png)
 
-## [Documentation](https://executeautomation.github.io/mcp-playwright/) | [API reference](https://executeautomation.github.io/mcp-playwright/docs/playwright-web/Supported-Tools)
+## [Documentation](https://aakashh242.github.io/mcp-playwright/) | [API reference](https://aakashh242.github.io/mcp-playwright/docs/playwright-web/Supported-Tools)
 
 ## Installation
 
