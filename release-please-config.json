@@ -2,14 +2,36 @@
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
   "bootstrap-sha": "",
   "changelog-path": "CHANGELOG.md",
+  "changelog-type": "github",
   "release-type": "node",
+  "draft": true,
+  "prerelease": false,
+  "bump-minor-pre-major": true,
+  "bump-patch-for-minor-pre-major": true,
+  "pull-request-title-pattern": "chore${scope}: release${component} ${version}",
+  "changelog-sections": [
+    {"type": "feat", "section": "🚀 Features", "hidden": false},
+    {"type": "fix", "section": "🐛 Bug Fixes", "hidden": false},
+    {"type": "perf", "section": "⚡ Performance Improvements", "hidden": false},
+    {"type": "revert", "section": "⏪ Reverts", "hidden": false},
+    {"type": "docs", "section": "📚 Documentation", "hidden": false},
+    {"type": "style", "section": "💎 Styles", "hidden": false},
+    {"type": "chore", "section": "🛠 Miscellaneous Chores", "hidden": false},
+    {"type": "refactor", "section": "♻️ Code Refactoring", "hidden": false},
+    {"type": "test", "section": "🧪 Tests", "hidden": false},
+    {"type": "build", "section": "📦 Build System", "hidden": false},
+    {"type": "ci", "section": "🔧 Continuous Integration", "hidden": false}
+  ],
   "packages": {
     ".": {
       "changelog-path": "CHANGELOG.md",
       "release-type": "node",
       "initial-version": "0.1.0",
       "component": "mcp-playwright",
-      "include-component-in-tag": false
+      "include-component-in-tag": false,
+      "extra-files": [
+        "package.json"
+      ]
     }
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@aakashh242/playwright-mcp",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "description": "Model Context Protocol servers for Playwright",
   "license": "MIT",
   "author": "ExecuteAutomation, Ltd (https://executeautomation.com)",

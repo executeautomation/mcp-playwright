@@ -1,0 +1,13 @@
+{{> header}}
+
+## What's Changed
+
+{{#each entries}}
+### {{title}}
+
+{{#each commits}}
+* {{subject}}{{#if scope}} ({{scope}}){{/if}}{{#if author}} by @{{author.login}}{{/if}}
+{{/each}}
+
+{{/each}}
+
