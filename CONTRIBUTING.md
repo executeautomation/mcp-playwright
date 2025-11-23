@@ -12,9 +12,9 @@ npm run prepare
 
 This installs the Husky pre-commit hook that runs lint, tests, and build before each commit.
 
-## 2. Use Conventional Commits
+## 2. Use Conventional Commits (PR Titles Too)
 
-All commits should follow the [Conventional Commits](https://www.conventionalcommits.org/) format (e.g., `feat: add streamable HTTP docs`, `fix: upload endpoint boundary error`). This keeps changelogs and releases clean.
+All commits **and PR titles** must follow [Conventional Commits](https://www.conventionalcommits.org/) (e.g., `feat: add streamable HTTP docs`, `fix: upload endpoint boundary error`). CI enforces this to keep auto-changelog and release automation working (release-please reads commit/PR metadata to version and update the changelog).
 
 ## 3. Update docs for user-facing changes
 
