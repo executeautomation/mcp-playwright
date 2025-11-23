@@ -1,15 +1,15 @@
 {
-  "name": "@executeautomation/playwright-mcp-server",
-  "version": "0.1.0",
+  "name": "@aakashh242/playwright-mcp",
+  "version": "0.0.0",
   "description": "Model Context Protocol servers for Playwright",
   "license": "MIT",
   "author": "ExecuteAutomation, Ltd (https://executeautomation.com)",
-  "homepage": "https://executeautomation.github.io/mcp-playwright/",
-  "bugs": "https://github.com/executeautomation/mcp-playwright/issues",
+  "homepage": "https://aakashh242.github.io/mcp-playwright/",
+  "bugs": "https://github.com/aakashh242/mcp-playwright/issues",
   "types": "dist/index.d.ts",
   "type": "module",
   "bin": {
-    "playwright-mcp-server": "dist/index.js"
+    "playwright-mcp": "dist/index.js"
   },
   "files": [
     "dist"
@@ -27,7 +27,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/executeautomation/mcp-playwright.git"
+    "url": "https://github.com/aakashh242/mcp-playwright.git"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.19.1",

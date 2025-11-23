@@ -27,10 +27,13 @@
 > 👉 https://github.com/executeautomation/mcp-playwright
 
 ![Release](https://img.shields.io/github/v/release/aakashh242/mcp-playwright?sort=semver)
+![Latest Tag](https://img.shields.io/github/v/tag/aakashh242/mcp-playwright?label=tag)
 ![Build](https://img.shields.io/github/actions/workflow/status/aakashh242/mcp-playwright/build.yml?branch=main&label=build)
 ![Lint](https://img.shields.io/github/actions/workflow/status/aakashh242/mcp-playwright/build.yml?branch=main&label=lint)
 ![Unit Tests](https://img.shields.io/github/actions/workflow/status/aakashh242/mcp-playwright/build.yml?branch=main&label=tests)
 [![Coverage](https://codecov.io/gh/aakashh242/mcp-playwright/graph/badge.svg)](https://codecov.io/gh/aakashh242/mcp-playwright)
+[![Release Please](https://img.shields.io/github/actions/workflow/status/aakashh242/mcp-playwright/release-please.yml?branch=main&label=release-please)](https://github.com/aakashh242/mcp-playwright/actions/workflows/release-please.yml)
+[![Docker Publish](https://img.shields.io/github/actions/workflow/status/aakashh242/mcp-playwright/docker-publish.yml?branch=main&label=docker)](https://github.com/aakashh242/mcp-playwright/actions/workflows/docker-publish.yml)
 
 A Model Context Protocol server that provides browser automation capabilities using Playwright. This server enables LLMs to interact with web pages, take screenshots, generate test code, web scraps the page and execute JavaScript in a real browser environment.
 It is optimized for QA and E2E automation: screenshots, logs, assertions, API testing, plus full MCP HTTP/gateway support — built on the same Playwright foundations, complementary to Microsoft’s server.
