@@ -1,9 +1,12 @@
 ---
-sidebar_position: 10
+sidebar_position: 1
 title: Streamable HTTP Mode
 ---
 
-# Streamable HTTP Mode
+import CodeBlock from '@theme/CodeBlock';
+import composeYml from '!!raw-loader!@site/docker-compose.yml';
+
+# 🌐 Streamable HTTP Mode
 
 Streamable HTTP allows the server to run behind gateways and lets clients download generated artifacts through signed URLs.
 
@@ -26,11 +29,9 @@ docker compose up -d
 ```
 The provided `docker-compose.yml` exposes `http://localhost:8000/mcp`, binds to `0.0.0.0:8000`, persists data to `./data` → `/app/data`, and runs streamable HTTP mode by default.
 
-import composeYml from '!!raw-loader!@site/docker-compose.yml';
-
-```yaml title="docker-compose.yml"
-{composeYml}
-```
+<CodeBlock language="yaml" title="docker-compose.yml">
+  {composeYml}
+</CodeBlock>
 
 ## Remote resources
 

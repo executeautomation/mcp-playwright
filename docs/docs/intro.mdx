@@ -18,53 +18,8 @@ With the Playwright MCP server, you can:
 
 
 ## Installation
-You can install Playwright MCP Server package using either **npm**, **mcp-get**, or **Smithery**:
 
-:::info Playwright MCP Tips
-
-To get started more quickly on Playwright MCP Server, watch the videos mentioned in the footer of this page under `Docs`
-
-:::
-
-
-### Installing via NPM
-To install Playwright MCP for Claude Desktop automatically via Smithery:
-
-```bash
-npm install -g @aakashh242/playwright-mcp-server
-```
-
-### Installing via Smithery
-To install Playwright MCP for Claude Desktop automatically via Smithery:
-
-```bash
-npx @smithery/cli install @aakashh242/playwright-mcp-server --client claude
-```
-
-You can type this command into Command Prompt, Powershell, Terminal, or any other integrated terminal of your code editor.
-
-### Installing via MCP-GET
-To install Playwright MCP for Claude Desktop automatically via Smithery:
-
-```bash
-npx @michaellatman/mcp-get@latest install @aakashh242/playwright-mcp-server
-```
-
-### Configuring Playwright MCP in Claude Desktop 
-Here's the Claude Desktop configuration to use the Playwright MCP server.
-
-Modify your `claude-desktop-config.json` file as shown below
-
-```json
-{
-  "mcpServers": {
-    "playwright": {
-      "command": "npx",
-      "args": ["-y", "@aakashh242/playwright-mcp-server"]
-    }
-  }
-}
-```
+See [Getting Started](./getting-started/install-with-npx.mdx) for installation instructions.
 
 ### What is Model Context Protocol
 This video should give you an high level overview of what Claude's MCP is and how helpful it will soon become for AI agents
