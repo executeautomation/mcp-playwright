@@ -99,6 +99,40 @@ let dragTool: DragTool;
 let pressKeyTool: PressKeyTool;
 let saveAsPdfTool: SaveAsPdfTool;
 let clickAndSwitchTabTool: ClickAndSwitchTabTool;
+let lastServer: any;
+
+function clearToolInstances() {
+  screenshotTool = undefined as any;
+  navigationTool = undefined as any;
+  closeBrowserTool = undefined as any;
+  consoleLogsTool = undefined as any;
+  clickTool = undefined as any;
+  iframeClickTool = undefined as any;
+  iframeFillTool = undefined as any;
+  fillTool = undefined as any;
+  selectTool = undefined as any;
+  hoverTool = undefined as any;
+  uploadFileTool = undefined as any;
+  evaluateTool = undefined as any;
+  expectResponseTool = undefined as any;
+  assertResponseTool = undefined as any;
+  customUserAgentTool = undefined as any;
+  visibleTextTool = undefined as any;
+  visibleHtmlTool = undefined as any;
+
+  getRequestTool = undefined as any;
+  postRequestTool = undefined as any;
+  putRequestTool = undefined as any;
+  patchRequestTool = undefined as any;
+  deleteRequestTool = undefined as any;
+
+  goBackTool = undefined as any;
+  goForwardTool = undefined as any;
+  dragTool = undefined as any;
+  pressKeyTool = undefined as any;
+  saveAsPdfTool = undefined as any;
+  clickAndSwitchTabTool = undefined as any;
+}
 
 let staticUserAgent = false;
 
@@ -343,6 +377,13 @@ async function ensureApiContext(url: string) {
  * Initialize all tool instances
  */
 function initializeTools(server: any) {
+  // HTTP mode creates a new Server per session; if the server reference changes,
+  // drop cached tool instances so they bind to the current session/server.
+  if (lastServer && lastServer !== server) {
+    clearToolInstances();
+  }
+
+  lastServer = server;
   // Browser tools
   if (!screenshotTool) screenshotTool = new ScreenshotTool(server);
   if (!navigationTool) navigationTool = new NavigationTool(server);
@@ -709,3 +750,16 @@ function buildUploadUrl(sessionId?: string): string | null {
   if (!base || !sessionId) return null;
   return `${base}/${sessionId}`;
 }
+
+// Test helpers (not part of public API)
+export const __testUtils = {
+  initializeToolsForTests: (server: any) => initializeTools(server),
+  clearToolInstancesForTests: () => {
+    clearToolInstances();
+    lastServer = undefined;
+  },
+  getToolStateForTests: () => ({
+    screenshotTool,
+    lastServer,
+  }),
+};
