@@ -5,6 +5,38 @@ import YouTubeVideoEmbed from '@site/src/components/HomepageFeatures/YouTubeVide
 
 # Release Notes
 
+## Version 1.0.7 (December 2025)
+- **New Transport Mode: HTTP/SSE Support**: Added standalone HTTP server mode for enhanced deployment flexibility 🌐
+  - `--port` flag to run server in HTTP mode (e.g., `playwright-mcp-server --port 8931`)
+  - Full support for Server-Sent Events (SSE) transport using MCP SDK's native `SSEServerTransport`
+  - Multiple concurrent client sessions with automatic session management
+  - Health check endpoint (`/health`) for monitoring server status
+  - Dual endpoint support: `/sse` + `/messages` (legacy) and `/mcp` (unified)
+  - Graceful shutdown with proper resource cleanup
+  - [Read the full HTTP/SSE Transport Guide](/docs/playwright-web/HTTP-SSE-Transport)
+- **Enhanced Deployment Options**:
+  - Run on remote servers without display (headless mode)
+  - Better integration with VS Code GitHub Copilot
+  - Support for background service deployment
+  - Multiple client access with session isolation
+  - Debugging capabilities with metrics endpoint (PORT+1)
+- **Backward Compatibility**:
+  - Default stdio mode unchanged (fully compatible with Claude Desktop)
+  - All existing tools work in both transport modes
+  - No breaking changes to existing configurations
+- **Documentation Updates**:
+  - Comprehensive HTTP/SSE transport documentation
+  - Client configuration guides (Claude Desktop, VS Code)
+  - Testing guides and automated test scripts
+  - Troubleshooting and FAQ sections
+  - Quick reference cards for common setups
+- **Infrastructure Improvements**:
+  - Logging system integration with HTTP transport
+  - Monitoring system for metrics collection
+  - Rate limiting framework (ready for future use)
+  - Automated testing script (`test-http-mode.sh`)
+- **Version bump**: Incremented version to 1.0.7
+
 ## Version 1.0.6
 - **New Tool: `playwright_upload_file`**: Added a new tool to upload files to an `input[type='file']` element.
 - **Enhanced Content Extraction**:

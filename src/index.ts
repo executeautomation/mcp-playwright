@@ -4,30 +4,129 @@ import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { createToolDefinitions } from "./tools.js";
 import { setupRequestHandlers } from "./requestHandler.js";
+import { Logger, RequestLoggingMiddleware } from "./logging/index.js";
+import { MonitoringSystem } from "./monitoring/index.js";
+import { startHttpServer } from "./http-server.js";
+
+// Parse command line arguments
+function parseArgs() {
+  const args = process.argv.slice(2);
+  const options: { port?: number } = {};
+  
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--port' && i + 1 < args.length) {
+      options.port = parseInt(args[i + 1], 10);
+      if (isNaN(options.port) || options.port < 1 || options.port > 65535) {
+        console.error('Error: --port must be a valid port number (1-65535)');
+        process.exit(1);
+      }
+    } else if (args[i] === '--help' || args[i] === '-h') {
+      console.log(`
+Playwright MCP Server
+
+USAGE:
+  playwright-mcp-server [OPTIONS]
+
+OPTIONS:
+  --port <number>    Run in HTTP mode on the specified port
+  --help, -h         Show this help message
+
+EXAMPLES:
+  # Run in stdio mode (default)
+  playwright-mcp-server
+
+  # Run in HTTP mode on port 8931
+  playwright-mcp-server --port 8931
+
+HTTP MODE CONFIGURATION:
+  When running with --port, configure your MCP client:
+  
+  {
+    "mcpServers": {
+      "playwright": {
+        "url": "http://localhost:8931/mcp"
+      }
+    }
+  }
+`);
+      process.exit(0);
+    }
+  }
+  
+  return options;
+}
 
 async function runServer() {
+  const options = parseArgs();
+  
+  // If port is specified, run in HTTP mode
+  if (options.port) {
+    await startHttpServer(options.port);
+    return;
+  }
+  
+  // Otherwise, run in stdio mode (default)
+  // Initialize logger and middleware
+  const logger = Logger.getInstance(Logger.createDefaultConfig());
+  const loggingMiddleware = new RequestLoggingMiddleware(logger);
+
+  // Initialize monitoring system
+  const monitoringSystem = new MonitoringSystem({
+    enabled: true,
+    metricsInterval: 30000, // 30 seconds
+    healthCheckInterval: 60000, // 1 minute
+    memoryThreshold: 80, // 80% memory usage threshold
+    responseTimeThreshold: 5000 // 5 second response time threshold
+  });
+
+  const serverInfo = {
+    name: "playwright-mcp",
+    version: "1.0.7",
+    capabilities: {
+      resources: {},
+      tools: {},
+    }
+  };
+
   const server = new Server(
     {
-      name: "playwright-mcp",
-      version: "1.0.6",
+      name: serverInfo.name,
+      version: serverInfo.version,
     },
     {
-      capabilities: {
-        resources: {},
-        tools: {},
-      },
+      capabilities: serverInfo.capabilities,
     }
   );
+
+  // Log server startup
+  loggingMiddleware.logServerStartup(serverInfo);
 
   // Create tool definitions
   const TOOLS = createToolDefinitions();
 
   // Setup request handlers
-  setupRequestHandlers(server, TOOLS);
+  setupRequestHandlers(server, TOOLS, monitoringSystem);
+
+  // Start monitoring system
+  try {
+    await monitoringSystem.startMetricsCollection(3001);
+    logger.info('Monitoring system started', { port: 3001 });
+  } catch (error) {
+    logger.warn('Failed to start monitoring HTTP server', { error: error instanceof Error ? error.message : String(error) });
+  }
 
   // Graceful shutdown logic
-  function shutdown() {
-    console.log('Shutdown signal received');
+  async function shutdown() {
+    loggingMiddleware.logServerShutdown();
+    logger.info('Shutdown signal received');
+    
+    try {
+      await monitoringSystem.stopMetricsCollection();
+      logger.info('Monitoring system stopped');
+    } catch (error) {
+      logger.error('Error stopping monitoring system', error instanceof Error ? error : new Error(String(error)));
+    }
+    
     process.exit(0);
   }
 
@@ -35,12 +134,21 @@ async function runServer() {
   process.on('SIGTERM', shutdown);
   process.on('exit', shutdown);
   process.on('uncaughtException', (err) => {
-    console.error('Uncaught Exception:', err);
+    logger.error('Uncaught Exception', err, {
+      category: 'system',
+      nodeVersion: process.version,
+      platform: process.platform,
+    });
   });
 
   // Create transport and connect
   const transport = new StdioServerTransport();
   await server.connect(transport);
+  
+  logger.info('MCP Server connected and ready', {
+    transport: 'stdio',
+    toolCount: TOOLS.length,
+  });
 }
 
 runServer().catch((error) => {

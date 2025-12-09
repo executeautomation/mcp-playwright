@@ -83,7 +83,9 @@ code-insiders --add-mcp '{"name":"playwright","command":"npx","args":["@executea
 After installation, the ExecuteAutomation Playwright MCP server will be available for use with your GitHub Copilot agent in VS Code.
 
 ## Configuration to use Playwright Server
-Here's the Claude Desktop configuration to use the Playwright server:
+
+### Standard Mode (stdio)
+Here's the Claude Desktop configuration to use the Playwright server in standard mode:
 
 ```json
 {
@@ -95,6 +97,76 @@ Here's the Claude Desktop configuration to use the Playwright server:
   }
 }
 ```
+
+### HTTP Mode (Standalone Server)
+
+When running headed browser on systems without display or from worker processes of IDEs, you can run the MCP server as a standalone HTTP server:
+
+> **Note for Claude Desktop Users:** Claude Desktop currently requires stdio mode (command/args configuration). HTTP mode is recommended for VS Code, custom clients, and remote deployments. See [CLAUDE_DESKTOP_CONFIG.md](CLAUDE_DESKTOP_CONFIG.md) for details.
+
+#### Starting the HTTP Server
+
+```bash
+# Using npx
+npx @executeautomation/playwright-mcp-server --port 8931
+
+# Or after global installation
+playwright-mcp-server --port 8931
+```
+
+The server will start and display available endpoints:
+
+```
+==============================================
+Playwright MCP Server (HTTP Mode)
+==============================================
+Port: 8931
+
+ENDPOINTS:
+- SSE Stream:     GET  http://localhost:8931/sse
+- Messages:       POST http://localhost:8931/messages?sessionId=<id>
+- MCP (unified):  GET  http://localhost:8931/mcp
+- MCP (unified):  POST http://localhost:8931/mcp?sessionId=<id>
+- Health Check:   GET  http://localhost:8931/health
+==============================================
+```
+
+#### Client Configuration for HTTP Mode
+
+**For VS Code GitHub Copilot:**
+```json
+{
+  "github.copilot.chat.mcp.servers": {
+    "playwright": {
+      "url": "http://localhost:8931/mcp"
+    }
+  }
+}
+```
+
+**For Custom MCP Clients:**
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "url": "http://localhost:8931/mcp"
+    }
+  }
+}
+```
+
+**For Claude Desktop:** Use stdio mode instead (see Standard Mode above)
+
+#### Use Cases for HTTP Mode
+
+- Running headed browsers on systems without display (e.g., remote servers)
+- Integrating with VS Code GitHub Copilot
+- Running the server as a background service
+- Accessing the server from multiple clients
+- Debugging with the `/health` endpoint
+- Custom MCP client integrations
+
+**Note:** For Claude Desktop, continue using stdio mode (Standard Mode above) for now.
 
 ## Testing
 
