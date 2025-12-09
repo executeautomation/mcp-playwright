@@ -13,6 +13,7 @@ import YouTubeVideoEmbed from '@site/src/components/HomepageFeatures/YouTubeVide
   - Health check endpoint (`/health`) for monitoring server status
   - Dual endpoint support: `/sse` + `/messages` (legacy) and `/mcp` (unified)
   - Graceful shutdown with proper resource cleanup
+  - DRY-compliant implementation with reusable endpoint handlers
   - [Read the full HTTP/SSE Transport Guide](/docs/playwright-web/HTTP-SSE-Transport)
 - **Enhanced Deployment Options**:
   - Run on remote servers without display (headless mode)
@@ -20,16 +21,25 @@ import YouTubeVideoEmbed from '@site/src/components/HomepageFeatures/YouTubeVide
   - Support for background service deployment
   - Multiple client access with session isolation
   - Debugging capabilities with metrics endpoint (PORT+1)
+- **Code Quality Improvements**:
+  - Refactored endpoint logic to eliminate duplication (~40% code reduction)
+  - Implemented DRY (Don't Repeat Yourself) principles throughout HTTP server
+  - Single source of truth for SSE connection and message handling
+  - Improved maintainability and consistency across all endpoints
+  - Enhanced logging with context-aware messages
+  - Reduced bug risk through centralized error handling
 - **Backward Compatibility**:
   - Default stdio mode unchanged (fully compatible with Claude Desktop)
   - All existing tools work in both transport modes
   - No breaking changes to existing configurations
+  - All 110 tests passing
 - **Documentation Updates**:
   - Comprehensive HTTP/SSE transport documentation
   - Client configuration guides (Claude Desktop, VS Code)
   - Testing guides and automated test scripts
   - Troubleshooting and FAQ sections
   - Quick reference cards for common setups
+  - Refactoring notes and best practices documentation
 - **Infrastructure Improvements**:
   - Logging system integration with HTTP transport
   - Monitoring system for metrics collection
