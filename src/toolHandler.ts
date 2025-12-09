@@ -66,7 +66,6 @@ export function resetBrowserState() {
 export function setGlobalPage(newPage: Page): void {
   page = newPage;
   page.bringToFront();// Bring the new tab to the front
-  console.log("Global page has been updated.");
 }
 // Tool instances
 let screenshotTool: ScreenshotTool;
@@ -121,9 +120,13 @@ async function registerConsoleMessage(page) {
       // "Unhandled Rejection In Promise" we injected
       if (text.startsWith("[Playwright]")) {
         const payload = text.replace("[Playwright]", "");
-        consoleLogsTool.registerConsoleMessage("exception", payload);
+        if (consoleLogsTool) {
+          consoleLogsTool.registerConsoleMessage("exception", payload);
+        }
       } else {
-        consoleLogsTool.registerConsoleMessage(type, text);
+        if (consoleLogsTool) {
+          consoleLogsTool.registerConsoleMessage(type, text);
+        }
       }
     }
   });
@@ -159,9 +162,8 @@ export async function ensureBrowser(browserSettings?: BrowserSettings) {
   try {
     // Check if browser exists but is disconnected
     if (browser && !browser.isConnected()) {
-      console.error("Browser exists but is disconnected. Cleaning up...");
       try {
-        await browser.close().catch(err => console.error("Error closing disconnected browser:", err));
+        await browser.close().catch(() => {});
       } catch (e) {
         // Ignore errors when closing disconnected browser
       }
@@ -176,15 +178,13 @@ export async function ensureBrowser(browserSettings?: BrowserSettings) {
       // If browser type is changing, force a new browser instance
       if (browser && currentBrowserType !== browserType) {
         try {
-          await browser.close().catch(err => console.error("Error closing browser on type change:", err));
+          await browser.close().catch(() => {});
         } catch (e) {
           // Ignore errors
         }
         resetBrowserState();
       }
-      
-      console.error(`Launching new ${browserType} browser instance...`);
-      
+
       // Use the appropriate browser engine
       let browserInstance;
       switch (browserType) {
@@ -211,7 +211,6 @@ export async function ensureBrowser(browserSettings?: BrowserSettings) {
 
       // Add cleanup logic when browser is disconnected
       browser.on('disconnected', () => {
-        console.error("Browser disconnected event triggered");
         browser = undefined;
         page = undefined;
       });
@@ -233,18 +232,16 @@ export async function ensureBrowser(browserSettings?: BrowserSettings) {
     
     // Verify page is still valid
     if (!page || page.isClosed()) {
-      console.error("Page is closed or invalid. Creating new page...");
       // Create a new page if the current one is invalid
       const context = browser.contexts()[0] || await browser.newContext();
       page = await context.newPage();
-      
+
       // Re-register console message handler
       await registerConsoleMessage(page);
     }
-    
+
     return page!;
   } catch (error) {
-    console.error("Error ensuring browser:", error);
     // If something went wrong, clean up completely and retry once
     try {
       if (browser) {
@@ -276,9 +273,8 @@ export async function ensureBrowser(browserSettings?: BrowserSettings) {
     
     browser = await browserInstance.launch({ headless });
     currentBrowserType = browserType;
-    
+
     browser.on('disconnected', () => {
-      console.error("Browser disconnected event triggered (retry)");
       browser = undefined;
       page = undefined;
     });
@@ -410,7 +406,6 @@ export async function handleToolCall(
 
     // Check if we have a disconnected browser that needs cleanup
     if (browser && !browser.isConnected() && BROWSER_TOOLS.includes(name)) {
-      console.error("Detected disconnected browser before tool execution, cleaning up...");
       try {
         await browser.close().catch(() => {}); // Ignore errors
       } catch (e) {
@@ -440,7 +435,6 @@ export async function handleToolCall(
       context.page = await ensureBrowser(browserSettings);
       context.browser = browser;
     } catch (error) {
-      console.error("Failed to ensure browser:", error);
       return {
         content: [{
           type: "text",
@@ -560,8 +554,6 @@ export async function handleToolCall(
         };
     }
   } catch (error) {
-    console.error(`Error handling tool ${name}:`, error);
-    
     // Handle browser-specific errors at the top level
     if (BROWSER_TOOLS.includes(name)) {
       const errorMessage = (error as Error).message;
