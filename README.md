@@ -53,6 +53,13 @@ To install Playwright MCP for Claude Desktop automatically via [Smithery](https:
 ```bash
 npx @smithery/cli install @executeautomation/playwright-mcp-server --client claude
 ```
+
+Using Claude Code:
+```bash
+claude mcp add --transport stdio playwright npx @executeautomation/playwright-mcp-server
+```
+
+
 #### Installation in VS Code
 
 Install the Playwright MCP server in VS Code using one of these buttons:
