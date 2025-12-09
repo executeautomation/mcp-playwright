@@ -65,34 +65,43 @@ export async function startHttpServer(port: number) {
     return server;
   };
 
-  // SSE endpoint - establishes the SSE connection
-  app.get('/sse', async (req, res) => {
-    logger.info('SSE connection request received');
+  // Helper function to handle SSE connection (DRY principle)
+  const handleSseConnection = async (
+    endpoint: string,
+    messageEndpoint: string,
+    req: express.Request,
+    res: express.Response
+  ) => {
+    logger.info('SSE connection request received', { endpoint });
     
     try {
-      const transport = new SSEServerTransport('/messages', res);
+      const transport = new SSEServerTransport(messageEndpoint, res);
       const sessionId = transport.sessionId;
       transports[sessionId] = transport;
 
       res.on('close', () => {
-        logger.info('SSE connection closed', { sessionId });
+        logger.info('SSE connection closed', { sessionId, endpoint });
         delete transports[sessionId];
       });
 
       const server = createMcpServer();
       await server.connect(transport);
       
-      logger.info('SSE transport connected', { sessionId });
+      logger.info('SSE transport connected', { sessionId, endpoint });
     } catch (error) {
-      logger.error('Error establishing SSE connection', error instanceof Error ? error : new Error(String(error)));
+      logger.error('Error establishing SSE connection', error instanceof Error ? error : new Error(String(error)), { endpoint });
       if (!res.headersSent) {
         res.status(500).send('Failed to establish SSE connection');
       }
     }
-  });
+  };
 
-  // Messages endpoint - receives client messages
-  app.post('/messages', async (req, res) => {
+  // Helper function to handle POST messages (DRY principle)
+  const handlePostMessage = async (
+    endpoint: string,
+    req: express.Request,
+    res: express.Response
+  ) => {
     const sessionId = req.query.sessionId as string;
     
     if (!sessionId) {
@@ -110,7 +119,7 @@ export async function startHttpServer(port: number) {
     const transport = transports[sessionId];
     
     if (!transport) {
-      logger.warn('Message received for unknown session', { sessionId });
+      logger.warn('Message received for unknown session', { sessionId, endpoint });
       res.status(400).json({
         jsonrpc: '2.0',
         error: {
@@ -125,7 +134,7 @@ export async function startHttpServer(port: number) {
     try {
       await transport.handlePostMessage(req, res, req.body);
     } catch (error) {
-      logger.error('Error handling POST message', error instanceof Error ? error : new Error(String(error)), { sessionId });
+      logger.error('Error handling POST message', error instanceof Error ? error : new Error(String(error)), { sessionId, endpoint });
       if (!res.headersSent) {
         res.status(500).json({
           jsonrpc: '2.0',
@@ -137,81 +146,15 @@ export async function startHttpServer(port: number) {
         });
       }
     }
-  });
+  };
 
-  // MCP endpoint - unified endpoint for SSE (compatible with newer clients)
-  app.get('/mcp', async (req, res) => {
-    logger.info('MCP SSE connection request received');
-    
-    try {
-      const transport = new SSEServerTransport('/mcp', res);
-      const sessionId = transport.sessionId;
-      transports[sessionId] = transport;
+  // Legacy SSE endpoint (for backward compatibility)
+  app.get('/sse', (req, res) => handleSseConnection('/sse', '/messages', req, res));
+  app.post('/messages', (req, res) => handlePostMessage('/messages', req, res));
 
-      res.on('close', () => {
-        logger.info('MCP SSE connection closed', { sessionId });
-        delete transports[sessionId];
-      });
-
-      const server = createMcpServer();
-      await server.connect(transport);
-      
-      logger.info('MCP SSE transport connected', { sessionId });
-    } catch (error) {
-      logger.error('Error establishing MCP SSE connection', error instanceof Error ? error : new Error(String(error)));
-      if (!res.headersSent) {
-        res.status(500).send('Failed to establish MCP SSE connection');
-      }
-    }
-  });
-
-  // MCP POST endpoint - receives client messages on unified endpoint
-  app.post('/mcp', async (req, res) => {
-    const sessionId = req.query.sessionId as string;
-    
-    if (!sessionId) {
-      res.status(400).json({
-        jsonrpc: '2.0',
-        error: {
-          code: -32000,
-          message: 'Bad Request: sessionId query parameter required',
-        },
-        id: null,
-      });
-      return;
-    }
-
-    const transport = transports[sessionId];
-    
-    if (!transport) {
-      logger.warn('MCP message received for unknown session', { sessionId });
-      res.status(400).json({
-        jsonrpc: '2.0',
-        error: {
-          code: -32000,
-          message: 'Bad Request: No transport found for sessionId',
-        },
-        id: null,
-      });
-      return;
-    }
-
-    try {
-      await transport.handlePostMessage(req, res, req.body);
-    } catch (error) {
-      logger.error('Error handling MCP POST message', error instanceof Error ? error : new Error(String(error)), { sessionId });
-      if (!res.headersSent) {
-        res.status(500).json({
-          jsonrpc: '2.0',
-          error: {
-            code: -32603,
-            message: 'Internal server error',
-          },
-          id: null,
-        });
-      }
-    }
-  });
+  // Unified MCP endpoint (recommended)
+  app.get('/mcp', (req, res) => handleSseConnection('/mcp', '/mcp', req, res));
+  app.post('/mcp', (req, res) => handlePostMessage('/mcp', req, res));
 
   // Health check endpoint
   app.get('/health', (req, res) => {
