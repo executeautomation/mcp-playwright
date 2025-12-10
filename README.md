@@ -172,6 +172,8 @@ ENDPOINTS:
 - Debugging with the `/health` endpoint
 - Custom MCP client integrations
 
+**Monitoring:** The server includes a monitoring system that starts on a dynamically allocated port (avoiding conflicts). Check the console output for the actual port.
+
 **Note:** For Claude Desktop, continue using stdio mode (Standard Mode above) for now.
 
 ## Troubleshooting

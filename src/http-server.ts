@@ -249,8 +249,8 @@ CLIENT CONFIGURATION:
 ==============================================
 `);
 
-      // Start monitoring system
-      monitoringSystem.startMetricsCollection(port + 1).catch(error => {
+      // Start monitoring system with dynamic port allocation
+      monitoringSystem.startMetricsCollection(0).catch(error => {
         logger.warn('Failed to start monitoring HTTP server', { 
           error: error instanceof Error ? error.message : String(error) 
         });

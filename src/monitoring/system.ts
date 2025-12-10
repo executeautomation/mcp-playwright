@@ -15,6 +15,7 @@ export class MonitoringSystem {
   private healthCheckInterval?: NodeJS.Timeout;
   private httpServer?: Server;
   private app?: Express;
+  private actualPort?: number;
 
   constructor(config: MonitoringConfig) {
     this.config = config;
@@ -187,9 +188,13 @@ export class MonitoringSystem {
 
     return new Promise((resolve, reject) => {
       this.httpServer = this.app!.listen(port, () => {
-        console.log(`Monitoring HTTP server listening on port ${port}`);
-        console.log(`Health check: http://localhost:${port}/health`);
-        console.log(`Metrics: http://localhost:${port}/metrics`);
+        // Get the actual port assigned (important when using port 0 for dynamic allocation)
+        const address = this.httpServer!.address();
+        this.actualPort = typeof address === 'object' && address !== null ? address.port : port;
+        
+        console.log(`Monitoring HTTP server listening on port ${this.actualPort}`);
+        console.log(`Health check: http://localhost:${this.actualPort}/health`);
+        console.log(`Metrics: http://localhost:${this.actualPort}/metrics`);
         resolve();
       });
 
@@ -240,5 +245,13 @@ export class MonitoringSystem {
 
     const totalTime = this.requestHistory.reduce((sum, req) => sum + req.duration, 0);
     this.metrics.averageResponseTime = totalTime / this.requestHistory.length;
+  }
+
+  /**
+   * Get the actual port the monitoring server is listening on
+   * @returns The port number, or undefined if server not started
+   */
+  getMonitoringPort(): number | undefined {
+    return this.actualPort;
   }
 }

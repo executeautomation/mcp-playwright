@@ -341,10 +341,20 @@ curl http://localhost:8931/health | jq
 
 ### Metrics Collection
 
-Access detailed metrics on PORT+1:
+The monitoring server uses **dynamic port allocation** to avoid conflicts. Check the console output for the actual port:
 
 ```bash
-curl http://localhost:8932/metrics | jq
+# Server output shows:
+# Monitoring HTTP server listening on port 59055
+# Health check: http://localhost:59055/health
+# Metrics: http://localhost:59055/metrics
+```
+
+Access detailed metrics:
+
+```bash
+# Use the port from server output
+curl http://localhost:59055/metrics | jq
 ```
 
 **Available metrics:**
@@ -353,6 +363,8 @@ curl http://localhost:8932/metrics | jq
 - Error rates
 - Memory usage
 - System health
+
+**Note:** The monitoring port is dynamically allocated (using port 0) to prevent conflicts with other services.
 
 ### Logs
 
