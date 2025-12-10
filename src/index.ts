@@ -90,7 +90,7 @@ async function runServer() {
 
   const serverInfo = {
     name: "playwright-mcp",
-    version: "1.0.8",
+    version: "1.0.9",
     capabilities: {
       resources: {},
       tools: {},
