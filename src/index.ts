@@ -21,7 +21,7 @@ function parseArgs() {
         process.exit(1);
       }
     } else if (args[i] === '--help' || args[i] === '-h') {
-      console.log(`
+      console.error(`
 Playwright MCP Server
 
 USAGE:
@@ -61,8 +61,8 @@ async function runServer() {
   
   // If port is specified, run in HTTP mode
   if (options.port) {
-    // Show immediate feedback (stderr won't break anything)
-    console.error(`\n⏳ Initializing Playwright MCP Server on port ${options.port}...\n`);
+    // Show immediate feedback
+    console.log(`\n⏳ Initializing Playwright MCP Server on port ${options.port}...\n`);
     await startHttpServer(options.port);
     return;
   }

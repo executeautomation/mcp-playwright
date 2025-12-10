@@ -16,7 +16,7 @@ interface TransportMap {
 
 export async function startHttpServer(port: number) {
   // Show immediate feedback that server is starting
-  console.error('\n🚀 Starting Playwright MCP Server (HTTP Mode)...\n');
+  console.log('\n🚀 Starting Playwright MCP Server (HTTP Mode)...\n');
   
   // Initialize logger for HTTP mode (file only - cleaner console output)
   const logger = Logger.getInstance({
