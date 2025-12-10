@@ -44,7 +44,8 @@ HTTP MODE CONFIGURATION:
   {
     "mcpServers": {
       "playwright": {
-        "url": "http://localhost:8931/mcp"
+        "url": "http://localhost:8931/mcp",
+        "type": "http"
       }
     }
   }
