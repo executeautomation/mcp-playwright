@@ -158,7 +158,6 @@ async function runServer() {
   });
 }
 
-runServer().catch((error) => {
-  console.error("Fatal error in main():", error);
+runServer().catch(() => {
   process.exit(1);
 });

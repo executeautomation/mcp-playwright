@@ -1,0 +1,18 @@
+services:
+  playwright-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mcp-playwright:latest
+    container_name: playwright-mcp-server
+    stdin_open: true
+    tty: true
+    # MCP servers communicate via stdio
+    # You can interact with this container using:
+    # docker compose run --rm playwright-mcp
+    environment:
+      # Skip browser download in container
+      - PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+    # Optionally mount a volume for persistent data
+    # volumes:
+    #   - ./data:/app/data

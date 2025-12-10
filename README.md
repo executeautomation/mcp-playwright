@@ -22,9 +22,10 @@
 
 # Playwright MCP Server 🎭
 
+[![Trust Score](https://archestra.ai/mcp-catalog/api/badge/quality/executeautomation/mcp-playwright)](https://archestra.ai/mcp-catalog/executeautomation__mcp-playwright)
 [![smithery badge](https://smithery.ai/badge/@executeautomation/playwright-mcp-server)](https://smithery.ai/server/@executeautomation/playwright-mcp-server)
 
-A Model Context Protocol server that provides browser automation capabilities using Playwright. This server enables LLMs to interact with web pages, take screenshots, generate test code, web scraps the page and execute JavaScript in a real browser environment.
+A Model Context Protocol server that provides browser automation capabilities using Playwright. This server enables LLMs to interact with web pages, take screenshots, generate test code, web scrapes the page and execute JavaScript in a real browser environment.
 
 <a href="https://glama.ai/mcp/servers/yh4lgtwgbe"><img width="380" height="200" src="https://glama.ai/mcp/servers/yh4lgtwgbe/badge" alt="mcp-playwright MCP server" /></a>
 
@@ -53,6 +54,13 @@ To install Playwright MCP for Claude Desktop automatically via [Smithery](https:
 ```bash
 npx @smithery/cli install @executeautomation/playwright-mcp-server --client claude
 ```
+
+Using Claude Code:
+```bash
+claude mcp add --transport stdio playwright npx @executeautomation/playwright-mcp-server
+```
+
+
 #### Installation in VS Code
 
 Install the Playwright MCP server in VS Code using one of these buttons:

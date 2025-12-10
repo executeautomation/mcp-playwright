@@ -1,10 +1,11 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { 
-  ListResourcesRequestSchema, 
-  ReadResourceRequestSchema, 
-  ListToolsRequestSchema, 
+import {
+  ListResourcesRequestSchema,
+  ReadResourceRequestSchema,
+  ListToolsRequestSchema,
   CallToolRequestSchema,
-  Tool
+  Tool,
+  McpError
 } from "@modelcontextprotocol/sdk/types.js";
 import { handleToolCall, getConsoleLogs, getScreenshots } from "./toolHandler.js";
 import { Logger, RequestLoggingMiddleware } from "./logging/index.js";
