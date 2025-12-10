@@ -62,7 +62,7 @@ async function runServer() {
   // If port is specified, run in HTTP mode
   if (options.port) {
     // Show immediate feedback
-    console.log(`\n⏳ Initializing Playwright MCP Server on port ${options.port}...\n`);
+    process.stdout.write(`\n⏳ Initializing Playwright MCP Server on port ${options.port}...\n`);
     await startHttpServer(options.port);
     return;
   }
