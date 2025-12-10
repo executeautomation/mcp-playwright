@@ -5,6 +5,28 @@ import YouTubeVideoEmbed from '@site/src/components/HomepageFeatures/YouTubeVide
 
 # Release Notes
 
+## Version 1.0.8 (December 2025)
+
+### 🖥️ Console Output Improvements
+
+**Fixed:** Console output visibility when running in HTTP mode
+
+- Changed console output from `stderr` to `stdout` for better visibility
+- Now displays initialization message: `⏳ Initializing Playwright MCP Server on port {port}...`
+- Shows complete server startup information including endpoints and configuration
+- Improved user experience when starting the server with `--port` flag
+
+**Before:** No visible console output when running `npx @executeautomation/playwright-mcp-server --port 8931`
+
+**After:** Clear, formatted output showing:
+- Server initialization status
+- Listening address and port
+- Available endpoints (SSE, Messages, MCP, Health Check)
+- Client configuration example
+- Monitoring server information
+
+This makes it much easier to verify that the server has started successfully and provides all necessary connection information at a glance.
+
 ## Version 1.0.7 (December 2024)
 
 ### 🌐 HTTP/SSE Transport Mode (New!)
