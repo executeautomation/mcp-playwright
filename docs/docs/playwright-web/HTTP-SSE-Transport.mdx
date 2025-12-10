@@ -32,11 +32,43 @@ The HTTP/SSE transport allows the MCP server to run as a standalone HTTP server,
 
 ### Starting the HTTP Server
 
-```bash
-# Using npx
-npx @executeautomation/playwright-mcp-server --port 8931
+#### Recommended: Using npx (Version 1.0.9+)
 
-# Or after global installation
+```bash
+npx @executeautomation/playwright-mcp-server --port 8931
+```
+
+:::info Version Requirement
+**npx support requires version 1.0.9 or later.** If you're using an older version, you'll need to use global installation (see below).
+:::
+
+#### Alternative: Global Installation
+
+If you prefer global installation or are using version 1.0.8 or earlier:
+
+```bash
+# Install globally
+npm install -g @executeautomation/playwright-mcp-server
+
+# Run the server
+playwright-mcp-server --port 8931
+```
+
+:::tip Which method to use?
+- **npx** (recommended): Always uses the latest version, no installation needed
+- **Global install**: Faster startup, uses specific installed version
+:::
+
+#### Troubleshooting npx
+
+If `npx` doesn't show console output (versions < 1.0.9):
+
+```bash
+# Option 1: Update to latest version
+npx @executeautomation/playwright-mcp-server@latest --port 8931
+
+# Option 2: Use global installation instead
+npm install -g @executeautomation/playwright-mcp-server
 playwright-mcp-server --port 8931
 ```
 
@@ -45,11 +77,18 @@ playwright-mcp-server --port 8931
 When started successfully, you'll see:
 
 ```
+⏳ Initializing Playwright MCP Server on port 8931...
+
+🚀 Starting Playwright MCP Server (HTTP Mode)...
+
 ==============================================
 Playwright MCP Server (HTTP Mode)
 ==============================================
-Port: 8931
-Version: 1.0.7
+Listening: 127.0.0.1:8931 (localhost only)
+Version: 1.0.9
+
+SECURITY: Server is bound to localhost only.
+          Not accessible from external networks.
 
 ENDPOINTS:
 - SSE Stream:     GET  http://localhost:8931/sse
@@ -57,8 +96,29 @@ ENDPOINTS:
 - MCP (unified):  GET  http://localhost:8931/mcp
 - MCP (unified):  POST http://localhost:8931/mcp?sessionId=<id>
 - Health Check:   GET  http://localhost:8931/health
+
+CLIENT CONFIGURATION:
+{
+  "mcpServers": {
+    "playwright": {
+      "url": "http://localhost:8931/mcp",
+      "type": "http"
+    }
+  }
+}
 ==============================================
+
+Monitoring HTTP server listening on port 55123
+Health check: http://localhost:55123/health
+Metrics: http://localhost:55123/metrics
 ```
+
+:::warning No Output Visible?
+If you don't see the console output above:
+1. **Check your version**: Run `npx @executeautomation/playwright-mcp-server@latest --port 8931`
+2. **Use global install**: `npm install -g @executeautomation/playwright-mcp-server` then `playwright-mcp-server --port 8931`
+3. **Verify server is running**: `curl http://localhost:8931/health` (should return `{"status":"ok"}`)
+:::
 
 ## Client Configuration
 
@@ -634,6 +694,37 @@ Monitor SSE sessions with:
 
 ### Common Issues
 
+#### Issue: npx Shows No Console Output
+
+**Symptom:** Running `npx @executeautomation/playwright-mcp-server --port 8931` shows no output or seems to hang.
+
+**Cause:** Versions prior to 1.0.9 had an output buffering issue with npx.
+
+**Solutions:**
+
+1. **Update to latest version (recommended):**
+   ```bash
+   npx @executeautomation/playwright-mcp-server@latest --port 8931
+   ```
+
+2. **Use global installation:**
+   ```bash
+   npm install -g @executeautomation/playwright-mcp-server
+   playwright-mcp-server --port 8931
+   ```
+
+3. **Verify server is actually running:**
+   ```bash
+   # Even without visible output, the server might be running
+   curl http://localhost:8931/health
+   ```
+   If this returns `{"status":"ok","version":"1.0.x","activeSessions":0}`, the server is running successfully despite no console output.
+
+**Why this happens:**
+- Node.js buffers `console.log()` output when stdout is not a TTY
+- Fixed in version 1.0.9 by using `process.stdout.write()`
+- Global installation doesn't have this issue
+
 #### Issue: "No transport found for sessionId"
 
 **Symptom:** Client receives 400 error with message about missing transport.
@@ -779,6 +870,30 @@ playwright-mcp-server --port 8931
 - Configurations are independent
 
 ## FAQ
+
+### Q: Should I use npx or global installation?
+
+**Use npx (recommended):**
+- ✅ Always uses latest version
+- ✅ No installation needed
+- ✅ Easy to update
+- ⚠️ Requires version 1.0.9+ for console output
+
+**Use global installation:**
+- ✅ Faster startup (no download)
+- ✅ Works with all versions
+- ✅ More predictable (pinned version)
+- ⚠️ Needs manual updates
+
+**Quick test which works for you:**
+```bash
+# Try npx first
+npx @executeautomation/playwright-mcp-server@latest --port 8931
+
+# If no output, use global install
+npm install -g @executeautomation/playwright-mcp-server
+playwright-mcp-server --port 8931
+```
 
 ### Q: Should I use HTTP or stdio mode?
 
