@@ -15,6 +15,9 @@ interface TransportMap {
 }
 
 export async function startHttpServer(port: number) {
+  // Show immediate feedback that server is starting
+  console.error('\n🚀 Starting Playwright MCP Server (HTTP Mode)...\n');
+  
   // Initialize logger and middleware
   const logger = Logger.getInstance(Logger.createDefaultConfig());
   const loggingMiddleware = new RequestLoggingMiddleware(logger);
