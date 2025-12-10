@@ -29,6 +29,32 @@ A Model Context Protocol server that provides browser automation capabilities us
 
 <a href="https://glama.ai/mcp/servers/yh4lgtwgbe"><img width="380" height="200" src="https://glama.ai/mcp/servers/yh4lgtwgbe/badge" alt="mcp-playwright MCP server" /></a>
 
+## ✨ What's New in v1.0.10
+
+### 🎯 Device Emulation with 143 Real Device Presets!
+
+Test your web applications on **real device profiles** with a simple command:
+
+```javascript
+// Test on iPhone 13 with automatic user-agent, touch support, and device pixel ratio
+await playwright_resize({ device: "iPhone 13" });
+
+// Switch to iPad with landscape orientation
+await playwright_resize({ device: "iPad Pro 11", orientation: "landscape" });
+
+// Test desktop view
+await playwright_resize({ device: "Desktop Chrome" });
+```
+
+**Natural Language Support for AI Assistants:**
+- "Test on iPhone 13" 
+- "Switch to iPad view"
+- "Rotate to landscape"
+
+**Supports 143 devices:** iPhone, iPad, Pixel, Galaxy, and Desktop browsers with proper emulation of viewport, user-agent, touch events, and device pixel ratios.
+
+📚 [View Device Quick Reference](https://executeautomation.github.io/mcp-playwright/docs/playwright-web/Device-Quick-Reference) | [Prompt Guide](https://executeautomation.github.io/mcp-playwright/docs/playwright-web/Resize-Prompts-Guide)
+
 ## Screenshot
 ![Playwright + Claude](image/playwright_claude.png)
 

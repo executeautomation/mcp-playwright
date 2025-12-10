@@ -232,6 +232,33 @@ export function createToolDefinitions() {
       },
     },
     {
+      name: "playwright_resize",
+      description: "Resize the browser viewport using manual dimensions or device presets. Supports 143+ device presets including iPhone, iPad, Android devices, and desktop browsers with proper user-agent and touch emulation.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          device: { 
+            type: "string", 
+            description: "Device preset name (e.g., 'iPhone 13', 'iPad Pro 11', 'Pixel 7', 'Galaxy S24', 'Desktop Chrome'). Automatically configures viewport, user-agent, and device capabilities. Use playwright.devices to see all available devices." 
+          },
+          width: { 
+            type: "number", 
+            description: "Viewport width in pixels (for manual resize without device preset)" 
+          },
+          height: { 
+            type: "number", 
+            description: "Viewport height in pixels (for manual resize without device preset)" 
+          },
+          orientation: {
+            type: "string",
+            description: "Device orientation: 'portrait' or 'landscape' (only applies when using device preset)",
+            enum: ["portrait", "landscape"]
+          }
+        },
+        required: [],
+      },
+    },
+    {
       name: "playwright_close",
       description: "Close the browser and release all resources",
       inputSchema: {
@@ -458,6 +485,7 @@ export const BROWSER_TOOLS = [
   "playwright_hover",
   "playwright_upload_file",
   "playwright_evaluate",
+  "playwright_resize",
   "playwright_close",
   "playwright_expect_response",
   "playwright_assert_response",
