@@ -18,8 +18,15 @@ export async function startHttpServer(port: number) {
   // Show immediate feedback that server is starting
   console.error('\n🚀 Starting Playwright MCP Server (HTTP Mode)...\n');
   
-  // Initialize logger and middleware
-  const logger = Logger.getInstance(Logger.createDefaultConfig());
+  // Initialize logger for HTTP mode (file only - cleaner console output)
+  const logger = Logger.getInstance({
+    level: 'info',
+    format: 'json',
+    outputs: ['file'], // File only - we have nice formatted console output below
+    filePath: `${process.env.HOME || '/tmp'}/playwright-mcp-server-http.log`,
+    maxFileSize: 10485760,
+    maxFiles: 5
+  });
   const loggingMiddleware = new RequestLoggingMiddleware(logger);
 
   // Initialize monitoring system
