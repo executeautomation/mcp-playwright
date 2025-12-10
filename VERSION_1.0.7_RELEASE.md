@@ -102,6 +102,12 @@ playwright-mcp-server --port 8931
 ### Fixed
 - 🐛 ES module imports (added `.js` extensions)
 
+### Security
+- 🔒 **CRITICAL FIX:** Server now binds to 127.0.0.1 (localhost only)
+- 🔒 Prevents external network access by default
+- 🔒 Added security notification in console output
+- 🔒 No accidental exposure to network interfaces
+
 ### Maintained
 - ✅ Full backward compatibility with stdio mode
 - ✅ All existing tools work in both modes

@@ -166,9 +166,14 @@ export async function startHttpServer(port: number) {
   });
 
   // Start the HTTP server
+  // SECURITY: Bind to localhost only to prevent external access
+  const host = '127.0.0.1';
+  
   return new Promise<void>((resolve, reject) => {
-    const httpServer = app.listen(port, () => {
-      logger.info(`Playwright MCP HTTP server listening on port ${port}`, {
+    const httpServer = app.listen(port, host, () => {
+      logger.info(`Playwright MCP HTTP server listening on ${host}:${port}`, {
+        host,
+        port,
         endpoints: {
           sse: `http://localhost:${port}/sse`,
           messages: `http://localhost:${port}/messages`,
@@ -181,8 +186,11 @@ export async function startHttpServer(port: number) {
 ==============================================
 Playwright MCP Server (HTTP Mode)
 ==============================================
-Port: ${port}
+Listening: ${host}:${port} (localhost only)
 Version: ${serverInfo.version}
+
+SECURITY: Server is bound to localhost only.
+          Not accessible from external networks.
 
 ENDPOINTS:
 - SSE Stream:     GET  http://localhost:${port}/sse

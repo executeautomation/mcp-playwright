@@ -478,20 +478,71 @@ Cleanup Session
 
 ## Security Considerations
 
+:::warning IMPORTANT SECURITY NOTE
+The server binds to **127.0.0.1 (localhost only)** by default. This is a critical security feature that prevents external access.
+:::
+
 ### Network Binding
 
-By default, the server binds to `localhost`:
-- Accessible only from the local machine
-- Not exposed to external networks
-- Suitable for local development
+**SECURITY:** The server binds to `127.0.0.1` (localhost only):
+- ✅ Accessible only from the local machine
+- ✅ Not exposed to external networks
+- ✅ Secure by default
+- ✅ Suitable for local development
+- ✅ No accidental external exposure
+- ✅ Protects against unauthorized access
 
-### Remote Access
+**Why This Matters:**
+- Prevents external machines from accessing your MCP server
+- Protects browser automation capabilities from network exposure
+- Ensures no accidental exposure in shared network environments
+- Follows security best practices for local development tools
 
-For remote access, consider:
-- Using SSH tunneling
-- Adding authentication layer
-- Implementing HTTPS/TLS
-- Setting up firewall rules
+### Remote Access (Secure Method)
+
+**DO NOT** modify the code to bind to 0.0.0.0. Instead, use SSH tunneling:
+
+```bash
+# On the remote server (server still binds to localhost)
+playwright-mcp-server --port 8931
+
+# On your local machine (create secure tunnel)
+ssh -L 8931:localhost:8931 user@remote-server
+
+# Now access securely via localhost:8931
+```
+
+**Benefits of SSH Tunneling:**
+- ✅ Encrypted connection
+- ✅ Authentication required
+- ✅ Server stays bound to localhost
+- ✅ Industry standard practice
+
+### Production Deployment
+
+For production environments, use a reverse proxy:
+
+```nginx
+# nginx example
+server {
+    listen 80;
+    server_name your-domain.com;
+
+    location /mcp {
+        proxy_pass http://127.0.0.1:8931;
+        # Add authentication
+        auth_basic "MCP Server";
+        auth_basic_user_file /etc/nginx/.htpasswd;
+    }
+}
+```
+
+**Benefits:**
+- ✅ Server stays on localhost
+- ✅ Add authentication layer
+- ✅ Enable SSL/TLS
+- ✅ Implement rate limiting
+- ✅ Better logging and monitoring
 
 ### Example: SSH Tunnel
 
