@@ -17,7 +17,8 @@ import {
   ConsoleLogsTool,
   ExpectResponseTool,
   AssertResponseTool,
-  CustomUserAgentTool
+  CustomUserAgentTool,
+  ResizeTool
 } from './tools/browser/index.js';
 import {
   ClickTool,
@@ -85,6 +86,7 @@ let assertResponseTool: AssertResponseTool;
 let customUserAgentTool: CustomUserAgentTool;
 let visibleTextTool: VisibleTextTool;
 let visibleHtmlTool: VisibleHtmlTool;
+let resizeTool: ResizeTool;
 
 let getRequestTool: GetRequestTool;
 let postRequestTool: PostRequestTool;
@@ -327,6 +329,7 @@ function initializeTools(server: any) {
   if (!customUserAgentTool) customUserAgentTool = new CustomUserAgentTool(server);
   if (!visibleTextTool) visibleTextTool = new VisibleTextTool(server);
   if (!visibleHtmlTool) visibleHtmlTool = new VisibleHtmlTool(server);
+  if (!resizeTool) resizeTool = new ResizeTool(server);
   
   // API tools
   if (!getRequestTool) getRequestTool = new GetRequestTool(server);
@@ -469,6 +472,9 @@ export async function handleToolCall(
       case "playwright_screenshot":
         return await screenshotTool.execute(args, context);
         
+      case "playwright_resize":
+        return await resizeTool.execute(args, context);
+
       case "playwright_close":
         return await closeBrowserTool.execute(args, context);
         

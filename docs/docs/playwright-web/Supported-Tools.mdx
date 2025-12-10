@@ -140,6 +140,56 @@ Capture screenshots of the entire page or specific elements
   Directory to save the screenshot.
 ---
 
+### Playwright_resize
+
+Resize the browser viewport at runtime to test responsive layouts without closing and reopening the browser. Supports 143+ device presets with automatic user-agent and touch emulation.
+
+**Device Preset Mode (Recommended):**
+
+- **`device`** *(string, optional)*:  
+  Device preset name (e.g., 'iPhone 13', 'iPad Pro 11', 'Pixel 7', 'Galaxy S24', 'Desktop Chrome'). Automatically configures viewport, user-agent, device scale factor, and touch capabilities.
+
+- **`orientation`** *(string, optional)*:  
+  Device orientation: 'portrait' or 'landscape' (only applies when using device preset).
+
+**Manual Dimensions Mode:**
+
+- **`width`** *(number, optional)*:  
+  Viewport width in pixels. Must be between 1 and 7680 (8K resolution).
+
+- **`height`** *(number, optional)*:  
+  Viewport height in pixels. Must be between 1 and 4320 (8K resolution).
+
+**Popular Device Presets:**
+- Mobile: `iPhone 13`, `iPhone 14`, `iPhone 15`, `Pixel 5`, `Pixel 7`, `Galaxy S24`
+- Tablet: `iPad Pro 11`, `iPad Pro 12.9`, `Galaxy Tab S4`
+- Desktop: `Desktop Chrome`, `Desktop Firefox`, `Desktop Safari`
+
+**Example Usage:**
+```javascript
+// Navigate to site
+await playwright_navigate({ url: "https://example.com" });
+
+// Test with device presets (includes user-agent, touch, scale factor)
+await playwright_resize({ device: "iPhone 13" });
+await playwright_resize({ device: "iPhone 13", orientation: "landscape" });
+await playwright_resize({ device: "iPad Pro 11" });
+await playwright_resize({ device: "Desktop Chrome" });
+
+// Manual dimensions (simple viewport resize)
+await playwright_resize({ width: 768, height: 1024 });
+await playwright_resize({ width: 375, height: 667 });
+```
+
+**Device Emulation Features:**
+- ✅ Automatic viewport sizing
+- ✅ Proper user-agent strings
+- ✅ Touch event support
+- ✅ Device pixel ratio
+- ✅ Mobile/desktop detection
+
+---
+
 ### Playwright_click
 Click elements on the page.
 

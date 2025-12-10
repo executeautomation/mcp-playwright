@@ -96,4 +96,14 @@ describe('Tool Definitions', () => {
     expect(uploadFileTool!.inputSchema.properties).toHaveProperty('filePath');
     expect(uploadFileTool!.inputSchema.required).toEqual(['selector', 'filePath']);
   });
+
+  test('should validate resize tool schema', () => {
+    const resizeTool = toolDefinitions.find(tool => tool.name === 'playwright_resize');
+    expect(resizeTool).toBeDefined();
+    expect(resizeTool!.inputSchema.properties).toHaveProperty('width');
+    expect(resizeTool!.inputSchema.properties).toHaveProperty('height');
+    expect(resizeTool!.inputSchema.properties).toHaveProperty('device');
+    expect(resizeTool!.inputSchema.properties).toHaveProperty('orientation');
+    expect(resizeTool!.inputSchema.required).toEqual([]);
+  });
 }); 

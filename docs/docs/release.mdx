@@ -5,6 +5,184 @@ import YouTubeVideoEmbed from '@site/src/components/HomepageFeatures/YouTubeVide
 
 # Release Notes
 
+## Version 1.0.10 (December 2025)
+
+### 🎯 Enhanced Device Emulation with `playwright_resize`
+
+**Major Feature:** Device preset support for realistic mobile, tablet, and desktop testing!
+
+The `playwright_resize` tool now supports **143 pre-configured device presets** from Playwright's device library, making it incredibly easy to test responsive designs across real device profiles.
+
+#### ✨ What's New
+
+**1. Device Preset Mode (Recommended)**
+```javascript
+// Test with real device profiles
+await playwright_resize({ device: "iPhone 13" });
+await playwright_resize({ device: "iPad Pro 11" });
+await playwright_resize({ device: "Desktop Chrome" });
+```
+
+**2. Orientation Support**
+```javascript
+// Portrait and landscape testing
+await playwright_resize({ device: "iPhone 13", orientation: "landscape" });
+await playwright_resize({ device: "iPad Pro 11", orientation: "portrait" });
+```
+
+**3. Natural Language Prompts**
+Users can now use simple, natural language with AI assistants:
+- "Test on iPhone 13"
+- "Switch to iPad view"
+- "Show desktop version"
+- "Rotate to landscape"
+
+#### 🎁 Device Emulation Includes
+
+- ✅ **Accurate viewport dimensions** - Precise screen sizes for each device
+- ✅ **Proper user-agent strings** - Real browser identification
+- ✅ **Touch event support** - Mobile touch capabilities
+- ✅ **Device pixel ratio** - 1x, 2x, 3x retina displays
+- ✅ **Mobile/desktop detection** - Correct device type flags
+
+#### 📱 Supported Devices (143 total)
+
+**iOS Devices:**
+- iPhones: SE, 6/7/8, X/XR/11, 12/13/14/15 series
+- iPads: Mini, Air, Pro 11", Pro 12.9"
+
+**Android Devices:**
+- Google: Pixel 5, 6, 7, Tablet
+- Samsung: Galaxy S8/S9/S20/S24 series, Galaxy Tab
+
+**Desktop Browsers:**
+- Desktop Chrome, Firefox, Safari
+
+#### 💡 Usage Examples
+
+**Device Presets (Recommended):**
+```javascript
+// iOS testing
+await playwright_resize({ device: "iPhone 13" });
+await playwright_resize({ device: "iPhone 15 Pro Max" });
+
+// Android testing
+await playwright_resize({ device: "Pixel 7" });
+await playwright_resize({ device: "Galaxy S24" });
+
+// Tablet testing
+await playwright_resize({ device: "iPad Pro 11" });
+
+// Desktop testing
+await playwright_resize({ device: "Desktop Chrome" });
+
+// With orientation
+await playwright_resize({ 
+  device: "iPhone 13", 
+  orientation: "landscape" 
+});
+```
+
+**Manual Dimensions (Still Supported):**
+```javascript
+// Backward compatible
+await playwright_resize({ width: 1024, height: 768 });
+await playwright_resize({ width: 375, height: 667 });
+```
+
+**Natural Language (AI Assistants):**
+```
+"Test this page on iPhone 13"
+"Switch to iPad Pro 11"
+"Rotate to landscape"
+"Show me desktop view"
+"Compare iPhone 13 and Galaxy S24"
+```
+
+#### 🚀 New Documentation
+
+**1. Comprehensive Prompt Guide** (`Resize-Prompts-Guide.md`)
+- Natural language patterns for AI assistants
+- Example conversations and workflows
+- Common testing scenarios
+- Best practices
+
+**2. Quick Reference Card** (`Device-Quick-Reference.md`)
+- Popular device dimensions
+- Quick command reference
+- Recommended test matrices
+- Pro tips
+
+**3. Device Discovery Tool**
+```bash
+# List all 143 available devices
+node scripts/list-devices.cjs
+
+# Filter by device type
+node scripts/list-devices.cjs iphone
+node scripts/list-devices.cjs pixel
+node scripts/list-devices.cjs ipad
+```
+
+#### 🔧 Backward Compatibility
+
+✅ **Fully backward compatible** - Manual width/height dimensions still work exactly as before
+
+✅ **No breaking changes** - Existing code continues to work without modifications
+
+✅ **Optional device parameter** - Use device presets only when you want them
+
+#### 📊 Technical Details
+
+**Files Changed:**
+- `src/tools/browser/resize.ts` - Enhanced with device preset support
+- `src/tools.ts` - Updated tool schema with device/orientation parameters
+- `docs/docs/playwright-web/Supported-Tools.mdx` - Enhanced documentation
+
+**Files Added:**
+- `docs/docs/playwright-web/Resize-Prompts-Guide.md` - Natural language prompt guide
+- `docs/docs/playwright-web/Device-Quick-Reference.md` - Quick reference card
+- `scripts/list-devices.cjs` - Device discovery helper
+- `src/__tests__/tools/browser/resize.test.ts` - Comprehensive test suite (23 tests)
+
+**Test Coverage:**
+- All 134 tests passing (111 existing + 23 new)
+- 98% code coverage for resize.ts
+- Device preset tests
+- Orientation tests
+- Manual dimension tests
+- Error handling tests
+
+#### 🎯 Use Cases
+
+**Responsive Design Testing:**
+```
+"Test mobile, tablet, desktop responsiveness"
+```
+
+**Cross-Device Comparison:**
+```
+"Compare how the navigation looks on iPhone 13 vs Galaxy S24"
+```
+
+**Orientation Testing:**
+```
+"Test form in both portrait and landscape on iPad"
+```
+
+**Bug Reproduction:**
+```
+"User reported button issue on iPhone SE - test it"
+```
+
+#### 📚 Learn More
+
+- [Device Testing Prompt Guide](/docs/playwright-web/Resize-Prompts-Guide)
+- [Device Quick Reference](/docs/playwright-web/Device-Quick-Reference)
+- [Supported Tools Documentation](/docs/playwright-web/Supported-Tools)
+
+---
+
 ## Version 1.0.9 (December 2025)
 
 ### 🔧 Critical Fix: Console Output Buffering with npx
