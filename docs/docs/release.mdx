@@ -5,6 +5,38 @@ import YouTubeVideoEmbed from '@site/src/components/HomepageFeatures/YouTubeVide
 
 # Release Notes
 
+## Version 1.0.9 (December 2025)
+
+### 🔧 Critical Fix: Console Output Buffering with npx
+
+**Fixed:** Console output not visible when running via `npx`
+
+**Problem:**
+When running `npx @executeautomation/playwright-mcp-server --port 8931`, users experienced no console output, making it impossible to verify if the server started successfully or see connection information.
+
+**Root Cause:**
+Node.js buffers `console.log()` output when stdout is not a TTY (terminal). When npx runs the server, it detects a non-interactive environment and buffers output indefinitely, preventing users from seeing any feedback.
+
+**Solution:**
+- Replaced `console.log()` with `process.stdout.write()` for immediate, unbuffered output
+- Updated `src/index.ts` initialization message
+- Updated `src/http-server.ts` startup banner
+
+**Impact:**
+Users now see immediate console output including:
+- ⏳ Server initialization message
+- 🚀 Server startup confirmation  
+- 📋 All endpoint URLs (SSE, Messages, MCP, Health)
+- 📝 Client configuration example
+- 📊 Monitoring server information
+
+**Testing:**
+Verified with local npm package testing using `npm pack` and `npx` to ensure the fix works correctly before publishing.
+
+**Files Changed:**
+- `src/index.ts` - Line 65
+- `src/http-server.ts` - Line 18
+
 ## Version 1.0.8 (December 2025)
 
 ### 🖥️ Console Output Improvements
@@ -27,7 +59,7 @@ import YouTubeVideoEmbed from '@site/src/components/HomepageFeatures/YouTubeVide
 
 This makes it much easier to verify that the server has started successfully and provides all necessary connection information at a glance.
 
-## Version 1.0.7 (December 2024)
+## Version 1.0.7 (December 2025)
 
 ### 🌐 HTTP/SSE Transport Mode (New!)
 
