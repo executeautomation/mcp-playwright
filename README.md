@@ -85,7 +85,8 @@ After installation, the ExecuteAutomation Playwright MCP server will be availabl
 ## Configuration to use Playwright Server
 
 ### Standard Mode (stdio)
-Here's the Claude Desktop configuration to use the Playwright server in standard mode:
+
+This is the **recommended mode for Claude Desktop**.
 
 ```json
 {
@@ -97,6 +98,8 @@ Here's the Claude Desktop configuration to use the Playwright server in standard
   }
 }
 ```
+
+**Note:** In stdio mode, logging is automatically directed to files only (not console) to maintain clean JSON-RPC communication. Logs are written to `~/playwright-mcp-server.log`.
 
 ### HTTP Mode (Standalone Server)
 

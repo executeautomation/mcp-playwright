@@ -66,17 +66,24 @@ async function runServer() {
   }
   
   // Otherwise, run in stdio mode (default)
-  // Initialize logger and middleware
-  const logger = Logger.getInstance(Logger.createDefaultConfig());
+  // Initialize logger for stdio mode (file only - no console output to avoid breaking stdio protocol)
+  const logger = Logger.getInstance({
+    level: 'info',
+    format: 'json',
+    outputs: ['file'], // File only - console would write to stdout and break stdio protocol
+    filePath: `${process.env.HOME || '/tmp'}/playwright-mcp-server.log`, // Use home directory
+    maxFileSize: 10485760,
+    maxFiles: 5
+  });
   const loggingMiddleware = new RequestLoggingMiddleware(logger);
 
-  // Initialize monitoring system
+  // Initialize monitoring system (disabled in stdio mode to avoid console output)
   const monitoringSystem = new MonitoringSystem({
-    enabled: true,
-    metricsInterval: 30000, // 30 seconds
-    healthCheckInterval: 60000, // 1 minute
-    memoryThreshold: 80, // 80% memory usage threshold
-    responseTimeThreshold: 5000 // 5 second response time threshold
+    enabled: false, // Disabled in stdio mode - HTTP server output would break stdio protocol
+    metricsInterval: 30000,
+    healthCheckInterval: 60000,
+    memoryThreshold: 80,
+    responseTimeThreshold: 5000
   });
 
   const serverInfo = {

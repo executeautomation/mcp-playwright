@@ -72,6 +72,13 @@ The `"type": "http"` field is **REQUIRED** for HTTP/SSE transport. Without it, t
 - No breaking changes to existing configurations
 - All 110 tests passing
 
+### 🔧 stdio Mode Improvements
+- **Fixed:** Logging in stdio mode now writes to file only (not stdout)
+- **Fixed:** Monitoring system disabled in stdio mode to prevent console output
+- **Fixed:** Log file path uses home directory to avoid permission issues
+- **Result:** Clean JSON-RPC communication with Claude Desktop
+- Logs available in `~/playwright-mcp-server.log`
+
 ### 🛠️ Infrastructure
 - Logging system integration with HTTP transport
 - Monitoring system for metrics collection (dynamic port allocation)
