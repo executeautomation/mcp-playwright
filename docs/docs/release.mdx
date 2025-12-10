@@ -5,52 +5,103 @@ import YouTubeVideoEmbed from '@site/src/components/HomepageFeatures/YouTubeVide
 
 # Release Notes
 
-## Version 1.0.7 (December 2025)
-- **New Transport Mode: HTTP/SSE Support**: Added standalone HTTP server mode for enhanced deployment flexibility 🌐
-  - `--port` flag to run server in HTTP mode (e.g., `playwright-mcp-server --port 8931`)
-  - Full support for Server-Sent Events (SSE) transport using MCP SDK's native `SSEServerTransport`
-  - Multiple concurrent client sessions with automatic session management
-  - Health check endpoint (`/health`) for monitoring server status
-  - Dual endpoint support: `/sse` + `/messages` (legacy) and `/mcp` (unified)
-  - Graceful shutdown with proper resource cleanup
-  - DRY-compliant implementation with reusable endpoint handlers
-  - [Read the full HTTP/SSE Transport Guide](/docs/playwright-web/HTTP-SSE-Transport)
-- **Enhanced Deployment Options**:
-  - Run on remote servers without display (headless mode)
-  - Better integration with VS Code GitHub Copilot
-  - Support for background service deployment
-  - Multiple client access with session isolation
-  - Debugging capabilities with metrics endpoint (PORT+1)
-- **Code Quality Improvements**:
-  - Refactored endpoint logic to eliminate duplication (~40% code reduction)
-  - Implemented DRY (Don't Repeat Yourself) principles throughout HTTP server
-  - Single source of truth for SSE connection and message handling
-  - Improved maintainability and consistency across all endpoints
-  - Enhanced logging with context-aware messages
-  - Reduced bug risk through centralized error handling
-- **Backward Compatibility**:
-  - Default stdio mode unchanged (fully compatible with Claude Desktop)
-  - All existing tools work in both transport modes
-  - No breaking changes to existing configurations
-  - All 110 tests passing
-- **Documentation Updates**:
-  - Comprehensive HTTP/SSE transport documentation
-  - Client configuration guides (Claude Desktop, VS Code)
-  - Testing guides and automated test scripts
-  - Troubleshooting and FAQ sections
-  - Quick reference cards for common setups
-  - Refactoring notes and best practices documentation
-- **Security Improvements**:
-  - 🔒 **CRITICAL:** Server now binds to 127.0.0.1 (localhost only) by default
-  - 🔒 Prevents external network access and accidental exposure
-  - 🔒 Added security notification in startup message
-  - 🔒 Secure by default configuration
-- **Infrastructure Improvements**:
-  - Logging system integration with HTTP transport
-  - Monitoring system for metrics collection
-  - Rate limiting framework (ready for future use)
-  - Automated testing script (`test-http-mode.sh`)
-- **Version bump**: Incremented version to 1.0.7
+## Version 1.0.7 (December 2024)
+
+### 🌐 HTTP/SSE Transport Mode (New!)
+
+Added standalone HTTP server mode for enhanced deployment flexibility:
+
+```bash
+playwright-mcp-server --port 8931
+```
+
+**Key Features:**
+- Full support for Server-Sent Events (SSE) transport using MCP SDK's native `SSEServerTransport`
+- Multiple concurrent client sessions with automatic session management
+- Health check endpoint (`/health`) for monitoring server status
+- Dual endpoint support: `/sse` + `/messages` (legacy) and `/mcp` (unified, recommended)
+- Graceful shutdown with proper resource cleanup
+- [Read the full HTTP/SSE Transport Guide](/docs/playwright-web/HTTP-SSE-Transport)
+
+**Configuration Example:**
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "url": "http://localhost:8931/mcp",
+      "type": "http"
+    }
+  }
+}
+```
+
+:::warning CRITICAL REQUIREMENT
+The `"type": "http"` field is **REQUIRED** for HTTP/SSE transport. Without it, the client will not connect properly.
+:::
+
+### 🚀 Enhanced Deployment Options
+- Run on remote servers without display (headless mode)
+- Better integration with VS Code GitHub Copilot and custom MCP clients
+- Support for background service deployment
+- Multiple client access with session isolation
+- Debugging capabilities with metrics endpoint (PORT+1)
+
+### 📊 Code Quality & Maintainability
+- **40% code reduction** in endpoint handlers through DRY refactoring
+- Single source of truth for SSE connection and message handling
+- Improved maintainability and consistency across all endpoints
+- Enhanced logging with context-aware messages
+- Reduced bug risk through centralized error handling
+
+### 🔒 Security Enhancements
+- **CRITICAL FIX:** Server now binds to 127.0.0.1 (localhost only) by default
+- Prevents external network access and accidental exposure
+- Clear security notification in startup message
+- SSH tunneling documented for secure remote access
+
+### 🔍 Debugging & Observability
+- Comprehensive request logging middleware (logs all HTTP requests)
+- Session lifecycle tracking with active transport counts
+- Enhanced error diagnostics with detailed context
+- Structured JSON logging for easy parsing
+- Clear troubleshooting messages
+
+### ✅ Backward Compatibility
+- Default stdio mode unchanged (fully compatible with Claude Desktop)
+- All existing tools work in both transport modes
+- No breaking changes to existing configurations
+- All 110 tests passing
+
+### 🛠️ Infrastructure
+- Logging system integration with HTTP transport
+- Monitoring system for metrics collection
+- Rate limiting framework (ready for future use)
+- Comprehensive error handling
+
+### 🐛 Common Issues & Solutions
+
+**Issue: "No transport found for sessionId" error**
+
+Solution:
+1. Ensure `"type": "http"` is present in your configuration
+2. Check server logs show this sequence:
+   - GET request to `/mcp`
+   - "Transport registered" with sessionId
+   - POST messages with same sessionId
+3. Restart both server and client if needed
+
+**Issue: Can't connect from another machine**
+
+This is by design for security. Server binds to localhost only. For remote access:
+```bash
+ssh -L 8931:localhost:8931 user@remote-server
+```
+
+### 📚 Documentation
+- Comprehensive HTTP/SSE transport guide in docs
+- Client configuration examples with required fields
+- Troubleshooting section in README
+- Security best practices documented
 
 ## Version 1.0.6
 - **New Tool: `playwright_upload_file`**: Added a new tool to upload files to an `input[type='file']` element.

@@ -133,12 +133,15 @@ ENDPOINTS:
 
 #### Client Configuration for HTTP Mode
 
+> **⚠️ CRITICAL:** The `"type": "http"` field is **REQUIRED** for HTTP/SSE transport!
+
 **For VS Code GitHub Copilot:**
 ```json
 {
   "github.copilot.chat.mcp.servers": {
     "playwright": {
-      "url": "http://localhost:8931/mcp"
+      "url": "http://localhost:8931/mcp",
+      "type": "http"
     }
   }
 }
@@ -149,11 +152,14 @@ ENDPOINTS:
 {
   "mcpServers": {
     "playwright": {
-      "url": "http://localhost:8931/mcp"
+      "url": "http://localhost:8931/mcp",
+      "type": "http"
     }
   }
 }
 ```
+
+**Important:** Without `"type": "http"`, the connection will fail.
 
 **For Claude Desktop:** Use stdio mode instead (see Standard Mode above)
 
@@ -167,6 +173,40 @@ ENDPOINTS:
 - Custom MCP client integrations
 
 **Note:** For Claude Desktop, continue using stdio mode (Standard Mode above) for now.
+
+## Troubleshooting
+
+### "No transport found for sessionId" Error
+
+**Symptom:** 400 error with message "Bad Request: No transport found for sessionId"
+
+**Solution:**
+1. **Check configuration includes `"type": "http"`**
+   ```json
+   {
+     "url": "http://localhost:8931/mcp",
+     "type": "http"  // ← This is REQUIRED!
+   }
+   ```
+
+2. **Verify server logs show connection:**
+   ```bash
+   # Should see these in order:
+   # 1. "Incoming request" - GET /mcp
+   # 2. "Transport registered" - with sessionId
+   # 3. "POST message received" - with same sessionId
+   ```
+
+3. **Restart both server and client**
+
+### Connection Issues
+
+- **Server not starting:** Check if port 8931 is available
+- **External access blocked:** This is by design (security). Server binds to localhost only
+- **For remote access:** Use SSH tunneling:
+  ```bash
+  ssh -L 8931:localhost:8931 user@remote-server
+  ```
 
 ## Testing
 

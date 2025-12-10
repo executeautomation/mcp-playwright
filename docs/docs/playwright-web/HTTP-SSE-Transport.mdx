@@ -74,11 +74,16 @@ playwright-mcp-server --port 8931
 {
   "github.copilot.chat.mcp.servers": {
     "playwright": {
-      "url": "http://localhost:8931/mcp"
+      "url": "http://localhost:8931/mcp",
+      "type": "http"
     }
   }
 }
 ```
+
+:::warning IMPORTANT
+The `"type": "http"` field is **required** for HTTP/SSE transport. Without it, the client will not connect properly.
+:::
 
 **Step 3:** Reload VS Code
 
@@ -107,11 +112,18 @@ HTTP transport support for Claude Desktop is expected in future updates.
 {
   "mcpServers": {
     "playwright": {
-      "url": "http://localhost:8931/mcp"
+      "url": "http://localhost:8931/mcp",
+      "type": "http"
     }
   }
 }
 ```
+
+**Required Fields:**
+- `url` - The HTTP endpoint URL
+- `type` - **Must be "http"** for HTTP/SSE transport
+
+Without `"type": "http"`, the client may attempt stdio mode and fail to connect.
 
 ## Available Endpoints
 
@@ -344,7 +356,7 @@ curl http://localhost:8932/metrics | jq
 
 ### Logs
 
-Server logs are written to stdout/stderr:
+Server logs are written to stdout/stderr in JSON format:
 
 ```bash
 # View logs in real-time
@@ -352,6 +364,34 @@ tail -f server.log
 
 # Filter by level
 grep '"level":"error"' server.log
+
+# Track specific session
+grep '"sessionId":"abc-123"' server.log
+
+# Monitor all incoming requests
+grep '"message":"Incoming request"' server.log
+```
+
+**Log Levels:**
+- `info` - Normal operations (requests, connections, transport events)
+- `warn` - Potential issues (unknown sessions, missing parameters)
+- `error` - Failures (connection errors, handler exceptions)
+
+**Key Log Messages:**
+
+```json
+// Client connects
+{"level":"info","message":"Incoming request","context":{"method":"GET","path":"/mcp"}}
+{"level":"info","message":"SSE connection request received","context":{"endpoint":"/mcp"}}
+{"level":"info","message":"Transport registered","context":{"sessionId":"...","activeTransports":1}}
+
+// Client sends message
+{"level":"info","message":"Incoming request","context":{"method":"POST","path":"/mcp"}}
+{"level":"info","message":"POST message received","context":{"sessionId":"...","availableTransports":[...]}}
+
+// Client disconnects
+{"level":"info","message":"SSE connection closed","context":{"sessionId":"...","endpoint":"/mcp"}}
+{"level":"info","message":"Transport unregistered","context":{"activeTransports":0}}
 ```
 
 ## Code Quality
@@ -555,6 +595,54 @@ ssh -L 8931:localhost:8931 user@remote-server
 
 ## Troubleshooting
 
+### Debugging Tools
+
+Version 1.0.7 includes comprehensive logging to help diagnose issues:
+
+**Request Logging:**
+Every HTTP request is logged with:
+- Method (GET, POST)
+- Path and URL
+- Query parameters
+- Headers (Accept, Content-Type)
+
+**Session Tracking:**
+Monitor SSE sessions with:
+- Transport registration logs
+- Active transport counts
+- Session ID tracking
+- Connection close events
+
+**Example Debug Output:**
+```json
+{"level":"info","message":"Incoming request","context":{"method":"GET","path":"/mcp"}}
+{"level":"info","message":"Transport registered","context":{"sessionId":"abc-123","activeTransports":1}}
+{"level":"info","message":"POST message received","context":{"sessionId":"abc-123","endpoint":"/mcp"}}
+```
+
+### Common Issues
+
+#### Issue: "No transport found for sessionId"
+
+**Symptom:** Client receives 400 error with message about missing transport.
+
+**Causes:**
+1. GET request to establish SSE connection didn't complete
+2. Client using stale/cached sessionId
+3. Server restarted but client kept old sessionId
+
+**Solution:**
+```bash
+# Check logs for "Transport registered" - should appear before POST messages
+# Look for this sequence:
+# 1. "Incoming request" GET /mcp
+# 2. "SSE connection request received"
+# 3. "Transport registered" with sessionId
+# 4. "POST message received" with same sessionId
+
+# If sequence is wrong, client needs to reconnect
+```
+
 ### Port Already in Use
 
 ```bash
@@ -576,6 +664,26 @@ tail -f server.log
 
 # Test with curl
 curl -v http://localhost:8931/health
+```
+
+### SSE Connection Issues
+
+**Check if SSE stream is established:**
+```bash
+# Should show continuous stream, not immediate close
+curl -N http://localhost:8931/mcp
+
+# Look for:
+# event: endpoint
+# data: /mcp?sessionId=<uuid>
+```
+
+**Verify session is registered:**
+```bash
+# In server logs, look for:
+grep "Transport registered" server.log
+
+# Should show sessionId matching what client uses
 ```
 
 ### Browser Issues

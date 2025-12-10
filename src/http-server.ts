@@ -40,6 +40,21 @@ export async function startHttpServer(port: number) {
   // Create Express application
   const app = express();
   app.use(express.json());
+  
+  // Log all incoming requests for debugging
+  app.use((req, res, next) => {
+    logger.info('Incoming request', { 
+      method: req.method, 
+      path: req.path,
+      url: req.url,
+      query: req.query,
+      headers: {
+        accept: req.headers['accept'],
+        contentType: req.headers['content-type']
+      }
+    });
+    next();
+  });
 
   // Store transports by session ID
   const transports: TransportMap = {};
@@ -78,10 +93,21 @@ export async function startHttpServer(port: number) {
       const transport = new SSEServerTransport(messageEndpoint, res);
       const sessionId = transport.sessionId;
       transports[sessionId] = transport;
+      
+      logger.info('Transport registered', { 
+        sessionId, 
+        endpoint, 
+        messageEndpoint,
+        activeTransports: Object.keys(transports).length 
+      });
 
       res.on('close', () => {
         logger.info('SSE connection closed', { sessionId, endpoint });
         delete transports[sessionId];
+        logger.info('Transport unregistered', { 
+          sessionId, 
+          activeTransports: Object.keys(transports).length 
+        });
       });
 
       const server = createMcpServer();
@@ -104,6 +130,13 @@ export async function startHttpServer(port: number) {
   ) => {
     const sessionId = req.query.sessionId as string;
     
+    logger.info('POST message received', { 
+      endpoint, 
+      sessionId: sessionId || 'missing',
+      availableTransports: Object.keys(transports),
+      activeTransports: Object.keys(transports).length 
+    });
+    
     if (!sessionId) {
       res.status(400).json({
         jsonrpc: '2.0',
@@ -119,7 +152,12 @@ export async function startHttpServer(port: number) {
     const transport = transports[sessionId];
     
     if (!transport) {
-      logger.warn('Message received for unknown session', { sessionId, endpoint });
+      logger.warn('Message received for unknown session', { 
+        sessionId, 
+        endpoint,
+        availableTransports: Object.keys(transports),
+        transportExists: sessionId in transports
+      });
       res.status(400).json({
         jsonrpc: '2.0',
         error: {
@@ -203,7 +241,8 @@ CLIENT CONFIGURATION:
 {
   "mcpServers": {
     "playwright": {
-      "url": "http://localhost:${port}/mcp"
+      "url": "http://localhost:${port}/mcp",
+      "type": "http"
     }
   }
 }
