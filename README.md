@@ -91,7 +91,10 @@ code-insiders --add-mcp '{"name":"playwright","command":"npx","args":["@executea
 After installation, the ExecuteAutomation Playwright MCP server will be available for use with your GitHub Copilot agent in VS Code.
 
 ## Configuration to use Playwright Server
-Here's the Claude Desktop configuration to use the Playwright server:
+
+### Standard Mode (stdio)
+
+This is the **recommended mode for Claude Desktop**.
 
 ```json
 {
@@ -104,66 +107,119 @@ Here's the Claude Desktop configuration to use the Playwright server:
 }
 ```
 
-## Docker Support
+**Note:** In stdio mode, logging is automatically directed to files only (not console) to maintain clean JSON-RPC communication. Logs are written to `~/playwright-mcp-server.log`.
 
-The Playwright MCP Server can be run in Docker for isolated and containerized execution.
+### HTTP Mode (Standalone Server)
 
-### Building the Docker Image
+When running headed browser on systems without display or from worker processes of IDEs, you can run the MCP server as a standalone HTTP server:
 
-Before building the Docker image, you need to build the TypeScript project with production dependencies:
+> **Note for Claude Desktop Users:** Claude Desktop currently requires stdio mode (command/args configuration). HTTP mode is recommended for VS Code, custom clients, and remote deployments. See [CLAUDE_DESKTOP_CONFIG.md](CLAUDE_DESKTOP_CONFIG.md) for details.
 
-```bash
-# Install production dependencies and build
-npm install --omit=dev
-npm run build
-
-# Build the Docker image
-docker build -t mcp-playwright .
-```
-
-Or use the provided convenience script:
+#### Starting the HTTP Server
 
 ```bash
-chmod +x docker-build.sh
-./docker-build.sh
+# Using npx
+npx @executeautomation/playwright-mcp-server --port 8931
+
+# Or after global installation
+playwright-mcp-server --port 8931
 ```
 
-### Running with Docker
+The server will start and display available endpoints:
 
-You can run the MCP server using Docker in several ways:
+```
+==============================================
+Playwright MCP Server (HTTP Mode)
+==============================================
+Port: 8931
 
-#### Using Docker directly
-
-```bash
-# Run the server (stdin/stdout communication)
-docker run -i mcp-playwright
+ENDPOINTS:
+- SSE Stream:     GET  http://localhost:8931/sse
+- Messages:       POST http://localhost:8931/messages?sessionId=<id>
+- MCP (unified):  GET  http://localhost:8931/mcp
+- MCP (unified):  POST http://localhost:8931/mcp?sessionId=<id>
+- Health Check:   GET  http://localhost:8931/health
+==============================================
 ```
 
-#### Using Docker Compose
+#### Client Configuration for HTTP Mode
 
-A `docker-compose.yml` file is provided for easier management:
+> **⚠️ CRITICAL:** The `"type": "http"` field is **REQUIRED** for HTTP/SSE transport!
 
-```bash
-# Run the server with docker-compose
-docker compose run --rm playwright-mcp
-```
-
-### Using Docker with MCP Clients
-
-To use the Dockerized server with Claude Desktop or other MCP clients, you can configure them to use Docker:
-
+**For VS Code GitHub Copilot:**
 ```json
 {
-  "mcpServers": {
+  "github.copilot.chat.mcp.servers": {
     "playwright": {
-      "command": "docker",
-      "args": ["run", "-i", "--rm", "mcp-playwright"]
+      "url": "http://localhost:8931/mcp",
+      "type": "http"
     }
   }
 }
 ```
 
-**Note**: The Docker image uses a Debian-based slim Node.js image and includes only the core dependencies. Playwright browsers are not pre-installed in the container to keep the image size small. The browsers will be downloaded on first use if needed.
+**For Custom MCP Clients:**
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "url": "http://localhost:8931/mcp",
+      "type": "http"
+    }
+  }
+}
+```
+
+**Important:** Without `"type": "http"`, the connection will fail.
+
+**For Claude Desktop:** Use stdio mode instead (see Standard Mode above)
+
+#### Use Cases for HTTP Mode
+
+- Running headed browsers on systems without display (e.g., remote servers)
+- Integrating with VS Code GitHub Copilot
+- Running the server as a background service
+- Accessing the server from multiple clients
+- Debugging with the `/health` endpoint
+- Custom MCP client integrations
+
+**Monitoring:** The server includes a monitoring system that starts on a dynamically allocated port (avoiding conflicts). Check the console output for the actual port.
+
+**Note:** For Claude Desktop, continue using stdio mode (Standard Mode above) for now.
+
+## Troubleshooting
+
+### "No transport found for sessionId" Error
+
+**Symptom:** 400 error with message "Bad Request: No transport found for sessionId"
+
+**Solution:**
+1. **Check configuration includes `"type": "http"`**
+   ```json
+   {
+     "url": "http://localhost:8931/mcp",
+     "type": "http"  // ← This is REQUIRED!
+   }
+   ```
+
+2. **Verify server logs show connection:**
+   ```bash
+   # Should see these in order:
+   # 1. "Incoming request" - GET /mcp
+   # 2. "Transport registered" - with sessionId
+   # 3. "POST message received" - with same sessionId
+   ```
+
+3. **Restart both server and client**
+
+### Connection Issues
+
+- **Server not starting:** Check if port 8931 is available
+- **External access blocked:** This is by design (security). Server binds to localhost only
+- **For remote access:** Use SSH tunneling:
+  ```bash
+  ssh -L 8931:localhost:8931 user@remote-server
+  ```
 
 ## Testing
 

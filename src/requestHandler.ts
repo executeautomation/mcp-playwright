@@ -8,110 +8,104 @@ import {
   McpError
 } from "@modelcontextprotocol/sdk/types.js";
 import { handleToolCall, getConsoleLogs, getScreenshots } from "./toolHandler.js";
+import { Logger, RequestLoggingMiddleware } from "./logging/index.js";
+import { MonitoringSystem } from "./monitoring/index.js";
 
-/**
- * Validates that required parameters are present in the arguments
- */
-function validateToolParameters(toolName: string, args: any, tools: Tool[]): { valid: boolean; error?: string } {
-  const tool = tools.find(t => t.name === toolName);
-  if (!tool) {
-    return { valid: false, error: `Unknown tool: ${toolName}` };
-  }
+export function setupRequestHandlers(server: Server, tools: Tool[], monitoringSystem?: MonitoringSystem) {
+  // Initialize logger and middleware
+  const logger = Logger.getInstance(Logger.createDefaultConfig());
+  const loggingMiddleware = new RequestLoggingMiddleware(logger);
 
-  const schema = tool.inputSchema;
-  if (!schema || !schema.required || !Array.isArray(schema.required) || schema.required.length === 0) {
-    return { valid: true };
-  }
+  // Helper function to wrap handlers with monitoring
+  const wrapWithMonitoring = <T extends (...args: any[]) => Promise<any>>(
+    handler: T,
+    category: string
+  ): T => {
+    return (async (...args: any[]) => {
+      const startTime = Date.now();
+      let success = true;
+      
+      try {
+        const result = await handler(...args);
+        return result;
+      } catch (error) {
+        success = false;
+        throw error;
+      } finally {
+        if (monitoringSystem) {
+          const duration = Date.now() - startTime;
+          monitoringSystem.recordRequest(duration, success, category);
+        }
+      }
+    }) as T;
+  };
 
-  const missingParams: string[] = [];
-  for (const requiredParam of schema.required) {
-    if (!(requiredParam in args) || args[requiredParam] === undefined || args[requiredParam] === null) {
-      missingParams.push(String(requiredParam));
-    }
-  }
-
-  if (missingParams.length > 0) {
-    return {
-      valid: false,
-      error: `Missing required parameters: ${missingParams.join(', ')}`
-    };
-  }
-
-  // Note: We only validate top-level required parameters
-  // Nested required parameters are often optional in practice due to defaults in implementations
-
-  return { valid: true };
-}
-
-export function setupRequestHandlers(server: Server, tools: Tool[]) {
   // List resources handler
-  server.setRequestHandler(ListResourcesRequestSchema, async () => ({
-    resources: [
-      {
-        uri: "console://logs",
-        mimeType: "text/plain",
-        name: "Browser console logs",
-      },
-      ...Array.from(getScreenshots().keys()).map(name => ({
-        uri: `screenshot://${name}`,
-        mimeType: "image/png",
-        name: `Screenshot: ${name}`,
-      })),
-    ],
-  }));
+  server.setRequestHandler(ListResourcesRequestSchema, loggingMiddleware.wrapHandler(
+    'ListResources',
+    wrapWithMonitoring(async () => ({
+      resources: [
+        {
+          uri: "console://logs",
+          mimeType: "text/plain",
+          name: "Browser console logs",
+        },
+        ...Array.from(getScreenshots().keys()).map(name => ({
+          uri: `screenshot://${name}`,
+          mimeType: "image/png",
+          name: `Screenshot: ${name}`,
+        })),
+      ],
+    }), 'ListResources')
+  ));
 
   // Read resource handler
-  server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
-    const uri = request.params.uri.toString();
+  server.setRequestHandler(ReadResourceRequestSchema, loggingMiddleware.wrapHandler(
+    'ReadResource',
+    wrapWithMonitoring(async (request) => {
+      const uri = request.params.uri.toString();
 
-    if (uri === "console://logs") {
-      const logs = getConsoleLogs().join("\n");
-      return {
-        contents: [{
-          uri,
-          mimeType: "text/plain",
-          text: logs,
-        }],
-      };
-    }
-
-    if (uri.startsWith("screenshot://")) {
-      const name = uri.split("://")[1];
-      const screenshot = getScreenshots().get(name);
-      if (screenshot) {
+      if (uri === "console://logs") {
+        const logs = getConsoleLogs().join("\n");
         return {
           contents: [{
             uri,
-            mimeType: "image/png",
-            blob: screenshot,
+            mimeType: "text/plain",
+            text: logs,
           }],
         };
       }
-    }
 
-    throw new Error(`Resource not found: ${uri}`);
-  });
+      if (uri.startsWith("screenshot://")) {
+        const name = uri.split("://")[1];
+        const screenshot = getScreenshots().get(name);
+        if (screenshot) {
+          return {
+            contents: [{
+              uri,
+              mimeType: "image/png",
+              blob: screenshot,
+            }],
+          };
+        }
+      }
+
+      throw new Error(`Resource not found: ${uri}`);
+    }, 'ReadResource')
+  ));
 
   // List tools handler
-  server.setRequestHandler(ListToolsRequestSchema, async () => ({
-    tools: tools,
-  }));
+  server.setRequestHandler(ListToolsRequestSchema, loggingMiddleware.wrapHandler(
+    'ListTools',
+    wrapWithMonitoring(async () => ({
+      tools: tools,
+    }), 'ListTools')
+  ));
 
-  // Call tool handler
-  server.setRequestHandler(CallToolRequestSchema, async (request) => {
-    const toolName = request.params.name;
-    const args = request.params.arguments ?? {};
-
-    // Validate parameters before execution
-    const validation = validateToolParameters(toolName, args, tools);
-    if (!validation.valid) {
-      // Throw McpError with Invalid params error code (-32602)
-      throw new McpError(
-        -32602,
-        validation.error || "Parameter validation failed"
-      );
-    }
-
-    return handleToolCall(toolName, args, server);
-  });
+  // Call tool handler with enhanced tool logging
+  const wrappedToolHandler = loggingMiddleware.wrapToolHandler(handleToolCall);
+  server.setRequestHandler(CallToolRequestSchema, loggingMiddleware.wrapHandler(
+    'CallTool',
+    wrapWithMonitoring(async (request) => wrappedToolHandler(request.params.name, request.params.arguments ?? {}, server), 'CallTool')
+  ));
 }
