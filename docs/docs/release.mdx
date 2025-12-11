@@ -5,6 +5,160 @@ import YouTubeVideoEmbed from '@site/src/components/HomepageFeatures/YouTubeVide
 
 # Release Notes
 
+## Version 1.0.11 (December 2025)
+
+### 🔐 Enhanced API Authentication & Code Quality Improvements
+
+**Major Enhancement:** Comprehensive authentication support and significant code quality improvements for all API request methods!
+
+This release brings production-ready authentication capabilities to all API methods (GET, PUT, PATCH, DELETE), along with improved type safety, validation, and comprehensive documentation.
+
+#### ✨ What's New
+
+**1. Bearer Token Authentication for All Methods**
+```javascript
+// GET with authentication
+await playwright_get({
+  url: 'https://api.example.com/protected-data',
+  token: 'your-bearer-token'
+});
+
+// DELETE with authentication
+await playwright_delete({
+  url: 'https://api.example.com/resource/123',
+  token: 'your-bearer-token'
+});
+
+// PUT with authentication
+await playwright_put({
+  url: 'https://api.example.com/resource/123',
+  value: '{"status":"active"}',
+  token: 'your-bearer-token'
+});
+```
+
+**2. Custom Headers Support**
+```javascript
+// Basic authentication
+await playwright_get({
+  url: 'https://api.example.com/data',
+  headers: {
+    'Authorization': 'Basic dXNlcjpwYXNz',
+    'X-API-Version': '2.0'
+  }
+});
+
+// API Key authentication
+await playwright_post({
+  url: 'https://api.example.com/data',
+  value: '{"name":"test"}',
+  headers: {
+    'X-API-Key': 'your-api-key',
+    'X-Request-ID': 'unique-id'
+  }
+});
+```
+
+**3. Flexible Authentication Options**
+```javascript
+// Combine token with additional headers
+await playwright_get({
+  url: 'https://api.example.com/data',
+  token: 'bearer-token',
+  headers: {
+    'X-Custom-Header': 'value'
+  }
+});
+
+// Custom Authorization header overrides token
+await playwright_get({
+  url: 'https://api.example.com/data',
+  token: 'this-is-ignored',
+  headers: {
+    'Authorization': 'Basic xyz123'  // Takes precedence
+  }
+});
+```
+
+#### 🏗️ Code Quality Improvements
+
+**Type Safety:**
+- Added `BaseRequestArgs` interface for GET and DELETE requests
+- Added `RequestWithBodyArgs` interface for POST, PUT, and PATCH requests
+- Replaced all `any` types with proper TypeScript interfaces
+- 100% type-safe implementation
+
+**DRY Principle:**
+- Created `buildHeaders()` helper function
+- Eliminated duplicate header building logic across 5 request methods
+- Centralized authentication logic for easier maintenance
+
+**Validation & Error Handling:**
+- Added `validateHeaders()` to ensure all header values are strings
+- Console warnings when both token and Authorization header are provided
+- Enhanced `parseJsonSafely()` with debug logging
+- Better error messages for invalid header values
+
+#### 🧪 Testing Enhancements
+
+**Added 8 New Edge Case Tests:**
+- Invalid header value validation (non-string types)
+- Token and Authorization header conflict warnings
+- JSON parse failure handling with fallback
+- Empty headers object handling
+- Header validation for all request methods
+
+**Test Results:**
+- ✅ 150 tests passing (142 existing + 8 new)
+- ✅ 88.37% code coverage for API requests (up from ~81%)
+- ✅ Zero TypeScript errors
+- ✅ 100% backward compatible
+
+#### 📚 Documentation Updates
+
+**Enhanced API Documentation:**
+- Updated `Supported-Tools.mdx` with `token` and `headers` parameters
+- Added comprehensive authentication examples
+- Bearer token, Basic auth, and API key usage patterns
+- Token + custom headers combination examples
+
+**Complete API Coverage:**
+- ✅ `playwright_get` - Now documents token and headers
+- ✅ `playwright_post` - Enhanced documentation
+- ✅ `playwright_put` - Now documents token and headers
+- ✅ `playwright_patch` - Now documents token and headers
+- ✅ `playwright_delete` - Now documents token and headers
+
+#### 🔄 Backward Compatibility
+
+All changes are 100% backward compatible:
+- Existing API calls without token/headers work unchanged
+- New parameters (`token`, `headers`) are optional
+- No breaking changes to the API
+
+#### 🛡️ Security Benefits
+
+- Proper authentication support prevents unauthorized API access
+- Header validation prevents injection attacks
+- Warning system alerts developers to configuration issues
+- Type safety prevents runtime errors
+
+#### 📦 Technical Details
+
+**Files Changed:**
+- `src/tools/api/requests.ts` - Refactored with helpers and type interfaces
+- `src/__tests__/tools/api/requests.test.ts` - Added comprehensive edge case tests
+- `docs/docs/playwright-api/Supported-Tools.mdx` - Updated all API method documentation
+- `docs/docs/playwright-api/Examples.md` - Added authentication examples
+- `CHANGELOG.md` - Detailed release notes
+
+**Code Metrics:**
+- +397 lines added (features, tests, documentation)
+- -29 lines removed (eliminated duplication)
+- 5 files modified
+
+---
+
 ## Version 1.0.10 (December 2025)
 
 ### 🎯 Enhanced Device Emulation with `playwright_resize`

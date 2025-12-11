@@ -29,6 +29,10 @@ Perform a GET operation on any given API request.
 - **Inputs:**
   - **`url`** *(string)*:  
     URL to perform the GET operation.
+  - **`token`** *(string, optional)*:  
+    Bearer token for authorization. When provided, it will be sent as `Authorization: Bearer <token>` header.
+  - **`headers`** *(object, optional)*:  
+    Additional headers to include in the request. Can be used for custom authentication methods (e.g., Basic auth, API keys).
 
 - **Response:**
   - **`statusCode`** *(string)*:  
@@ -65,6 +69,10 @@ Perform a PUT operation on any given API request.
     URL to perform the PUT operation.  
   - **`value`** *(string)*:  
     Data to include in the body of the PUT request.
+  - **`token`** *(string, optional)*:  
+    Bearer token for authorization. When provided, it will be sent as `Authorization: Bearer <token>` header.
+  - **`headers`** *(object, optional)*:  
+    Additional headers to include in the request. Note: `Content-Type: application/json` is set by default.
 
 - **Response:**
   - **`statusCode`** *(string)*:  
@@ -82,6 +90,10 @@ Perform a PATCH operation on any given API request.
     URL to perform the PATCH operation.  
   - **`value`** *(string)*:  
     Data to include in the body of the PATCH request.
+  - **`token`** *(string, optional)*:  
+    Bearer token for authorization. When provided, it will be sent as `Authorization: Bearer <token>` header.
+  - **`headers`** *(object, optional)*:  
+    Additional headers to include in the request. Note: `Content-Type: application/json` is set by default.
 
 - **Response:**
   - **`statusCode`** *(string)*:  
@@ -97,6 +109,10 @@ Perform a DELETE operation on any given API request.
 - **Inputs:**
   - **`url`** *(string)*:  
     URL to perform the DELETE operation.
+  - **`token`** *(string, optional)*:  
+    Bearer token for authorization. When provided, it will be sent as `Authorization: Bearer <token>` header.
+  - **`headers`** *(object, optional)*:  
+    Additional headers to include in the request. Can be used for custom authentication methods.
 
 - **Response:**
   - **`statusCode`** *(string)*:  

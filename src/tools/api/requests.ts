@@ -2,15 +2,103 @@ import { ApiToolBase } from './base.js';
 import { ToolContext, ToolResponse, createSuccessResponse, createErrorResponse } from '../common/types.js';
 
 /**
+ * Base arguments for all API requests
+ */
+export interface BaseRequestArgs {
+  url: string;
+  token?: string;
+  headers?: Record<string, string>;
+}
+
+/**
+ * Arguments for requests with body (POST, PUT, PATCH)
+ */
+export interface RequestWithBodyArgs extends BaseRequestArgs {
+  value: string | object;
+}
+
+/**
+ * Helper function to safely parse JSON string or return the value as-is
+ * @param value The value to parse (can be string or object)
+ * @returns Parsed JSON object or the original value
+ */
+function parseJsonSafely(value: any): any {
+  if (typeof value === 'string') {
+    try {
+      return JSON.parse(value);
+    } catch (error) {
+      // Log warning for debugging
+      console.warn('Failed to parse JSON, using raw string:', error instanceof Error ? error.message : 'Unknown error');
+      return value;
+    }
+  }
+  return value;
+}
+
+/**
+ * Helper function to build request headers with optional token and custom headers
+ * @param token Optional Bearer token for authorization
+ * @param customHeaders Optional custom headers to include
+ * @param includeContentType Whether to include Content-Type: application/json header
+ * @returns Merged headers object
+ */
+function buildHeaders(token?: string, customHeaders?: Record<string, string>, includeContentType: boolean = false): Record<string, string> {
+  const headers: Record<string, string> = {};
+  
+  if (includeContentType) {
+    headers['Content-Type'] = 'application/json';
+  }
+  
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  
+  if (customHeaders) {
+    // Warn if both token and Authorization header are provided
+    if (token && customHeaders['Authorization']) {
+      console.warn('Both token and Authorization header provided. Custom Authorization header will override token.');
+    }
+    Object.assign(headers, customHeaders);
+  }
+  
+  return headers;
+}
+
+/**
+ * Validate headers are all strings
+ * @param headers Headers to validate
+ * @returns Error message if invalid, null if valid
+ */
+function validateHeaders(headers?: Record<string, string>): string | null {
+  if (!headers) return null;
+  
+  for (const [key, value] of Object.entries(headers)) {
+    if (typeof value !== 'string') {
+      return `Header '${key}' must be a string, got ${typeof value}`;
+    }
+  }
+  
+  return null;
+}
+
+/**
  * Tool for making GET requests
  */
 export class GetRequestTool extends ApiToolBase {
   /**
    * Execute the GET request tool
    */
-  async execute(args: any, context: ToolContext): Promise<ToolResponse> {
+  async execute(args: BaseRequestArgs, context: ToolContext): Promise<ToolResponse> {
     return this.safeExecute(context, async (apiContext) => {
-      const response = await apiContext.get(args.url);
+      // Validate headers
+      const headerError = validateHeaders(args.headers);
+      if (headerError) {
+        return createErrorResponse(headerError);
+      }
+      
+      const response = await apiContext.get(args.url, {
+        headers: buildHeaders(args.token, args.headers)
+      });
       
       let responseText;
       try {
@@ -35,8 +123,14 @@ export class PostRequestTool extends ApiToolBase {
   /**
    * Execute the POST request tool
    */
-  async execute(args: any, context: ToolContext): Promise<ToolResponse> {
+  async execute(args: RequestWithBodyArgs, context: ToolContext): Promise<ToolResponse> {
     return this.safeExecute(context, async (apiContext) => {
+      // Validate headers
+      const headerError = validateHeaders(args.headers);
+      if (headerError) {
+        return createErrorResponse(headerError);
+      }
+      
       // Check if the value is valid JSON if it starts with { or [
       if (args.value && typeof args.value === 'string' && 
           (args.value.startsWith('{') || args.value.startsWith('['))) {
@@ -48,12 +142,8 @@ export class PostRequestTool extends ApiToolBase {
       }
       
       const response = await apiContext.post(args.url, {
-        data: typeof args.value === 'string' ? JSON.parse(args.value) : args.value,
-        headers: {
-          'Content-Type': 'application/json',
-          ...(args.token ? { 'Authorization': `Bearer ${args.token}` } : {}),
-          ...(args.headers || {})
-        }
+        data: parseJsonSafely(args.value),
+        headers: buildHeaders(args.token, args.headers, true)
       });
       
       let responseText;
@@ -79,8 +169,14 @@ export class PutRequestTool extends ApiToolBase {
   /**
    * Execute the PUT request tool
    */
-  async execute(args: any, context: ToolContext): Promise<ToolResponse> {
+  async execute(args: RequestWithBodyArgs, context: ToolContext): Promise<ToolResponse> {
     return this.safeExecute(context, async (apiContext) => {
+      // Validate headers
+      const headerError = validateHeaders(args.headers);
+      if (headerError) {
+        return createErrorResponse(headerError);
+      }
+      
       // Check if the value is valid JSON if it starts with { or [
       if (args.value && typeof args.value === 'string' && 
           (args.value.startsWith('{') || args.value.startsWith('['))) {
@@ -92,7 +188,8 @@ export class PutRequestTool extends ApiToolBase {
       }
       
       const response = await apiContext.put(args.url, {
-        data: args.value
+        data: parseJsonSafely(args.value),
+        headers: buildHeaders(args.token, args.headers, true)
       });
       
       let responseText;
@@ -118,8 +215,14 @@ export class PatchRequestTool extends ApiToolBase {
   /**
    * Execute the PATCH request tool
    */
-  async execute(args: any, context: ToolContext): Promise<ToolResponse> {
+  async execute(args: RequestWithBodyArgs, context: ToolContext): Promise<ToolResponse> {
     return this.safeExecute(context, async (apiContext) => {
+      // Validate headers
+      const headerError = validateHeaders(args.headers);
+      if (headerError) {
+        return createErrorResponse(headerError);
+      }
+      
       // Check if the value is valid JSON if it starts with { or [
       if (args.value && typeof args.value === 'string' && 
           (args.value.startsWith('{') || args.value.startsWith('['))) {
@@ -131,7 +234,8 @@ export class PatchRequestTool extends ApiToolBase {
       }
       
       const response = await apiContext.patch(args.url, {
-        data: args.value
+        data: parseJsonSafely(args.value),
+        headers: buildHeaders(args.token, args.headers, true)
       });
       
       let responseText;
@@ -157,9 +261,17 @@ export class DeleteRequestTool extends ApiToolBase {
   /**
    * Execute the DELETE request tool
    */
-  async execute(args: any, context: ToolContext): Promise<ToolResponse> {
+  async execute(args: BaseRequestArgs, context: ToolContext): Promise<ToolResponse> {
     return this.safeExecute(context, async (apiContext) => {
-      const response = await apiContext.delete(args.url);
+      // Validate headers
+      const headerError = validateHeaders(args.headers);
+      if (headerError) {
+        return createErrorResponse(headerError);
+      }
+      
+      const response = await apiContext.delete(args.url, {
+        headers: buildHeaders(args.token, args.headers)
+      });
       
       let responseText;
       try {
