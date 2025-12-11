@@ -2,6 +2,23 @@ import { ApiToolBase } from './base.js';
 import { ToolContext, ToolResponse, createSuccessResponse, createErrorResponse } from '../common/types.js';
 
 /**
+ * Helper function to safely parse JSON string or return the value as-is
+ * @param value The value to parse (can be string or object)
+ * @returns Parsed JSON object or the original value
+ */
+function parseJsonSafely(value: any): any {
+  if (typeof value === 'string') {
+    try {
+      return JSON.parse(value);
+    } catch (error) {
+      // If parsing fails, return the raw value
+      return value;
+    }
+  }
+  return value;
+}
+
+/**
  * Tool for making GET requests
  */
 export class GetRequestTool extends ApiToolBase {
@@ -53,7 +70,7 @@ export class PostRequestTool extends ApiToolBase {
       }
       
       const response = await apiContext.post(args.url, {
-        data: typeof args.value === 'string' ? JSON.parse(args.value) : args.value,
+        data: parseJsonSafely(args.value),
         headers: {
           'Content-Type': 'application/json',
           ...(args.token ? { 'Authorization': `Bearer ${args.token}` } : {}),
@@ -97,13 +114,7 @@ export class PutRequestTool extends ApiToolBase {
       }
       
       const response = await apiContext.put(args.url, {
-        data: typeof args.value === 'string' ? (() => {
-          try {
-            return JSON.parse(args.value);
-          } catch (error) {
-            return args.value; // If parsing fails, use the raw value
-          }
-        })() : args.value,
+        data: parseJsonSafely(args.value),
         headers: {
           'Content-Type': 'application/json',
           ...(args.token ? { 'Authorization': `Bearer ${args.token}` } : {}),
@@ -147,13 +158,7 @@ export class PatchRequestTool extends ApiToolBase {
       }
       
       const response = await apiContext.patch(args.url, {
-        data: typeof args.value === 'string' ? (() => {
-          try {
-            return JSON.parse(args.value);
-          } catch (error) {
-            return args.value; // If parsing fails, use the raw value
-          }
-        })() : args.value,
+        data: parseJsonSafely(args.value),
         headers: {
           'Content-Type': 'application/json',
           ...(args.token ? { 'Authorization': `Bearer ${args.token}` } : {}),
