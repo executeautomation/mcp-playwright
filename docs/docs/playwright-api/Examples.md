@@ -6,6 +6,95 @@ sidebar_position: 2
 
 Lets see how we can use the power of Playwright MCP Server to automate API of our application
 
+## Authentication Examples
+
+### Bearer Token Authentication
+
+Use the `token` parameter for Bearer token authentication:
+
+```typescript
+// GET request with Bearer token
+await playwright_get({
+  url: 'https://api.example.com/protected-data',
+  token: 'your-bearer-token-here'
+});
+
+// POST request with Bearer token
+await playwright_post({
+  url: 'https://api.example.com/create',
+  value: '{"name":"test"}',
+  token: 'your-bearer-token-here'
+});
+
+// DELETE request with Bearer token
+await playwright_delete({
+  url: 'https://api.example.com/resource/123',
+  token: 'your-bearer-token-here'
+});
+```
+
+### Custom Headers Authentication
+
+Use the `headers` parameter for other authentication methods:
+
+```typescript
+// Basic authentication
+await playwright_get({
+  url: 'https://api.example.com/data',
+  headers: {
+    'Authorization': 'Basic dXNlcjpwYXNzd29yZA==',
+    'X-API-Version': '2.0'
+  }
+});
+
+// API Key authentication
+await playwright_post({
+  url: 'https://api.example.com/data',
+  value: '{"data":"test"}',
+  headers: {
+    'X-API-Key': 'your-api-key-here',
+    'X-Request-ID': 'unique-request-id'
+  }
+});
+
+// Custom authentication header
+await playwright_put({
+  url: 'https://api.example.com/update/123',
+  value: '{"status":"active"}',
+  headers: {
+    'X-Custom-Auth': 'custom-token',
+    'X-Client-ID': 'client-123'
+  }
+});
+```
+
+### Combining Token and Headers
+
+You can combine both `token` and `headers` parameters. Custom `Authorization` header will override the token:
+
+```typescript
+// Token takes precedence if no Authorization header in custom headers
+await playwright_get({
+  url: 'https://api.example.com/data',
+  token: 'bearer-token',
+  headers: {
+    'X-Custom-Header': 'value'
+  }
+});
+
+// Custom Authorization header overrides token parameter
+await playwright_get({
+  url: 'https://api.example.com/data',
+  token: 'this-will-be-ignored',
+  headers: {
+    'Authorization': 'Basic xyz123',  // This takes precedence
+    'X-Custom-Header': 'value'
+  }
+});
+```
+
+## CRUD Operations Example
+
 ### Scenario
 
 ```json

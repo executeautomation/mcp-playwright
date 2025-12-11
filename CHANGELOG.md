@@ -5,6 +5,38 @@ All notable changes to the Playwright MCP Server will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **Bearer Token Authentication**: Added `token` parameter to all API request methods (GET, POST, PUT, PATCH, DELETE) for Bearer token authentication
+- **Custom Headers Support**: Added `headers` parameter to all API request methods for custom authentication and header management
+- **Request Validation**: Added header value validation to ensure all headers are strings
+- **Type Safety**: Added `BaseRequestArgs` and `RequestWithBodyArgs` TypeScript interfaces for better type safety
+- **Helper Functions**: 
+  - `buildHeaders()` - Centralized header building logic with token and custom header support
+  - `validateHeaders()` - Validates header values are strings
+  - Enhanced `parseJsonSafely()` - Improved JSON parsing with console warnings for debugging
+- **Comprehensive Test Coverage**: Added 12 new edge case tests covering header validation, token/header conflicts, and invalid inputs
+- **Enhanced Documentation**: 
+  - Updated `Supported-Tools.mdx` with authentication parameters for all API methods
+  - Added authentication examples to `Examples.md` with Bearer token, Basic auth, and API key examples
+
+### Changed
+- **Code Quality**: Refactored duplicate header building logic into shared helper function
+- **Error Handling**: Improved error messages for invalid header values
+- **Warnings**: Added console warnings when both `token` and custom `Authorization` header are provided
+- **JSON Parsing**: Enhanced parseJsonSafely with warning logs for better debugging
+
+### Fixed
+- **Authentication Issue**: Fixed missing authentication support for GET, PUT, PATCH, DELETE requests (only POST had it previously)
+- **Header Consistency**: Ensured consistent Content-Type header handling across POST, PUT, PATCH methods
+
+### Technical Details
+- All 154 tests passing (142 existing + 12 new edge case tests)
+- Backward compatible: Existing API calls without token/headers continue to work
+- Custom Authorization headers override token parameter when both are provided
+- Header validation prevents runtime errors from invalid header types
+
 ## [1.0.10] - 2024-12-10
 
 ### Added
