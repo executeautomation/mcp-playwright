@@ -5,7 +5,7 @@ All notable changes to the Playwright MCP Server will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.11] - 2024-12-11
+## [1.0.11] - 2025-12-11
 
 ### Added
 - **Bearer Token Authentication**: Added `token` parameter to all API request methods (GET, POST, PUT, PATCH, DELETE) for Bearer token authentication
@@ -37,7 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Custom Authorization headers override token parameter when both are provided
 - Header validation prevents runtime errors from invalid header types
 
-## [1.0.10] - 2024-12-10
+## [1.0.10] - 2025-12-10
 
 ### Added
 - **Device Preset Support**: `playwright_resize` now supports 143 pre-configured device presets from Playwright's device library
@@ -61,7 +61,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Test coverage: 134 total tests passing (111 existing + 23 new)
 - Code coverage: 98% for resize.ts
 
-## [1.0.9] - 2024-12-09
+## [1.0.9] - 2025-12-09
 
 ### Fixed
 - **Critical Fix**: Console output buffering when running via `npx`
@@ -72,7 +72,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated `src/index.ts` initialization message
 - Updated `src/http-server.ts` startup banner
 
-## [1.0.8] - 2024-12-08
+## [1.0.8] - 2025-12-08
 
 ### Changed
 - Console output visibility improvements in HTTP mode
@@ -80,7 +80,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added initialization message display
 - Improved user experience when starting server with `--port` flag
 
-## [1.0.7] - 2024-12-07
+## [1.0.7] - 2025-12-07
 
 ### Added
 - **HTTP/SSE Transport Mode**: Standalone HTTP server mode for enhanced deployment
