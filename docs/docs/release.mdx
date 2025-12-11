@@ -6,496 +6,88 @@ import YouTubeVideoEmbed from '@site/src/components/HomepageFeatures/YouTubeVide
 # Release Notes
 
 ## Version 1.0.11 (December 2025)
-
-### 🔐 Enhanced API Authentication & Code Quality Improvements
-
-**Major Enhancement:** Comprehensive authentication support and significant code quality improvements for all API request methods!
-
-This release brings production-ready authentication capabilities to all API methods (GET, PUT, PATCH, DELETE), along with improved type safety, validation, and comprehensive documentation.
-
-#### ✨ What's New
-
-**1. Bearer Token Authentication for All Methods**
-```javascript
-// GET with authentication
-await playwright_get({
-  url: 'https://api.example.com/protected-data',
-  token: 'your-bearer-token'
-});
-
-// DELETE with authentication
-await playwright_delete({
-  url: 'https://api.example.com/resource/123',
-  token: 'your-bearer-token'
-});
-
-// PUT with authentication
-await playwright_put({
-  url: 'https://api.example.com/resource/123',
-  value: '{"status":"active"}',
-  token: 'your-bearer-token'
-});
-```
-
-**2. Custom Headers Support**
-```javascript
-// Basic authentication
-await playwright_get({
-  url: 'https://api.example.com/data',
-  headers: {
-    'Authorization': 'Basic dXNlcjpwYXNz',
-    'X-API-Version': '2.0'
-  }
-});
-
-// API Key authentication
-await playwright_post({
-  url: 'https://api.example.com/data',
-  value: '{"name":"test"}',
-  headers: {
-    'X-API-Key': 'your-api-key',
-    'X-Request-ID': 'unique-id'
-  }
-});
-```
-
-**3. Flexible Authentication Options**
-```javascript
-// Combine token with additional headers
-await playwright_get({
-  url: 'https://api.example.com/data',
-  token: 'bearer-token',
-  headers: {
-    'X-Custom-Header': 'value'
-  }
-});
-
-// Custom Authorization header overrides token
-await playwright_get({
-  url: 'https://api.example.com/data',
-  token: 'this-is-ignored',
-  headers: {
-    'Authorization': 'Basic xyz123'  // Takes precedence
-  }
-});
-```
-
-#### 🏗️ Code Quality Improvements
-
-**Type Safety:**
-- Added `BaseRequestArgs` interface for GET and DELETE requests
-- Added `RequestWithBodyArgs` interface for POST, PUT, and PATCH requests
-- Replaced all `any` types with proper TypeScript interfaces
-- 100% type-safe implementation
-
-**DRY Principle:**
-- Created `buildHeaders()` helper function
-- Eliminated duplicate header building logic across 5 request methods
-- Centralized authentication logic for easier maintenance
-
-**Validation & Error Handling:**
-- Added `validateHeaders()` to ensure all header values are strings
-- Console warnings when both token and Authorization header are provided
-- Enhanced `parseJsonSafely()` with debug logging
-- Better error messages for invalid header values
-
-#### 🧪 Testing Enhancements
-
-**Added 8 New Edge Case Tests:**
-- Invalid header value validation (non-string types)
-- Token and Authorization header conflict warnings
-- JSON parse failure handling with fallback
-- Empty headers object handling
-- Header validation for all request methods
-
-**Test Results:**
-- ✅ 150 tests passing (142 existing + 8 new)
-- ✅ 88.37% code coverage for API requests (up from ~81%)
-- ✅ Zero TypeScript errors
-- ✅ 100% backward compatible
-
-#### 📚 Documentation Updates
-
-**Enhanced API Documentation:**
-- Updated `Supported-Tools.mdx` with `token` and `headers` parameters
-- Added comprehensive authentication examples
-- Bearer token, Basic auth, and API key usage patterns
-- Token + custom headers combination examples
-
-**Complete API Coverage:**
-- ✅ `playwright_get` - Now documents token and headers
-- ✅ `playwright_post` - Enhanced documentation
-- ✅ `playwright_put` - Now documents token and headers
-- ✅ `playwright_patch` - Now documents token and headers
-- ✅ `playwright_delete` - Now documents token and headers
-
-#### 🔄 Backward Compatibility
-
-All changes are 100% backward compatible:
-- Existing API calls without token/headers work unchanged
-- New parameters (`token`, `headers`) are optional
-- No breaking changes to the API
-
-#### 🛡️ Security Benefits
-
-- Proper authentication support prevents unauthorized API access
-- Header validation prevents injection attacks
-- Warning system alerts developers to configuration issues
-- Type safety prevents runtime errors
-
-#### 📦 Technical Details
-
-**Files Changed:**
-- `src/tools/api/requests.ts` - Refactored with helpers and type interfaces
-- `src/__tests__/tools/api/requests.test.ts` - Added comprehensive edge case tests
-- `docs/docs/playwright-api/Supported-Tools.mdx` - Updated all API method documentation
-- `docs/docs/playwright-api/Examples.md` - Added authentication examples
-- `CHANGELOG.md` - Detailed release notes
-
-**Code Metrics:**
-- +397 lines added (features, tests, documentation)
-- -29 lines removed (eliminated duplication)
-- 5 files modified
+- **Enhanced API Authentication**: Added Bearer token authentication support for all API methods (GET, POST, PUT, PATCH, DELETE)
+  ```javascript
+  await playwright_get({
+    url: 'https://api.example.com/protected-data',
+    token: 'your-bearer-token'
+  });
+  ```
+- **Custom Headers Support**: Added custom headers parameter for flexible authentication (Basic auth, API keys, etc.)
+  ```javascript
+  await playwright_post({
+    url: 'https://api.example.com/data',
+    value: '{"name":"test"}',
+    headers: {
+      'X-API-Key': 'your-api-key'
+    }
+  });
+  ```
+- **Code Quality Improvements**:
+  - Added TypeScript interfaces (`BaseRequestArgs`, `RequestWithBodyArgs`)
+  - Created `buildHeaders()` and `validateHeaders()` helper functions
+  - Improved error handling and validation
+- **Test Coverage**: Added 8 new edge case tests, 150 tests passing with 88.37% code coverage
+- **Backward Compatibility**: All changes are fully backward compatible, new parameters are optional
 
 ---
 
 ## Version 1.0.10 (December 2025)
-
-### 🎯 Enhanced Device Emulation with `playwright_resize`
-
-**Major Feature:** Device preset support for realistic mobile, tablet, and desktop testing!
-
-The `playwright_resize` tool now supports **143 pre-configured device presets** from Playwright's device library, making it incredibly easy to test responsive designs across real device profiles.
-
-#### ✨ What's New
-
-**1. Device Preset Mode (Recommended)**
-```javascript
-// Test with real device profiles
-await playwright_resize({ device: "iPhone 13" });
-await playwright_resize({ device: "iPad Pro 11" });
-await playwright_resize({ device: "Desktop Chrome" });
-```
-
-**2. Orientation Support**
-```javascript
-// Portrait and landscape testing
-await playwright_resize({ device: "iPhone 13", orientation: "landscape" });
-await playwright_resize({ device: "iPad Pro 11", orientation: "portrait" });
-```
-
-**3. Natural Language Prompts**
-Users can now use simple, natural language with AI assistants:
-- "Test on iPhone 13"
-- "Switch to iPad view"
-- "Show desktop version"
-- "Rotate to landscape"
-
-#### 🎁 Device Emulation Includes
-
-- ✅ **Accurate viewport dimensions** - Precise screen sizes for each device
-- ✅ **Proper user-agent strings** - Real browser identification
-- ✅ **Touch event support** - Mobile touch capabilities
-- ✅ **Device pixel ratio** - 1x, 2x, 3x retina displays
-- ✅ **Mobile/desktop detection** - Correct device type flags
-
-#### 📱 Supported Devices (143 total)
-
-**iOS Devices:**
-- iPhones: SE, 6/7/8, X/XR/11, 12/13/14/15 series
-- iPads: Mini, Air, Pro 11", Pro 12.9"
-
-**Android Devices:**
-- Google: Pixel 5, 6, 7, Tablet
-- Samsung: Galaxy S8/S9/S20/S24 series, Galaxy Tab
-
-**Desktop Browsers:**
-- Desktop Chrome, Firefox, Safari
-
-#### 💡 Usage Examples
-
-**Device Presets (Recommended):**
-```javascript
-// iOS testing
-await playwright_resize({ device: "iPhone 13" });
-await playwright_resize({ device: "iPhone 15 Pro Max" });
-
-// Android testing
-await playwright_resize({ device: "Pixel 7" });
-await playwright_resize({ device: "Galaxy S24" });
-
-// Tablet testing
-await playwright_resize({ device: "iPad Pro 11" });
-
-// Desktop testing
-await playwright_resize({ device: "Desktop Chrome" });
-
-// With orientation
-await playwright_resize({ 
-  device: "iPhone 13", 
-  orientation: "landscape" 
-});
-```
-
-**Manual Dimensions (Still Supported):**
-```javascript
-// Backward compatible
-await playwright_resize({ width: 1024, height: 768 });
-await playwright_resize({ width: 375, height: 667 });
-```
-
-**Natural Language (AI Assistants):**
-```
-"Test this page on iPhone 13"
-"Switch to iPad Pro 11"
-"Rotate to landscape"
-"Show me desktop view"
-"Compare iPhone 13 and Galaxy S24"
-```
-
-#### 🚀 New Documentation
-
-**1. Comprehensive Prompt Guide** (`Resize-Prompts-Guide.md`)
-- Natural language patterns for AI assistants
-- Example conversations and workflows
-- Common testing scenarios
-- Best practices
-
-**2. Quick Reference Card** (`Device-Quick-Reference.md`)
-- Popular device dimensions
-- Quick command reference
-- Recommended test matrices
-- Pro tips
-
-**3. Device Discovery Tool**
-```bash
-# List all 143 available devices
-node scripts/list-devices.cjs
-
-# Filter by device type
-node scripts/list-devices.cjs iphone
-node scripts/list-devices.cjs pixel
-node scripts/list-devices.cjs ipad
-```
-
-#### 🔧 Backward Compatibility
-
-✅ **Fully backward compatible** - Manual width/height dimensions still work exactly as before
-
-✅ **No breaking changes** - Existing code continues to work without modifications
-
-✅ **Optional device parameter** - Use device presets only when you want them
-
-#### 📊 Technical Details
-
-**Files Changed:**
-- `src/tools/browser/resize.ts` - Enhanced with device preset support
-- `src/tools.ts` - Updated tool schema with device/orientation parameters
-- `docs/docs/playwright-web/Supported-Tools.mdx` - Enhanced documentation
-
-**Files Added:**
-- `docs/docs/playwright-web/Resize-Prompts-Guide.md` - Natural language prompt guide
-- `docs/docs/playwright-web/Device-Quick-Reference.md` - Quick reference card
-- `scripts/list-devices.cjs` - Device discovery helper
-- `src/__tests__/tools/browser/resize.test.ts` - Comprehensive test suite (23 tests)
-
-**Test Coverage:**
-- All 134 tests passing (111 existing + 23 new)
-- 98% code coverage for resize.ts
-- Device preset tests
-- Orientation tests
-- Manual dimension tests
-- Error handling tests
-
-#### 🎯 Use Cases
-
-**Responsive Design Testing:**
-```
-"Test mobile, tablet, desktop responsiveness"
-```
-
-**Cross-Device Comparison:**
-```
-"Compare how the navigation looks on iPhone 13 vs Galaxy S24"
-```
-
-**Orientation Testing:**
-```
-"Test form in both portrait and landscape on iPad"
-```
-
-**Bug Reproduction:**
-```
-"User reported button issue on iPhone SE - test it"
-```
-
-#### 📚 Learn More
-
-- [Device Testing Prompt Guide](/docs/playwright-web/Resize-Prompts-Guide)
-- [Device Quick Reference](/docs/playwright-web/Device-Quick-Reference)
-- [Supported Tools Documentation](/docs/playwright-web/Supported-Tools)
+- **Device Emulation for `playwright_resize`**: Added support for 143 pre-configured device presets (iPhone, iPad, Pixel, Galaxy, Desktop)
+  ```javascript
+  await playwright_resize({ device: "iPhone 13" });
+  await playwright_resize({ device: "iPad Pro 11", orientation: "landscape" });
+  ```
+- **Device Emulation Features**: Accurate viewport dimensions, proper user-agent strings, touch event support, device pixel ratio, mobile/desktop detection
+- **Supported Devices**: iOS (iPhone SE through 15 series, iPads), Android (Pixel, Galaxy), Desktop browsers (Chrome, Firefox, Safari)
+- **Natural Language Support**: Users can use simple prompts like "Test on iPhone 13" or "Rotate to landscape"
+- **New Documentation**: Added Resize-Prompts-Guide.md and Device-Quick-Reference.md
+- **Device Discovery Tool**: `node scripts/list-devices.cjs` to list all available devices
+- **Test Coverage**: 134 tests passing (111 existing + 23 new) with 98% code coverage
+- **Backward Compatibility**: Manual width/height dimensions still work as before
 
 ---
 
 ## Version 1.0.9 (December 2025)
+- **Critical Fix**: Console output buffering issue when running via `npx`
+- **Problem**: Users saw no console output when running `npx @executeautomation/playwright-mcp-server --port 8931`
+- **Solution**: Replaced `console.log()` with `process.stdout.write()` for immediate, unbuffered output
+- **Impact**: Users now see immediate console output including server initialization, startup confirmation, endpoints, and configuration examples
+- **Files Changed**: `src/index.ts` and `src/http-server.ts`
 
-### 🔧 Critical Fix: Console Output Buffering with npx
-
-**Fixed:** Console output not visible when running via `npx`
-
-**Problem:**
-When running `npx @executeautomation/playwright-mcp-server --port 8931`, users experienced no console output, making it impossible to verify if the server started successfully or see connection information.
-
-**Root Cause:**
-Node.js buffers `console.log()` output when stdout is not a TTY (terminal). When npx runs the server, it detects a non-interactive environment and buffers output indefinitely, preventing users from seeing any feedback.
-
-**Solution:**
-- Replaced `console.log()` with `process.stdout.write()` for immediate, unbuffered output
-- Updated `src/index.ts` initialization message
-- Updated `src/http-server.ts` startup banner
-
-**Impact:**
-Users now see immediate console output including:
-- ⏳ Server initialization message
-- 🚀 Server startup confirmation  
-- 📋 All endpoint URLs (SSE, Messages, MCP, Health)
-- 📝 Client configuration example
-- 📊 Monitoring server information
-
-**Testing:**
-Verified with local npm package testing using `npm pack` and `npx` to ensure the fix works correctly before publishing.
-
-**Files Changed:**
-- `src/index.ts` - Line 65
-- `src/http-server.ts` - Line 18
+---
 
 ## Version 1.0.8 (December 2025)
+- **Console Output Improvements**: Changed console output from `stderr` to `stdout` for better visibility in HTTP mode
+- **Server Startup**: Now displays initialization message and complete server startup information
+- **Better UX**: Shows listening address, available endpoints, client configuration example, and monitoring server info
 
-### 🖥️ Console Output Improvements
-
-**Fixed:** Console output visibility when running in HTTP mode
-
-- Changed console output from `stderr` to `stdout` for better visibility
-- Now displays initialization message: `⏳ Initializing Playwright MCP Server on port {port}...`
-- Shows complete server startup information including endpoints and configuration
-- Improved user experience when starting the server with `--port` flag
-
-**Before:** No visible console output when running `npx @executeautomation/playwright-mcp-server --port 8931`
-
-**After:** Clear, formatted output showing:
-- Server initialization status
-- Listening address and port
-- Available endpoints (SSE, Messages, MCP, Health Check)
-- Client configuration example
-- Monitoring server information
-
-This makes it much easier to verify that the server has started successfully and provides all necessary connection information at a glance.
+---
 
 ## Version 1.0.7 (December 2025)
-
-### 🌐 HTTP/SSE Transport Mode (New!)
-
-Added standalone HTTP server mode for enhanced deployment flexibility:
-
-```bash
-playwright-mcp-server --port 8931
-```
-
-**Key Features:**
-- Full support for Server-Sent Events (SSE) transport using MCP SDK's native `SSEServerTransport`
-- Multiple concurrent client sessions with automatic session management
-- Health check endpoint (`/health`) for monitoring server status
-- Dual endpoint support: `/sse` + `/messages` (legacy) and `/mcp` (unified, recommended)
-- Graceful shutdown with proper resource cleanup
-- [Read the full HTTP/SSE Transport Guide](/docs/playwright-web/HTTP-SSE-Transport)
-
-**Configuration Example:**
-```json
-{
-  "mcpServers": {
-    "playwright": {
-      "url": "http://localhost:8931/mcp",
-      "type": "http"
+- **HTTP/SSE Transport Mode**: Added standalone HTTP server mode with Server-Sent Events support
+  ```bash
+  playwright-mcp-server --port 8931
+  ```
+- **Configuration Example**:
+  ```json
+  {
+    "mcpServers": {
+      "playwright": {
+        "url": "http://localhost:8931/mcp",
+        "type": "http"
+      }
     }
   }
-}
-```
+  ```
+- **Key Features**: Multiple concurrent client sessions, health check endpoint (`/health`), graceful shutdown, session isolation
+- **Security**: Server binds to 127.0.0.1 (localhost only) by default for security
+- **Code Quality**: 40% code reduction in endpoint handlers through DRY refactoring
+- **stdio Mode Fixes**: Logging in stdio mode now writes to file only, monitoring system disabled in stdio mode
+- **Backward Compatibility**: Default stdio mode unchanged, all existing tools work in both transport modes
+- [Read the full HTTP/SSE Transport Guide](/docs/playwright-web/HTTP-SSE-Transport)
 
-:::warning CRITICAL REQUIREMENT
-The `"type": "http"` field is **REQUIRED** for HTTP/SSE transport. Without it, the client will not connect properly.
-:::
-
-### 🚀 Enhanced Deployment Options
-- Run on remote servers without display (headless mode)
-- Better integration with VS Code GitHub Copilot and custom MCP clients
-- Support for background service deployment
-- Multiple client access with session isolation
-- Debugging capabilities with metrics endpoint (PORT+1)
-
-### 📊 Code Quality & Maintainability
-- **40% code reduction** in endpoint handlers through DRY refactoring
-- Single source of truth for SSE connection and message handling
-- Improved maintainability and consistency across all endpoints
-- Enhanced logging with context-aware messages
-- Reduced bug risk through centralized error handling
-
-### 🔒 Security Enhancements
-- **CRITICAL FIX:** Server now binds to 127.0.0.1 (localhost only) by default
-- Prevents external network access and accidental exposure
-- Clear security notification in startup message
-- SSH tunneling documented for secure remote access
-
-### 🔍 Debugging & Observability
-- Comprehensive request logging middleware (logs all HTTP requests)
-- Session lifecycle tracking with active transport counts
-- Enhanced error diagnostics with detailed context
-- Structured JSON logging for easy parsing
-- Clear troubleshooting messages
-
-### ✅ Backward Compatibility
-- Default stdio mode unchanged (fully compatible with Claude Desktop)
-- All existing tools work in both transport modes
-- No breaking changes to existing configurations
-- All 110 tests passing
-
-### 🔧 stdio Mode Improvements
-- **Fixed:** Logging in stdio mode now writes to file only (not stdout)
-- **Fixed:** Monitoring system disabled in stdio mode to prevent console output
-- **Fixed:** Log file path uses home directory to avoid permission issues
-- **Result:** Clean JSON-RPC communication with Claude Desktop
-- Logs available in `~/playwright-mcp-server.log`
-
-### 🛠️ Infrastructure
-- Logging system integration with HTTP transport
-- Monitoring system for metrics collection (dynamic port allocation)
-- Rate limiting framework (ready for future use)
-- Comprehensive error handling
-- Automatic port conflict resolution for monitoring server
-
-### 🐛 Common Issues & Solutions
-
-**Issue: "No transport found for sessionId" error**
-
-Solution:
-1. Ensure `"type": "http"` is present in your configuration
-2. Check server logs show this sequence:
-   - GET request to `/mcp`
-   - "Transport registered" with sessionId
-   - POST messages with same sessionId
-3. Restart both server and client if needed
-
-**Issue: Can't connect from another machine**
-
-This is by design for security. Server binds to localhost only. For remote access:
-```bash
-ssh -L 8931:localhost:8931 user@remote-server
-```
-
-### 📚 Documentation
-- Comprehensive HTTP/SSE transport guide in docs
-- Client configuration examples with required fields
-- Troubleshooting section in README
-- Security best practices documented
+---
 
 ## Version 1.0.6
 - **New Tool: `playwright_upload_file`**: Added a new tool to upload files to an `input[type='file']` element.
