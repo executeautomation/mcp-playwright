@@ -10,7 +10,12 @@ export class GetRequestTool extends ApiToolBase {
    */
   async execute(args: any, context: ToolContext): Promise<ToolResponse> {
     return this.safeExecute(context, async (apiContext) => {
-      const response = await apiContext.get(args.url);
+      const response = await apiContext.get(args.url, {
+        headers: {
+          ...(args.token ? { 'Authorization': `Bearer ${args.token}` } : {}),
+          ...(args.headers || {})
+        }
+      });
       
       let responseText;
       try {
@@ -92,7 +97,12 @@ export class PutRequestTool extends ApiToolBase {
       }
       
       const response = await apiContext.put(args.url, {
-        data: args.value
+        data: typeof args.value === 'string' ? JSON.parse(args.value) : args.value,
+        headers: {
+          'Content-Type': 'application/json',
+          ...(args.token ? { 'Authorization': `Bearer ${args.token}` } : {}),
+          ...(args.headers || {})
+        }
       });
       
       let responseText;
@@ -131,7 +141,12 @@ export class PatchRequestTool extends ApiToolBase {
       }
       
       const response = await apiContext.patch(args.url, {
-        data: args.value
+        data: typeof args.value === 'string' ? JSON.parse(args.value) : args.value,
+        headers: {
+          'Content-Type': 'application/json',
+          ...(args.token ? { 'Authorization': `Bearer ${args.token}` } : {}),
+          ...(args.headers || {})
+        }
       });
       
       let responseText;
@@ -159,7 +174,12 @@ export class DeleteRequestTool extends ApiToolBase {
    */
   async execute(args: any, context: ToolContext): Promise<ToolResponse> {
     return this.safeExecute(context, async (apiContext) => {
-      const response = await apiContext.delete(args.url);
+      const response = await apiContext.delete(args.url, {
+        headers: {
+          ...(args.token ? { 'Authorization': `Bearer ${args.token}` } : {}),
+          ...(args.headers || {})
+        }
+      });
       
       let responseText;
       try {

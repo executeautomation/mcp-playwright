@@ -273,7 +273,13 @@ export function createToolDefinitions() {
       inputSchema: {
         type: "object",
         properties: {
-          url: { type: "string", description: "URL to perform GET operation" }
+          url: { type: "string", description: "URL to perform GET operation" },
+          token: { type: "string", description: "Bearer token for authorization" },
+          headers: { 
+            type: "object", 
+            description: "Additional headers to include in the request",
+            additionalProperties: { type: "string" }
+          }
         },
         required: ["url"],
       },
@@ -304,6 +310,12 @@ export function createToolDefinitions() {
         properties: {
           url: { type: "string", description: "URL to perform PUT operation" },
           value: { type: "string", description: "Data to PUT in the body" },
+          token: { type: "string", description: "Bearer token for authorization" },
+          headers: { 
+            type: "object", 
+            description: "Additional headers to include in the request",
+            additionalProperties: { type: "string" }
+          }
         },
         required: ["url", "value"],
       },
@@ -314,8 +326,14 @@ export function createToolDefinitions() {
       inputSchema: {
         type: "object",
         properties: {
-          url: { type: "string", description: "URL to perform PUT operation" },
+          url: { type: "string", description: "URL to perform PATCH operation" },
           value: { type: "string", description: "Data to PATCH in the body" },
+          token: { type: "string", description: "Bearer token for authorization" },
+          headers: { 
+            type: "object", 
+            description: "Additional headers to include in the request",
+            additionalProperties: { type: "string" }
+          }
         },
         required: ["url", "value"],
       },
@@ -326,7 +344,13 @@ export function createToolDefinitions() {
       inputSchema: {
         type: "object",
         properties: {
-          url: { type: "string", description: "URL to perform DELETE operation" }
+          url: { type: "string", description: "URL to perform DELETE operation" },
+          token: { type: "string", description: "Bearer token for authorization" },
+          headers: { 
+            type: "object", 
+            description: "Additional headers to include in the request",
+            additionalProperties: { type: "string" }
+          }
         },
         required: ["url"],
       },

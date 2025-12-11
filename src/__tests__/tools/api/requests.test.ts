@@ -68,7 +68,45 @@ describe('API Request Tools', () => {
 
       const result = await getRequestTool.execute(args, mockContext);
 
-      expect(mockGet).toHaveBeenCalledWith('https://api.example.com');
+      expect(mockGet).toHaveBeenCalledWith('https://api.example.com', { headers: {} });
+      expect(result.isError).toBe(false);
+      expect(result.content[0].text).toContain('GET request to');
+    });
+
+    test('should make a GET request with Bearer token', async () => {
+      const args = {
+        url: 'https://api.example.com',
+        token: 'test-token'
+      };
+
+      const result = await getRequestTool.execute(args, mockContext);
+
+      expect(mockGet).toHaveBeenCalledWith('https://api.example.com', { 
+        headers: {
+          'Authorization': 'Bearer test-token'
+        }
+      });
+      expect(result.isError).toBe(false);
+      expect(result.content[0].text).toContain('GET request to');
+    });
+
+    test('should make a GET request with custom headers', async () => {
+      const args = {
+        url: 'https://api.example.com',
+        headers: {
+          'Authorization': 'Basic YWRtaW46cGFzc3dvcmQxMjM=',
+          'X-Custom-Header': 'custom-value'
+        }
+      };
+
+      const result = await getRequestTool.execute(args, mockContext);
+
+      expect(mockGet).toHaveBeenCalledWith('https://api.example.com', { 
+        headers: {
+          'Authorization': 'Basic YWRtaW46cGFzc3dvcmQxMjM=',
+          'X-Custom-Header': 'custom-value'
+        }
+      });
       expect(result.isError).toBe(false);
       expect(result.content[0].text).toContain('GET request to');
     });
@@ -83,7 +121,6 @@ describe('API Request Tools', () => {
 
       const result = await getRequestTool.execute(args, mockContext);
 
-      expect(mockGet).toHaveBeenCalledWith('https://api.example.com');
       expect(result.isError).toBe(true);
       expect(result.content[0].text).toContain('API operation failed');
     });
@@ -174,7 +211,56 @@ describe('API Request Tools', () => {
 
       const result = await putRequestTool.execute(args, mockContext);
 
-      expect(mockPut).toHaveBeenCalledWith('https://api.example.com', { data: args.value });
+      expect(mockPut).toHaveBeenCalledWith('https://api.example.com', { 
+        data: { data: "test" },
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      expect(result.isError).toBe(false);
+      expect(result.content[0].text).toContain('PUT request to');
+    });
+
+    test('should make a PUT request with Bearer token', async () => {
+      const args = {
+        url: 'https://api.example.com',
+        value: '{"data": "test"}',
+        token: 'test-token'
+      };
+
+      const result = await putRequestTool.execute(args, mockContext);
+
+      expect(mockPut).toHaveBeenCalledWith('https://api.example.com', { 
+        data: { data: "test" },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer test-token'
+        }
+      });
+      expect(result.isError).toBe(false);
+      expect(result.content[0].text).toContain('PUT request to');
+    });
+
+    test('should make a PUT request with custom headers including Basic auth', async () => {
+      const args = {
+        url: 'https://api.example.com',
+        value: '{"data": "test"}',
+        headers: {
+          'Authorization': 'Basic YWRtaW46cGFzc3dvcmQxMjM=',
+          'Accept': 'application/json'
+        }
+      };
+
+      const result = await putRequestTool.execute(args, mockContext);
+
+      expect(mockPut).toHaveBeenCalledWith('https://api.example.com', { 
+        data: { data: "test" },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Basic YWRtaW46cGFzc3dvcmQxMjM=',
+          'Accept': 'application/json'
+        }
+      });
       expect(result.isError).toBe(false);
       expect(result.content[0].text).toContain('PUT request to');
     });
@@ -189,7 +275,54 @@ describe('API Request Tools', () => {
 
       const result = await patchRequestTool.execute(args, mockContext);
 
-      expect(mockPatch).toHaveBeenCalledWith('https://api.example.com', { data: args.value });
+      expect(mockPatch).toHaveBeenCalledWith('https://api.example.com', { 
+        data: { data: "test" },
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      expect(result.isError).toBe(false);
+      expect(result.content[0].text).toContain('PATCH request to');
+    });
+
+    test('should make a PATCH request with Bearer token', async () => {
+      const args = {
+        url: 'https://api.example.com',
+        value: '{"data": "test"}',
+        token: 'test-token'
+      };
+
+      const result = await patchRequestTool.execute(args, mockContext);
+
+      expect(mockPatch).toHaveBeenCalledWith('https://api.example.com', { 
+        data: { data: "test" },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer test-token'
+        }
+      });
+      expect(result.isError).toBe(false);
+      expect(result.content[0].text).toContain('PATCH request to');
+    });
+
+    test('should make a PATCH request with custom headers', async () => {
+      const args = {
+        url: 'https://api.example.com',
+        value: '{"data": "test"}',
+        headers: {
+          'X-Custom-Header': 'custom-value'
+        }
+      };
+
+      const result = await patchRequestTool.execute(args, mockContext);
+
+      expect(mockPatch).toHaveBeenCalledWith('https://api.example.com', { 
+        data: { data: "test" },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Custom-Header': 'custom-value'
+        }
+      });
       expect(result.isError).toBe(false);
       expect(result.content[0].text).toContain('PATCH request to');
     });
@@ -203,7 +336,45 @@ describe('API Request Tools', () => {
 
       const result = await deleteRequestTool.execute(args, mockContext);
 
-      expect(mockDelete).toHaveBeenCalledWith('https://api.example.com/1');
+      expect(mockDelete).toHaveBeenCalledWith('https://api.example.com/1', { headers: {} });
+      expect(result.isError).toBe(false);
+      expect(result.content[0].text).toContain('DELETE request to');
+    });
+
+    test('should make a DELETE request with Bearer token', async () => {
+      const args = {
+        url: 'https://api.example.com/1',
+        token: 'test-token'
+      };
+
+      const result = await deleteRequestTool.execute(args, mockContext);
+
+      expect(mockDelete).toHaveBeenCalledWith('https://api.example.com/1', { 
+        headers: {
+          'Authorization': 'Bearer test-token'
+        }
+      });
+      expect(result.isError).toBe(false);
+      expect(result.content[0].text).toContain('DELETE request to');
+    });
+
+    test('should make a DELETE request with custom headers', async () => {
+      const args = {
+        url: 'https://api.example.com/1',
+        headers: {
+          'Authorization': 'Basic YWRtaW46cGFzc3dvcmQxMjM=',
+          'X-Custom-Header': 'custom-value'
+        }
+      };
+
+      const result = await deleteRequestTool.execute(args, mockContext);
+
+      expect(mockDelete).toHaveBeenCalledWith('https://api.example.com/1', { 
+        headers: {
+          'Authorization': 'Basic YWRtaW46cGFzc3dvcmQxMjM=',
+          'X-Custom-Header': 'custom-value'
+        }
+      });
       expect(result.isError).toBe(false);
       expect(result.content[0].text).toContain('DELETE request to');
     });
