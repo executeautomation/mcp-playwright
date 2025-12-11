@@ -97,7 +97,13 @@ export class PutRequestTool extends ApiToolBase {
       }
       
       const response = await apiContext.put(args.url, {
-        data: typeof args.value === 'string' ? JSON.parse(args.value) : args.value,
+        data: typeof args.value === 'string' ? (() => {
+          try {
+            return JSON.parse(args.value);
+          } catch (error) {
+            return args.value; // If parsing fails, use the raw value
+          }
+        })() : args.value,
         headers: {
           'Content-Type': 'application/json',
           ...(args.token ? { 'Authorization': `Bearer ${args.token}` } : {}),
@@ -141,7 +147,13 @@ export class PatchRequestTool extends ApiToolBase {
       }
       
       const response = await apiContext.patch(args.url, {
-        data: typeof args.value === 'string' ? JSON.parse(args.value) : args.value,
+        data: typeof args.value === 'string' ? (() => {
+          try {
+            return JSON.parse(args.value);
+          } catch (error) {
+            return args.value; // If parsing fails, use the raw value
+          }
+        })() : args.value,
         headers: {
           'Content-Type': 'application/json',
           ...(args.token ? { 'Authorization': `Bearer ${args.token}` } : {}),
