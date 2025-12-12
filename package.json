@@ -27,15 +27,15 @@
     "url": "https://github.com/executeautomation/mcp-playwright.git"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "1.11.1",
-    "@playwright/browser-chromium": "1.53.1",
-    "@playwright/browser-firefox": "1.53.1",
-    "@playwright/browser-webkit": "1.53.1",
-    "@playwright/test": "^1.53.1",
+    "@modelcontextprotocol/sdk": "1.24.3",
+    "@playwright/browser-chromium": "1.57.0",
+    "@playwright/browser-firefox": "1.57.0",
+    "@playwright/browser-webkit": "1.57.0",
+    "@playwright/test": "^1.57.0",
     "cors": "^2.8.5",
-    "express": "^4.18.2",
-    "mcp-evals": "^1.0.18",
-    "playwright": "1.53.1",
+    "express": "^5.2.1",
+    "mcp-evals": "^2.0.1",
+    "playwright": "1.57.0",
     "uuid": "11.1.0"
   },
   "keywords": [
