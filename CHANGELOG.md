@@ -24,8 +24,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated @playwright/browser-firefox: 1.53.1 → 1.57.0
   - Updated @playwright/browser-webkit: 1.53.1 → 1.57.0
   - Updated @playwright/test: 1.53.1 → 1.57.0
-  - Updated express: 4.18.2 → 5.2.1 (major update)
+  - Updated express: 4.18.2 → 4.21.1 (patch update for stability)
   - Updated mcp-evals: 1.0.18 → 2.0.1 (major update)
+- **Security Improvement**: Removed `shell: true` from spawn() in browser installation for better security
 - **Enhanced ensureBrowser()**: Wrapped browser launch in try-catch to detect missing executables
 - **Improved Error Messages**: Better error messages when browsers are missing or installation fails
 
