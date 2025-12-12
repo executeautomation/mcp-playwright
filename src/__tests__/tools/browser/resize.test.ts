@@ -31,7 +31,10 @@ describe('ResizeTool', () => {
 
     expect(mockPage.setViewportSize).toHaveBeenCalledWith({ width: 1920, height: 1080 });
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toBe('Browser viewport resized to 1920x1080');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toBe('Browser viewport resized to 1920x1080');
+    }
   });
 
   test('should resize to mobile viewport', async () => {
@@ -40,7 +43,10 @@ describe('ResizeTool', () => {
 
     expect(mockPage.setViewportSize).toHaveBeenCalledWith({ width: 375, height: 667 });
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toBe('Browser viewport resized to 375x667');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toBe('Browser viewport resized to 375x667');
+    }
   });
 
   test('should resize to tablet viewport', async () => {
@@ -49,7 +55,10 @@ describe('ResizeTool', () => {
 
     expect(mockPage.setViewportSize).toHaveBeenCalledWith({ width: 768, height: 1024 });
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toBe('Browser viewport resized to 768x1024');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toBe('Browser viewport resized to 768x1024');
+    }
   });
 
   test('should reject negative width', async () => {
@@ -57,7 +66,10 @@ describe('ResizeTool', () => {
     const result = await resizeTool.execute(args, mockContext);
 
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Width and height must be positive integers');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('Width and height must be positive integers');
+    }
   });
 
   test('should reject negative height', async () => {
@@ -65,7 +77,10 @@ describe('ResizeTool', () => {
     const result = await resizeTool.execute(args, mockContext);
 
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Width and height must be positive integers');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('Width and height must be positive integers');
+    }
   });
 
   test('should reject zero width', async () => {
@@ -73,7 +88,10 @@ describe('ResizeTool', () => {
     const result = await resizeTool.execute(args, mockContext);
 
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Width and height must be positive integers');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('Width and height must be positive integers');
+    }
   });
 
   test('should reject zero height', async () => {
@@ -81,7 +99,10 @@ describe('ResizeTool', () => {
     const result = await resizeTool.execute(args, mockContext);
 
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Width and height must be positive integers');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('Width and height must be positive integers');
+    }
   });
 
   test('should reject dimensions exceeding 8K resolution width', async () => {
@@ -89,7 +110,10 @@ describe('ResizeTool', () => {
     const result = await resizeTool.execute(args, mockContext);
 
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Width and height must not exceed 7680x4320 (8K resolution)');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('Width and height must not exceed 7680x4320 (8K resolution)');
+    }
   });
 
   test('should reject dimensions exceeding 8K resolution height', async () => {
@@ -97,7 +121,10 @@ describe('ResizeTool', () => {
     const result = await resizeTool.execute(args, mockContext);
 
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Width and height must not exceed 7680x4320 (8K resolution)');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('Width and height must not exceed 7680x4320 (8K resolution)');
+    }
   });
 
   test('should accept maximum 8K resolution', async () => {
@@ -106,7 +133,10 @@ describe('ResizeTool', () => {
 
     expect(mockPage.setViewportSize).toHaveBeenCalledWith({ width: 7680, height: 4320 });
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toBe('Browser viewport resized to 7680x4320');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toBe('Browser viewport resized to 7680x4320');
+    }
   });
 
   test('should return error when page is not available', async () => {
@@ -120,7 +150,10 @@ describe('ResizeTool', () => {
     const result = await resizeTool.execute(args, contextWithoutPage);
 
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Browser page not initialized');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('Browser page not initialized');
+    }
   });
 
   test('should handle setViewportSize errors gracefully', async () => {
@@ -130,7 +163,10 @@ describe('ResizeTool', () => {
     const result = await resizeTool.execute(args, mockContext);
 
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Viewport error');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('Viewport error');
+    }
   });
 
   // Device preset tests
@@ -141,8 +177,11 @@ describe('ResizeTool', () => {
     expect(mockPage.setViewportSize).toHaveBeenCalledWith({ width: 390, height: 664 });
     expect(mockPage.setExtraHTTPHeaders).toHaveBeenCalled();
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toContain('iPhone 13');
-    expect(result.content[0].text).toContain('390x664');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('iPhone 13');
+      expect(result.content[0].text).toContain('390x664');
+    }
   });
 
   test('should resize using iPad device preset', async () => {
@@ -152,7 +191,10 @@ describe('ResizeTool', () => {
     expect(mockPage.setViewportSize).toHaveBeenCalled();
     expect(mockPage.setExtraHTTPHeaders).toHaveBeenCalled();
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toContain('iPad Pro 11');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('iPad Pro 11');
+    }
   });
 
   test('should resize using Android device preset', async () => {
@@ -162,7 +204,10 @@ describe('ResizeTool', () => {
     expect(mockPage.setViewportSize).toHaveBeenCalled();
     expect(mockPage.setExtraHTTPHeaders).toHaveBeenCalled();
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toContain('Pixel 5');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('Pixel 5');
+    }
   });
 
   test('should handle device preset with portrait orientation', async () => {
@@ -171,7 +216,10 @@ describe('ResizeTool', () => {
 
     expect(mockPage.setViewportSize).toHaveBeenCalledWith({ width: 390, height: 664 });
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toContain('portrait');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('portrait');
+    }
   });
 
   test('should handle device preset with landscape orientation', async () => {
@@ -181,7 +229,10 @@ describe('ResizeTool', () => {
     // Should swap width and height for landscape
     expect(mockPage.setViewportSize).toHaveBeenCalledWith({ width: 664, height: 390 });
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toContain('landscape');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('landscape');
+    }
   });
 
   test('should return error for invalid device name', async () => {
@@ -189,8 +240,11 @@ describe('ResizeTool', () => {
     const result = await resizeTool.execute(args, mockContext);
 
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Device "InvalidDevice123" not found');
-    expect(result.content[0].text).toContain('Popular devices');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('Device "InvalidDevice123" not found');
+      expect(result.content[0].text).toContain('Popular devices');
+    }
   });
 
   test('should return error when neither device nor dimensions provided', async () => {
@@ -198,7 +252,10 @@ describe('ResizeTool', () => {
     const result = await resizeTool.execute(args, mockContext);
 
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Either 'device' parameter or both 'width' and 'height'");
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain("Either 'device' parameter or both 'width' and 'height'");
+    }
   });
 
   test('should return error when only width provided without device', async () => {
@@ -206,7 +263,10 @@ describe('ResizeTool', () => {
     const result = await resizeTool.execute(args, mockContext);
 
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Either 'device' parameter or both 'width' and 'height'");
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain("Either 'device' parameter or both 'width' and 'height'");
+    }
   });
 
   test('should return error when only height provided without device', async () => {
@@ -214,7 +274,10 @@ describe('ResizeTool', () => {
     const result = await resizeTool.execute(args, mockContext);
 
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Either 'device' parameter or both 'width' and 'height'");
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain("Either 'device' parameter or both 'width' and 'height'");
+    }
   });
 
   test('should include device features in success message', async () => {
@@ -222,8 +285,11 @@ describe('ResizeTool', () => {
     const result = await resizeTool.execute(args, mockContext);
 
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toContain('mobile');
-    expect(result.content[0].text).toContain('touch');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('mobile');
+      expect(result.content[0].text).toContain('touch');
+    }
   });
 
   test('should use Desktop Chrome device preset', async () => {
@@ -232,6 +298,9 @@ describe('ResizeTool', () => {
 
     expect(mockPage.setViewportSize).toHaveBeenCalled();
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toContain('Desktop Chrome');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('Desktop Chrome');
+    }
   });
 });

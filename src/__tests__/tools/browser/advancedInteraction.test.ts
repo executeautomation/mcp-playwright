@@ -90,7 +90,10 @@ describe('Advanced Browser Interaction Tools', () => {
       expect(mockMouseMove).toHaveBeenCalledWith(60, 35); // Target center (same mock values)
       expect(mockMouseUp).toHaveBeenCalled();
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('Dragged element from');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('Dragged element from');
+      }
     });
 
     test('should handle errors when element positions cannot be determined', async () => {
@@ -108,7 +111,10 @@ describe('Advanced Browser Interaction Tools', () => {
       expect(mockBoundingBox).toHaveBeenCalled();
       expect(mockMouseMove).not.toHaveBeenCalled();
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('Could not get element positions');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('Could not get element positions');
+      }
     });
 
     test('should handle drag errors', async () => {
@@ -128,7 +134,10 @@ describe('Advanced Browser Interaction Tools', () => {
       expect(mockMouseMove).toHaveBeenCalled();
       expect(mockMouseDown).toHaveBeenCalled();
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('Operation failed');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('Operation failed');
+      }
     });
 
     test('should handle missing page', async () => {
@@ -141,7 +150,10 @@ describe('Advanced Browser Interaction Tools', () => {
 
       expect(mockWaitForSelector).not.toHaveBeenCalled();
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('Browser page not initialized');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('Browser page not initialized');
+      }
     });
   });
 
@@ -155,7 +167,10 @@ describe('Advanced Browser Interaction Tools', () => {
 
       expect(mockKeyboardPress).toHaveBeenCalledWith('Enter');
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('Pressed key: Enter');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('Pressed key: Enter');
+      }
     });
 
     test('should focus an element before pressing a key if selector provided', async () => {
@@ -170,7 +185,10 @@ describe('Advanced Browser Interaction Tools', () => {
       expect(mockFocus).toHaveBeenCalledWith('#input-field');
       expect(mockKeyboardPress).toHaveBeenCalledWith('Enter');
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('Pressed key: Enter');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('Pressed key: Enter');
+      }
     });
 
     test('should handle key press errors', async () => {
@@ -185,7 +203,10 @@ describe('Advanced Browser Interaction Tools', () => {
 
       expect(mockKeyboardPress).toHaveBeenCalledWith('Enter');
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('Operation failed');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('Operation failed');
+      }
     });
 
     test('should handle missing page', async () => {
@@ -197,7 +218,10 @@ describe('Advanced Browser Interaction Tools', () => {
 
       expect(mockKeyboardPress).not.toHaveBeenCalled();
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('Browser page not initialized');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('Browser page not initialized');
+      }
     });
   });
 }); 

@@ -172,7 +172,10 @@ describe('Tool Handler', () => {
   test('handleToolCall should handle unknown tool', async () => {
     const result = await handleToolCall('unknown_tool', {}, mockServer);
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Unknown tool');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('Unknown tool');
+    }
   });
 
   // In the actual implementation, the tools might succeed or fail depending on how the mocks are set up
@@ -386,9 +389,10 @@ describe('Tool Handler', () => {
     // A more direct test would require exporting ensureBrowser and spying on it.
     // For now, we will just check if the tool call succeeds.
     const result = await handleToolCall('playwright_navigate', { url: 'about:blank' }, mockServer);
-    expect(result.content[0].text).toContain('Navigated to');
-
-    // Clean up
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('Navigated to');
+    }
     delete process.env.CHROME_EXECUTABLE_PATH;
   });
 

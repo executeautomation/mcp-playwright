@@ -4,6 +4,7 @@ import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { BROWSER_TOOLS, API_TOOLS } from './tools.js';
 import type { ToolContext } from './tools/common/types.js';
 import { ActionRecorder } from './tools/codegen/recorder.js';
+import { spawn } from 'child_process';
 import { 
   startCodegenSession,
   endCodegenSession,
@@ -158,6 +159,63 @@ async function registerConsoleMessage(page) {
 }
 
 /**
+ * Attempts to install browsers automatically
+ */
+async function installBrowsers(browserType: string = 'chromium'): Promise<{ success: boolean; message: string }> {
+  return new Promise((resolve) => {
+    console.error(`[Playwright MCP] Attempting to install ${browserType} browser...`);
+    
+    const installProcess = spawn('npx', ['playwright', 'install', browserType], {
+      stdio: ['ignore', 'pipe', 'pipe']
+    });
+
+    let output = '';
+    let errorOutput = '';
+
+    installProcess.stdout?.on('data', (data) => {
+      output += data.toString();
+    });
+
+    installProcess.stderr?.on('data', (data) => {
+      errorOutput += data.toString();
+    });
+
+    installProcess.on('close', (code) => {
+      if (code === 0) {
+        console.error(`[Playwright MCP] Successfully installed ${browserType} browser`);
+        resolve({
+          success: true,
+          message: `Successfully installed ${browserType} browser. Please try your request again.`
+        });
+      } else {
+        console.error(`[Playwright MCP] Failed to install browser: ${errorOutput}`);
+        resolve({
+          success: false,
+          message: `Failed to automatically install ${browserType} browser. Please run: npx playwright install ${browserType}`
+        });
+      }
+    });
+
+    installProcess.on('error', (error) => {
+      console.error(`[Playwright MCP] Error during browser installation: ${error.message}`);
+      resolve({
+        success: false,
+        message: `Error during installation: ${error.message}. Please run: npx playwright install ${browserType}`
+      });
+    });
+
+    // Timeout after 2 minutes
+    setTimeout(() => {
+      installProcess.kill();
+      resolve({
+        success: false,
+        message: `Browser installation timed out. Please run manually: npx playwright install ${browserType}`
+      });
+    }, 120000);
+  });
+}
+
+/**
  * Ensures a browser is launched and returns the page
  */
 export async function ensureBrowser(browserSettings?: BrowserSettings) {
@@ -204,12 +262,36 @@ export async function ensureBrowser(browserSettings?: BrowserSettings) {
       
       const executablePath = process.env.CHROME_EXECUTABLE_PATH;
 
-      browser = await browserInstance.launch({
-        headless,
-        executablePath: executablePath
-      });
-      
-      currentBrowserType = browserType;
+      try {
+        browser = await browserInstance.launch({
+          headless,
+          executablePath: executablePath
+        });
+        
+        currentBrowserType = browserType;
+      } catch (launchError: any) {
+        // Check if error is due to missing browser executable
+        if (launchError.message?.includes("Executable doesn't exist") || 
+            launchError.message?.includes("Failed to launch") ||
+            launchError.message?.includes("browserType.launch")) {
+          
+          console.error(`[Playwright MCP] Browser not found, attempting auto-installation...`);
+          const installResult = await installBrowsers(browserType);
+          
+          if (installResult.success) {
+            // Try launching again after installation
+            browser = await browserInstance.launch({
+              headless,
+              executablePath: executablePath
+            });
+            currentBrowserType = browserType;
+          } else {
+            throw new Error(installResult.message);
+          }
+        } else {
+          throw launchError;
+        }
+      }
 
       // Add cleanup logic when browser is disconnected
       browser.on('disconnected', () => {
@@ -254,6 +336,22 @@ export async function ensureBrowser(browserSettings?: BrowserSettings) {
     }
     
     resetBrowserState();
+    
+    // Check if error is due to missing browser, if so attempt install
+    const errorMessage = (error as Error).message;
+    if (errorMessage?.includes("Executable doesn't exist") || 
+        errorMessage?.includes("Failed to launch") ||
+        errorMessage?.includes("browserType.launch")) {
+      
+      const { browserType = 'chromium' } = browserSettings ?? {};
+      console.error(`[Playwright MCP] Browser not found in retry, attempting auto-installation...`);
+      const installResult = await installBrowsers(browserType);
+      
+      if (!installResult.success) {
+        throw new Error(installResult.message);
+      }
+      // If installation successful, continue to retry
+    }
     
     // Try one more time from scratch
     const { viewport, userAgent, headless = false, browserType = 'chromium' } = browserSettings ?? {};

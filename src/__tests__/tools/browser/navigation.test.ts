@@ -52,7 +52,10 @@ describe('NavigationTool', () => {
 
     expect(mockGoto).toHaveBeenCalledWith('https://example.com', { waitUntil: 'networkidle', timeout: 30000 });
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toContain('Navigated to');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('Navigated to');
+    }
   });
 
   test('should handle navigation with specific browser type', async () => {
@@ -66,7 +69,10 @@ describe('NavigationTool', () => {
 
     expect(mockGoto).toHaveBeenCalledWith('https://example.com', { waitUntil: 'networkidle', timeout: 30000 });
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toContain('Navigated to');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('Navigated to');
+    }
   });
 
   test('should handle navigation with webkit browser type', async () => {
@@ -79,7 +85,10 @@ describe('NavigationTool', () => {
 
     expect(mockGoto).toHaveBeenCalledWith('https://example.com', { waitUntil: 'load', timeout: 30000 });
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toContain('Navigated to');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('Navigated to');
+    }
   });
 
   test('should handle navigation errors', async () => {
@@ -94,7 +103,10 @@ describe('NavigationTool', () => {
 
     expect(mockGoto).toHaveBeenCalledWith('https://example.com', { waitUntil: 'load', timeout: 30000 });
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Operation failed');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('Operation failed');
+    }
   });
 
   test('should handle missing page', async () => {
@@ -112,7 +124,10 @@ describe('NavigationTool', () => {
 
     expect(mockGoto).not.toHaveBeenCalled();
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Page is not available');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('Page is not available');
+    }
   });
   
   test('should handle disconnected browser', async () => {
@@ -127,7 +142,10 @@ describe('NavigationTool', () => {
     
     expect(mockGoto).not.toHaveBeenCalled();
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Browser is not connected');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('Browser is not connected');
+    }
   });
   
   test('should handle closed page', async () => {
@@ -142,6 +160,9 @@ describe('NavigationTool', () => {
     
     expect(mockGoto).not.toHaveBeenCalled();
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Page is not available or has been closed');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('Page is not available or has been closed');
+    }
   });
 }); 

@@ -126,7 +126,10 @@ describe('Browser Interaction Tools', () => {
       // The actual implementation uses page.click directly, not locator
       expect(mockPageClick).toHaveBeenCalledWith('#test-button');
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('Clicked element');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('Clicked element');
+      }
     });
 
     test('should handle click errors', async () => {
@@ -141,7 +144,10 @@ describe('Browser Interaction Tools', () => {
 
       expect(mockPageClick).toHaveBeenCalledWith('#test-button');
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('Operation failed');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('Operation failed');
+      }
     });
 
     test('should handle missing page', async () => {
@@ -153,7 +159,10 @@ describe('Browser Interaction Tools', () => {
 
       expect(mockPageClick).not.toHaveBeenCalled();
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('Browser page not initialized');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('Browser page not initialized');
+      }
     });
   });
 
@@ -169,8 +178,11 @@ describe('Browser Interaction Tools', () => {
       expect(mockWaitForEvent).toHaveBeenCalledWith('page');
       expect(mockWaitForLoadState).toHaveBeenCalledWith('domcontentloaded');
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('Clicked link and switched to new tab');
-      expect(result.content[0].text).toContain('https://example.com');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('Clicked link and switched to new tab');
+        expect(result.content[0].text).toContain('https://example.com');
+      }
     });
   
     test('should handle errors during click', async () => {
@@ -185,7 +197,10 @@ describe('Browser Interaction Tools', () => {
   
       expect(mockPageClick).toHaveBeenCalledWith('a#test-link');
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('Operation failed');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('Operation failed');
+      }
     });
   
     test('should handle errors during new tab opening', async () => {
@@ -201,7 +216,10 @@ describe('Browser Interaction Tools', () => {
       expect(mockPageClick).toHaveBeenCalledWith('a#test-link');
       expect(mockWaitForEvent).toHaveBeenCalledWith('page');
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('Operation failed');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('Operation failed');
+      }
     });
   
     test('should handle missing page in context', async () => {
@@ -213,7 +231,10 @@ describe('Browser Interaction Tools', () => {
   
       expect(mockPageClick).not.toHaveBeenCalled();
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('Browser page not initialized');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('Browser page not initialized');
+      }
     });
   });
 
@@ -231,7 +252,10 @@ describe('Browser Interaction Tools', () => {
       expect(mockIframeLocator).toHaveBeenCalledWith('#test-button');
       expect(mockLocatorClick).toHaveBeenCalled();
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('Clicked element');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('Clicked element');
+      }
     });
   });
 
@@ -247,7 +271,10 @@ describe('Browser Interaction Tools', () => {
       expect(mockPageWaitForSelector).toHaveBeenCalledWith('#test-input');
       expect(mockPageFill).toHaveBeenCalledWith('#test-input', 'test value');
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('Filled');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('Filled');
+      }
     });
   });
 
@@ -263,7 +290,10 @@ describe('Browser Interaction Tools', () => {
       expect(mockPageWaitForSelector).toHaveBeenCalledWith('#test-select');
       expect(mockPageSelectOption).toHaveBeenCalledWith('#test-select', 'option1');
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('Selected');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('Selected');
+      }
     });
   });
 
@@ -278,7 +308,10 @@ describe('Browser Interaction Tools', () => {
       expect(mockPageWaitForSelector).toHaveBeenCalledWith('#test-element');
       expect(mockPageHover).toHaveBeenCalledWith('#test-element');
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('Hovered');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('Hovered');
+      }
     });
   });
 
@@ -294,7 +327,10 @@ describe('Browser Interaction Tools', () => {
       expect(mockPageWaitForSelector).toHaveBeenCalledWith('#file-input');
       expect(mockPageSetInputFiles).toHaveBeenCalledWith('#file-input', '/tmp/testfile.txt');
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain("Uploaded file '/tmp/testfile.txt' to '#file-input'");
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain("Uploaded file '/tmp/testfile.txt' to '#file-input'");
+      }
     });
   });
 
@@ -308,7 +344,10 @@ describe('Browser Interaction Tools', () => {
 
       expect(mockEvaluate).toHaveBeenCalledWith('return document.title');
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('Executed JavaScript');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('Executed JavaScript');
+      }
     });
   });
 });
@@ -334,7 +373,10 @@ describe('NavigationTool', () => {
 
     expect(mockGoto).toHaveBeenCalledWith('https://example.com', { waitUntil: 'networkidle', timeout: 30000 });
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toContain('Navigated to');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('Navigated to');
+    }
   });
 
   test('should handle navigation errors', async () => {
@@ -349,7 +391,10 @@ describe('NavigationTool', () => {
 
     expect(mockGoto).toHaveBeenCalledWith('https://example.com', { waitUntil: 'load', timeout: 30000 });
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Operation failed');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('Operation failed');
+    }
   });
 
   test('should handle missing page', async () => {
@@ -367,7 +412,10 @@ describe('NavigationTool', () => {
 
     expect(mockGoto).not.toHaveBeenCalled();
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Page is not available');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('Page is not available');
+    }
   });
   
   test('should handle disconnected browser', async () => {
@@ -382,7 +430,10 @@ describe('NavigationTool', () => {
     
     expect(mockGoto).not.toHaveBeenCalled();
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Browser is not connected');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('Browser is not connected');
+    }
   });
   
   test('should handle closed page', async () => {
@@ -397,6 +448,9 @@ describe('NavigationTool', () => {
     
     expect(mockGoto).not.toHaveBeenCalled();
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Page is not available or has been closed');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('Page is not available or has been closed');
+    }
   });
 });

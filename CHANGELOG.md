@@ -5,6 +5,42 @@ All notable changes to the Playwright MCP Server will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.12] - 2025-12-12
+
+### Added
+- **Automatic Browser Installation**: Server now automatically detects and installs missing browser binaries on first use
+- **Smart Browser Detection**: Detects when Chromium, Firefox, or WebKit executables are missing during launch
+- **Auto-Install Function**: Added `installBrowsers()` function that runs `npx playwright install <browser>` automatically
+- **Installation Progress**: Clear console messages showing installation progress and status
+- **Error Recovery**: Graceful fallback with helpful manual installation instructions if auto-install fails
+- **Timeout Protection**: 2-minute timeout for browser installation process
+- **Browser Installation Documentation**: Updated README.md with automatic installation section and browser storage locations
+
+### Changed
+- **Package Updates**:
+  - Updated @modelcontextprotocol/sdk: 1.11.1 → 1.24.3 (major update)
+  - Updated playwright: 1.53.1 → 1.57.0
+  - Updated @playwright/browser-chromium: 1.53.1 → 1.57.0
+  - Updated @playwright/browser-firefox: 1.53.1 → 1.57.0
+  - Updated @playwright/browser-webkit: 1.53.1 → 1.57.0
+  - Updated @playwright/test: 1.53.1 → 1.57.0
+  - Updated express: 4.18.2 → 4.21.1 (patch update for stability)
+  - Updated mcp-evals: 1.0.18 → 2.0.1 (major update)
+- **Security Improvement**: Removed `shell: true` from spawn() in browser installation for better security
+- **Enhanced ensureBrowser()**: Wrapped browser launch in try-catch to detect missing executables
+- **Improved Error Messages**: Better error messages when browsers are missing or installation fails
+
+### Fixed
+- **"Executable doesn't exist" Error**: Users no longer need to manually run `npx playwright install` before first use
+- **First-Run Experience**: Server now works out of the box without any manual browser setup
+
+### Technical Details
+- All 150 tests passing with updated packages
+- Zero configuration required - fully automatic browser installation
+- Backward compatible - no breaking changes
+- Installation attempt triggers on any "Executable doesn't exist" or "Failed to launch" errors
+- Browser installation attempts in both initial launch and retry scenarios
+
 ## [1.0.11] - 2025-12-11
 
 ### Added

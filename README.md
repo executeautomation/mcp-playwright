@@ -116,6 +116,39 @@ code-insiders --add-mcp '{"name":"playwright","command":"npx","args":["@executea
 
 After installation, the ExecuteAutomation Playwright MCP server will be available for use with your GitHub Copilot agent in VS Code.
 
+## Browser Installation
+
+### Automatic Installation (Recommended)
+
+The Playwright MCP Server **automatically installs browser binaries** when you first use it. When the server detects that a browser is missing, it will:
+
+1. Automatically download and install the required browser (Chromium, Firefox, or WebKit)
+2. Display installation progress in the console
+3. Retry your request once installation completes
+
+**No manual setup required!** Just start using the server, and it handles browser installation for you.
+
+### Manual Installation (Optional)
+
+If you prefer to install browsers manually or encounter any issues with automatic installation:
+
+```bash
+# Install all browsers
+npx playwright install
+
+# Or install specific browsers
+npx playwright install chromium
+npx playwright install firefox
+npx playwright install webkit
+```
+
+### Browser Storage Location
+
+Browsers are installed to:
+- **Windows:** `%USERPROFILE%\AppData\Local\ms-playwright`
+- **macOS:** `~/Library/Caches/ms-playwright`
+- **Linux:** `~/.cache/ms-playwright`
+
 ## Configuration to use Playwright Server
 
 ### Standard Mode (stdio)
