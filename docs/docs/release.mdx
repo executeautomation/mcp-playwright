@@ -5,6 +5,25 @@ import YouTubeVideoEmbed from '@site/src/components/HomepageFeatures/YouTubeVide
 
 # Release Notes
 
+## Version 1.0.12 (December 2025)
+- **Automatic Browser Installation**: No more manual setup required! The server now automatically detects and installs missing browsers
+  ```bash
+  # Just run the server - browsers install automatically on first use
+  npx @executeautomation/playwright-mcp-server
+  ```
+- **Smart Browser Detection**: Automatically detects when Chromium, Firefox, or WebKit browsers are missing
+- **Auto-Install Process**: Runs `npx playwright install <browser>` automatically when needed
+- **Better User Experience**: Clear progress messages and helpful error messages if auto-install fails
+- **Zero Configuration**: Works out of the box without running `npx playwright install` manually
+- **Package Updates**: 
+  - Updated @modelcontextprotocol/sdk: 1.11.1 → 1.24.3
+  - Updated Playwright packages: 1.53.1 → 1.57.0
+  - Updated express: 4.18.2 → 5.2.1
+  - Updated mcp-evals: 1.0.18 → 2.0.1
+- **Test Coverage**: All 150 tests passing with no breaking changes
+
+---
+
 ## Version 1.0.11 (December 2025)
 - **Enhanced API Authentication**: Added Bearer token authentication support for all API methods (GET, POST, PUT, PATCH, DELETE)
   ```javascript
