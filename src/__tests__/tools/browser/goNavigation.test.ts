@@ -54,7 +54,10 @@ describe('Browser Navigation History Tools', () => {
 
       expect(mockGoBack).toHaveBeenCalled();
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('Navigated back');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('Navigated back');
+      }
     });
 
     test('should handle navigation back errors', async () => {
@@ -67,7 +70,10 @@ describe('Browser Navigation History Tools', () => {
 
       expect(mockGoBack).toHaveBeenCalled();
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('Operation failed');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('Operation failed');
+      }
     });
 
     test('should handle missing page', async () => {
@@ -77,7 +83,10 @@ describe('Browser Navigation History Tools', () => {
 
       expect(mockGoBack).not.toHaveBeenCalled();
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('Browser page not initialized');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('Browser page not initialized');
+      }
     });
   });
 
@@ -89,7 +98,10 @@ describe('Browser Navigation History Tools', () => {
 
       expect(mockGoForward).toHaveBeenCalled();
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('Navigated forward');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('Navigated forward');
+      }
     });
 
     test('should handle navigation forward errors', async () => {
@@ -102,7 +114,10 @@ describe('Browser Navigation History Tools', () => {
 
       expect(mockGoForward).toHaveBeenCalled();
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('Operation failed');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('Operation failed');
+      }
     });
 
     test('should handle missing page', async () => {
@@ -112,7 +127,10 @@ describe('Browser Navigation History Tools', () => {
 
       expect(mockGoForward).not.toHaveBeenCalled();
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('Browser page not initialized');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('Browser page not initialized');
+      }
     });
   });
 }); 

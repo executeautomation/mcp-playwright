@@ -166,8 +166,7 @@ async function installBrowsers(browserType: string = 'chromium'): Promise<{ succ
     console.error(`[Playwright MCP] Attempting to install ${browserType} browser...`);
     
     const installProcess = spawn('npx', ['playwright', 'install', browserType], {
-      stdio: ['ignore', 'pipe', 'pipe'],
-      shell: true
+      stdio: ['ignore', 'pipe', 'pipe']
     });
 
     let output = '';

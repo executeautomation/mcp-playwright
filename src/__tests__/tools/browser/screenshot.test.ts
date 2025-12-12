@@ -92,7 +92,10 @@ describe('ScreenshotTool', () => {
     
     // Check that the result contains success message
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toContain('Screenshot saved to');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('Screenshot saved to');
+    }
   });
 
   test('should handle element screenshot', async () => {
@@ -109,7 +112,10 @@ describe('ScreenshotTool', () => {
 
     // Check that the result contains success message
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toContain('Screenshot saved to');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('Screenshot saved to');
+    }
   });
 
   test('should handle screenshot errors', async () => {
@@ -124,7 +130,10 @@ describe('ScreenshotTool', () => {
 
     expect(mockScreenshot).toHaveBeenCalled();
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Operation failed');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('Operation failed');
+    }
   });
 
   test('should handle missing page', async () => {
@@ -142,7 +151,10 @@ describe('ScreenshotTool', () => {
 
     expect(mockScreenshot).not.toHaveBeenCalled();
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('Browser page not initialized');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('Browser page not initialized');
+    }
   });
 
   test('should store screenshots in a map', async () => {
@@ -173,6 +185,9 @@ describe('ScreenshotTool', () => {
     
     expect(mockScreenshot).toHaveBeenCalled();
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toContain('Screenshot saved to');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('Screenshot saved to');
+    }
   });
 }); 

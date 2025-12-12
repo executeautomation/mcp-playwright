@@ -33,7 +33,7 @@
     "@playwright/browser-webkit": "1.57.0",
     "@playwright/test": "^1.57.0",
     "cors": "^2.8.5",
-    "express": "^5.2.1",
+    "express": "^4.21.1",
     "mcp-evals": "^2.0.1",
     "playwright": "1.57.0",
     "uuid": "11.1.0"
