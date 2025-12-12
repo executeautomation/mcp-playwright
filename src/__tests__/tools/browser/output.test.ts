@@ -68,7 +68,10 @@ describe('Browser Output Tools', () => {
         }
       });
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('Saved page as PDF');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('Saved page as PDF');
+      }
     });
 
     test('should save page as PDF with custom options', async () => {
@@ -99,7 +102,10 @@ describe('Browser Output Tools', () => {
         }
       });
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('Saved page as PDF');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('Saved page as PDF');
+      }
     });
 
     test('should handle PDF generation errors', async () => {
@@ -114,7 +120,10 @@ describe('Browser Output Tools', () => {
 
       expect(mockPdf).toHaveBeenCalled();
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('Operation failed');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('Operation failed');
+      }
     });
 
     test('should handle missing page', async () => {
@@ -126,7 +135,10 @@ describe('Browser Output Tools', () => {
 
       expect(mockPdf).not.toHaveBeenCalled();
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('Browser page not initialized');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('Browser page not initialized');
+      }
     });
   });
 }); 
