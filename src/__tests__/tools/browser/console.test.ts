@@ -44,10 +44,16 @@ describe('ConsoleLogsTool', () => {
     const result = await consoleLogsTool.execute(args, mockContext);
 
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toContain('Retrieved 1 console log(s)');
-    expect(result.content[1].text).toContain('Test error message');
-    expect(result.content[1].text).not.toContain('Test log message');
-    expect(result.content[1].text).not.toContain('Test warning message');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('Retrieved 1 console log(s)');
+    }
+    expect(result.content[1].type).toBe('text');
+    if (result.content[1].type === 'text') {
+      expect(result.content[1].text).toContain('Test error message');
+      expect(result.content[1].text).not.toContain('Test log message');
+      expect(result.content[1].text).not.toContain('Test warning message');
+    }
   });
 
   test('should retrieve console logs with search filter', async () => {
@@ -62,10 +68,16 @@ describe('ConsoleLogsTool', () => {
     const result = await consoleLogsTool.execute(args, mockContext);
 
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toContain('Retrieved 1 console log(s)');
-    expect(result.content[1].text).toContain('Test error with [special] characters');
-    expect(result.content[1].text).not.toContain('Test log message');
-    expect(result.content[1].text).not.toContain('Another warning message');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('Retrieved 1 console log(s)');
+    }
+    expect(result.content[1].type).toBe('text');
+    if (result.content[1].type === 'text') {
+      expect(result.content[1].text).toContain('Test error with [special] characters');
+      expect(result.content[1].text).not.toContain('Test log message');
+      expect(result.content[1].text).not.toContain('Another warning message');
+    }
   });
 
   test('should retrieve console logs with limit', async () => {
@@ -80,12 +92,14 @@ describe('ConsoleLogsTool', () => {
     const result = await consoleLogsTool.execute(args, mockContext);
 
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toContain('Retrieved 5 console log(s)');
-    
-    // The actual implementation might only show the first log in the content
-    // Just verify that at least one log message is present
-    const logText = result.content[1].text as string;
-    expect(logText).toContain('Test log message');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('Retrieved 5 console log(s)');
+    }
+    expect(result.content[1].type).toBe('text');
+    if (result.content[1].type === 'text') {
+      expect(result.content[1].text).toContain('Test log message');
+    }
   });
 
   test('should clear console logs when requested', async () => {
@@ -99,9 +113,10 @@ describe('ConsoleLogsTool', () => {
     const result = await consoleLogsTool.execute(args, mockContext);
 
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toContain('Retrieved 2 console log(s)');
-    
-    // Logs should be cleared after retrieval
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('Retrieved 2 console log(s)');
+    }
     const logs = consoleLogsTool.getConsoleLogs();
     expect(logs.length).toBe(0);
   });
@@ -112,6 +127,9 @@ describe('ConsoleLogsTool', () => {
     const result = await consoleLogsTool.execute(args, mockContext);
 
     expect(result.isError).toBe(false);
-    expect(result.content[0].text).toContain('No console logs matching the criteria');
+    expect(result.content[0].type).toBe('text');
+    if (result.content[0].type === 'text') {
+      expect(result.content[0].text).toContain('No console logs matching the criteria');
+    }
   });
 }); 
