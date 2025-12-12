@@ -70,7 +70,10 @@ describe('API Request Tools', () => {
 
       expect(mockGet).toHaveBeenCalledWith('https://api.example.com', { headers: {} });
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('GET request to');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('GET request to');
+      }
     });
 
     test('should make a GET request with Bearer token', async () => {
@@ -87,7 +90,10 @@ describe('API Request Tools', () => {
         }
       });
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('GET request to');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('GET request to');
+      }
     });
 
     test('should make a GET request with custom headers', async () => {
@@ -108,7 +114,10 @@ describe('API Request Tools', () => {
         }
       });
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('GET request to');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('GET request to');
+      }
     });
 
     test('should handle GET request errors', async () => {
@@ -122,7 +131,10 @@ describe('API Request Tools', () => {
       const result = await getRequestTool.execute(args, mockContext);
 
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('API operation failed');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('API operation failed');
+      }
     });
 
     test('should handle missing API context', async () => {
@@ -134,7 +146,10 @@ describe('API Request Tools', () => {
 
       expect(mockGet).not.toHaveBeenCalled();
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain('API context not initialized');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('API context not initialized');
+      }
     });
   });
 
@@ -154,7 +169,10 @@ describe('API Request Tools', () => {
         }
       });
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('POST request to');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('POST request to');
+      }
     });
 
     test('should make a POST request with Bearer token', async () => {
@@ -174,7 +192,10 @@ describe('API Request Tools', () => {
         }
       });
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('POST request to');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('POST request to');
+      }
     });
 
     test('should make a POST request with Bearer token and custom headers', async () => {
@@ -198,7 +219,10 @@ describe('API Request Tools', () => {
         }
       });
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('POST request to');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('POST request to');
+      }
     });
   });
 
@@ -218,7 +242,10 @@ describe('API Request Tools', () => {
         }
       });
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('PUT request to');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('PUT request to');
+      }
     });
 
     test('should make a PUT request with Bearer token', async () => {
@@ -238,7 +265,10 @@ describe('API Request Tools', () => {
         }
       });
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('PUT request to');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('PUT request to');
+      }
     });
 
     test('should make a PUT request with custom headers including Basic auth', async () => {
@@ -262,7 +292,10 @@ describe('API Request Tools', () => {
         }
       });
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('PUT request to');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('PUT request to');
+      }
     });
   });
 
@@ -282,7 +315,10 @@ describe('API Request Tools', () => {
         }
       });
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('PATCH request to');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('PATCH request to');
+      }
     });
 
     test('should make a PATCH request with Bearer token', async () => {
@@ -302,7 +338,10 @@ describe('API Request Tools', () => {
         }
       });
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('PATCH request to');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('PATCH request to');
+      }
     });
 
     test('should make a PATCH request with custom headers', async () => {
@@ -324,7 +363,10 @@ describe('API Request Tools', () => {
         }
       });
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('PATCH request to');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('PATCH request to');
+      }
     });
   });
 
@@ -338,7 +380,10 @@ describe('API Request Tools', () => {
 
       expect(mockDelete).toHaveBeenCalledWith('https://api.example.com/1', { headers: {} });
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('DELETE request to');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('DELETE request to');
+      }
     });
 
     test('should make a DELETE request with Bearer token', async () => {
@@ -355,7 +400,10 @@ describe('API Request Tools', () => {
         }
       });
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('DELETE request to');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('DELETE request to');
+      }
     });
 
     test('should make a DELETE request with custom headers', async () => {
@@ -376,7 +424,10 @@ describe('API Request Tools', () => {
         }
       });
       expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('DELETE request to');
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain('DELETE request to');
+      }
     });
   });
 
@@ -393,7 +444,10 @@ describe('API Request Tools', () => {
       const result = await getRequestTool.execute(args, mockContext);
 
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain("Header 'Invalid-Header' must be a string");
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain("Header 'Invalid-Header' must be a string");
+      }
     });
 
     test('should warn when both token and Authorization header provided (GET)', async () => {
@@ -502,7 +556,10 @@ describe('API Request Tools', () => {
       const result = await putRequestTool.execute(args, mockContext);
 
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain("Header 'Invalid' must be a string");
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain("Header 'Invalid' must be a string");
+      }
     });
 
     test('should validate headers in PATCH request', async () => {
@@ -518,7 +575,10 @@ describe('API Request Tools', () => {
       const result = await patchRequestTool.execute(args, mockContext);
 
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain("Header 'Invalid' must be a string");
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain("Header 'Invalid' must be a string");
+      }
     });
 
     test('should validate headers in DELETE request', async () => {
@@ -532,7 +592,10 @@ describe('API Request Tools', () => {
       const result = await deleteRequestTool.execute(args, mockContext);
 
       expect(result.isError).toBe(true);
-      expect(result.content[0].text).toContain("Header 'Array-Header' must be a string");
+      expect(result.content[0].type).toBe('text');
+      if (result.content[0].type === 'text') {
+        expect(result.content[0].text).toContain("Header 'Array-Header' must be a string");
+      }
     });
   });
 }); 
