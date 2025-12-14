@@ -324,7 +324,7 @@ describe('Browser Interaction Tools', () => {
 
       const result = await uploadFileTool.execute(args, mockContext);
 
-      expect(mockPageWaitForSelector).toHaveBeenCalledWith('#file-input');
+      expect(mockPageWaitForSelector).toHaveBeenCalledWith('#file-input', {"state": "attached"});
       expect(mockPageSetInputFiles).toHaveBeenCalledWith('#file-input', '/tmp/testfile.txt');
       expect(result.isError).toBe(false);
       expect(result.content[0].type).toBe('text');
