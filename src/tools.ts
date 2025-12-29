@@ -14,23 +14,29 @@ export function createToolDefinitions() {
             type: "object",
             description: "Code generation options",
             properties: {
-              outputPath: { 
-                type: "string", 
-                description: "Directory path where generated tests will be saved (use absolute path)" 
+              outputPath: {
+                type: "string",
+                description: "Directory path where generated tests will be saved (use absolute path)"
               },
-              testNamePrefix: { 
-                type: "string", 
-                description: "Prefix to use for generated test names (default: 'GeneratedTest')" 
+              testNamePrefix: {
+                type: "string",
+                description: "Prefix to use for generated test names (default: 'GeneratedTest')"
               },
-              includeComments: { 
-                type: "boolean", 
-                description: "Whether to include descriptive comments in generated tests" 
+              includeComments: {
+                type: "boolean",
+                description: "Whether to include descriptive comments in generated tests"
               }
             },
             required: ["outputPath"]
           }
         },
         required: ["options"]
+      },
+      annotations: {
+        title: "Start Codegen Session",
+        readOnlyHint: false,
+        destructiveHint: false,
+        openWorldHint: true,
       }
     },
     {
@@ -39,12 +45,18 @@ export function createToolDefinitions() {
       inputSchema: {
         type: "object",
         properties: {
-          sessionId: { 
-            type: "string", 
-            description: "ID of the session to end" 
+          sessionId: {
+            type: "string",
+            description: "ID of the session to end"
           }
         },
         required: ["sessionId"]
+      },
+      annotations: {
+        title: "End Codegen Session",
+        readOnlyHint: false,
+        destructiveHint: false,
+        openWorldHint: true,
       }
     },
     {
@@ -53,12 +65,18 @@ export function createToolDefinitions() {
       inputSchema: {
         type: "object",
         properties: {
-          sessionId: { 
-            type: "string", 
-            description: "ID of the session to retrieve" 
+          sessionId: {
+            type: "string",
+            description: "ID of the session to retrieve"
           }
         },
         required: ["sessionId"]
+      },
+      annotations: {
+        title: "Get Codegen Session",
+        readOnlyHint: true,
+        destructiveHint: false,
+        openWorldHint: true,
       }
     },
     {
@@ -67,12 +85,18 @@ export function createToolDefinitions() {
       inputSchema: {
         type: "object",
         properties: {
-          sessionId: { 
-            type: "string", 
-            description: "ID of the session to clear" 
+          sessionId: {
+            type: "string",
+            description: "ID of the session to clear"
           }
         },
         required: ["sessionId"]
+      },
+      annotations: {
+        title: "Clear Codegen Session",
+        readOnlyHint: false,
+        destructiveHint: true,
+        openWorldHint: true,
       }
     },
     {
@@ -91,6 +115,12 @@ export function createToolDefinitions() {
         },
         required: ["url"],
       },
+      annotations: {
+        title: "Navigate to URL",
+        readOnlyHint: false,
+        destructiveHint: false,
+        openWorldHint: true,
+      }
     },
     {
       name: "playwright_screenshot",
@@ -109,6 +139,12 @@ export function createToolDefinitions() {
         },
         required: ["name"],
       },
+      annotations: {
+        title: "Take Screenshot",
+        readOnlyHint: true,
+        destructiveHint: false,
+        openWorldHint: true,
+      }
     },
     {
       name: "playwright_click",
@@ -120,6 +156,12 @@ export function createToolDefinitions() {
         },
         required: ["selector"],
       },
+      annotations: {
+        title: "Click Element",
+        readOnlyHint: false,
+        destructiveHint: true,
+        openWorldHint: true,
+      }
     },
     {
       name: "playwright_iframe_click",
@@ -132,6 +174,12 @@ export function createToolDefinitions() {
         },
         required: ["iframeSelector", "selector"],
       },
+      annotations: {
+        title: "Click in Iframe",
+        readOnlyHint: false,
+        destructiveHint: true,
+        openWorldHint: true,
+      }
     },
     {
       name: "playwright_iframe_fill",
@@ -145,6 +193,12 @@ export function createToolDefinitions() {
         },
         required: ["iframeSelector", "selector", "value"],
       },
+      annotations: {
+        title: "Fill in Iframe",
+        readOnlyHint: false,
+        destructiveHint: true,
+        openWorldHint: true,
+      }
     },
     {
       name: "playwright_fill",
@@ -157,6 +211,12 @@ export function createToolDefinitions() {
         },
         required: ["selector", "value"],
       },
+      annotations: {
+        title: "Fill Input Field",
+        readOnlyHint: false,
+        destructiveHint: true,
+        openWorldHint: true,
+      }
     },
     {
       name: "playwright_select",
@@ -169,6 +229,12 @@ export function createToolDefinitions() {
         },
         required: ["selector", "value"],
       },
+      annotations: {
+        title: "Select Option",
+        readOnlyHint: false,
+        destructiveHint: true,
+        openWorldHint: true,
+      }
     },
     {
       name: "playwright_hover",
@@ -180,6 +246,12 @@ export function createToolDefinitions() {
         },
         required: ["selector"],
       },
+      annotations: {
+        title: "Hover Element",
+        readOnlyHint: false,
+        destructiveHint: false,
+        openWorldHint: true,
+      }
     },
     {
       name: "playwright_upload_file",
@@ -192,6 +264,12 @@ export function createToolDefinitions() {
         },
         required: ["selector", "filePath"],
       },
+      annotations: {
+        title: "Upload File",
+        readOnlyHint: false,
+        destructiveHint: true,
+        openWorldHint: true,
+      }
     },
     {
       name: "playwright_evaluate",
@@ -203,6 +281,12 @@ export function createToolDefinitions() {
         },
         required: ["script"],
       },
+      annotations: {
+        title: "Execute JavaScript",
+        readOnlyHint: false,
+        destructiveHint: true,
+        openWorldHint: true,
+      }
     },
     {
       name: "playwright_console_logs",
@@ -230,6 +314,12 @@ export function createToolDefinitions() {
         },
         required: [],
       },
+      annotations: {
+        title: "Get Console Logs",
+        readOnlyHint: true,
+        destructiveHint: false,
+        openWorldHint: true,
+      }
     },
     {
       name: "playwright_resize",
@@ -237,17 +327,17 @@ export function createToolDefinitions() {
       inputSchema: {
         type: "object",
         properties: {
-          device: { 
-            type: "string", 
-            description: "Device preset name (e.g., 'iPhone 13', 'iPad Pro 11', 'Pixel 7', 'Galaxy S24', 'Desktop Chrome'). Automatically configures viewport, user-agent, and device capabilities. Use playwright.devices to see all available devices." 
+          device: {
+            type: "string",
+            description: "Device preset name (e.g., 'iPhone 13', 'iPad Pro 11', 'Pixel 7', 'Galaxy S24', 'Desktop Chrome'). Automatically configures viewport, user-agent, and device capabilities. Use playwright.devices to see all available devices."
           },
-          width: { 
-            type: "number", 
-            description: "Viewport width in pixels (for manual resize without device preset)" 
+          width: {
+            type: "number",
+            description: "Viewport width in pixels (for manual resize without device preset)"
           },
-          height: { 
-            type: "number", 
-            description: "Viewport height in pixels (for manual resize without device preset)" 
+          height: {
+            type: "number",
+            description: "Viewport height in pixels (for manual resize without device preset)"
           },
           orientation: {
             type: "string",
@@ -257,6 +347,12 @@ export function createToolDefinitions() {
         },
         required: [],
       },
+      annotations: {
+        title: "Resize Viewport",
+        readOnlyHint: false,
+        destructiveHint: false,
+        openWorldHint: true,
+      }
     },
     {
       name: "playwright_close",
@@ -266,6 +362,12 @@ export function createToolDefinitions() {
         properties: {},
         required: [],
       },
+      annotations: {
+        title: "Close Browser",
+        readOnlyHint: false,
+        destructiveHint: true,
+        openWorldHint: true,
+      }
     },
     {
       name: "playwright_get",
@@ -275,14 +377,20 @@ export function createToolDefinitions() {
         properties: {
           url: { type: "string", description: "URL to perform GET operation" },
           token: { type: "string", description: "Bearer token for authorization" },
-          headers: { 
-            type: "object", 
+          headers: {
+            type: "object",
             description: "Additional headers to include in the request",
             additionalProperties: { type: "string" }
           }
         },
         required: ["url"],
       },
+      annotations: {
+        title: "HTTP GET Request",
+        readOnlyHint: true,
+        destructiveHint: false,
+        openWorldHint: true,
+      }
     },
     {
       name: "playwright_post",
@@ -293,14 +401,20 @@ export function createToolDefinitions() {
           url: { type: "string", description: "URL to perform POST operation" },
           value: { type: "string", description: "Data to post in the body" },
           token: { type: "string", description: "Bearer token for authorization" },
-          headers: { 
-            type: "object", 
+          headers: {
+            type: "object",
             description: "Additional headers to include in the request",
             additionalProperties: { type: "string" }
           }
         },
         required: ["url", "value"],
       },
+      annotations: {
+        title: "HTTP POST Request",
+        readOnlyHint: false,
+        destructiveHint: true,
+        openWorldHint: true,
+      }
     },
     {
       name: "playwright_put",
@@ -311,14 +425,20 @@ export function createToolDefinitions() {
           url: { type: "string", description: "URL to perform PUT operation" },
           value: { type: "string", description: "Data to PUT in the body" },
           token: { type: "string", description: "Bearer token for authorization" },
-          headers: { 
-            type: "object", 
+          headers: {
+            type: "object",
             description: "Additional headers to include in the request",
             additionalProperties: { type: "string" }
           }
         },
         required: ["url", "value"],
       },
+      annotations: {
+        title: "HTTP PUT Request",
+        readOnlyHint: false,
+        destructiveHint: true,
+        openWorldHint: true,
+      }
     },
     {
       name: "playwright_patch",
@@ -329,14 +449,20 @@ export function createToolDefinitions() {
           url: { type: "string", description: "URL to perform PATCH operation" },
           value: { type: "string", description: "Data to PATCH in the body" },
           token: { type: "string", description: "Bearer token for authorization" },
-          headers: { 
-            type: "object", 
+          headers: {
+            type: "object",
             description: "Additional headers to include in the request",
             additionalProperties: { type: "string" }
           }
         },
         required: ["url", "value"],
       },
+      annotations: {
+        title: "HTTP PATCH Request",
+        readOnlyHint: false,
+        destructiveHint: true,
+        openWorldHint: true,
+      }
     },
     {
       name: "playwright_delete",
@@ -346,14 +472,20 @@ export function createToolDefinitions() {
         properties: {
           url: { type: "string", description: "URL to perform DELETE operation" },
           token: { type: "string", description: "Bearer token for authorization" },
-          headers: { 
-            type: "object", 
+          headers: {
+            type: "object",
             description: "Additional headers to include in the request",
             additionalProperties: { type: "string" }
           }
         },
         required: ["url"],
       },
+      annotations: {
+        title: "HTTP DELETE Request",
+        readOnlyHint: false,
+        destructiveHint: true,
+        openWorldHint: true,
+      }
     },
     {
       name: "playwright_expect_response",
@@ -366,6 +498,12 @@ export function createToolDefinitions() {
         },
         required: ["id", "url"],
       },
+      annotations: {
+        title: "Expect HTTP Response",
+        readOnlyHint: true,
+        destructiveHint: false,
+        openWorldHint: true,
+      }
     },
     {
       name: "playwright_assert_response",
@@ -378,6 +516,12 @@ export function createToolDefinitions() {
         },
         required: ["id"],
       },
+      annotations: {
+        title: "Assert HTTP Response",
+        readOnlyHint: true,
+        destructiveHint: false,
+        openWorldHint: true,
+      }
     },
     {
       name: "playwright_custom_user_agent",
@@ -389,6 +533,12 @@ export function createToolDefinitions() {
         },
         required: ["userAgent"],
       },
+      annotations: {
+        title: "Set Custom User Agent",
+        readOnlyHint: false,
+        destructiveHint: false,
+        openWorldHint: true,
+      }
     },
     {
       name: "playwright_get_visible_text",
@@ -398,6 +548,12 @@ export function createToolDefinitions() {
         properties: {},
         required: [],
       },
+      annotations: {
+        title: "Get Visible Text",
+        readOnlyHint: true,
+        destructiveHint: false,
+        openWorldHint: true,
+      }
     },
     {
       name: "playwright_get_visible_html",
@@ -416,6 +572,12 @@ export function createToolDefinitions() {
         },
         required: [],
       },
+      annotations: {
+        title: "Get Visible HTML",
+        readOnlyHint: true,
+        destructiveHint: false,
+        openWorldHint: true,
+      }
     },
     {
       name: "playwright_go_back",
@@ -425,6 +587,12 @@ export function createToolDefinitions() {
         properties: {},
         required: [],
       },
+      annotations: {
+        title: "Go Back",
+        readOnlyHint: false,
+        destructiveHint: false,
+        openWorldHint: true,
+      }
     },
     {
       name: "playwright_go_forward",
@@ -434,6 +602,12 @@ export function createToolDefinitions() {
         properties: {},
         required: [],
       },
+      annotations: {
+        title: "Go Forward",
+        readOnlyHint: false,
+        destructiveHint: false,
+        openWorldHint: true,
+      }
     },
     {
       name: "playwright_drag",
@@ -446,6 +620,12 @@ export function createToolDefinitions() {
         },
         required: ["sourceSelector", "targetSelector"],
       },
+      annotations: {
+        title: "Drag Element",
+        readOnlyHint: false,
+        destructiveHint: true,
+        openWorldHint: true,
+      }
     },
     {
       name: "playwright_press_key",
@@ -458,6 +638,12 @@ export function createToolDefinitions() {
         },
         required: ["key"],
       },
+      annotations: {
+        title: "Press Key",
+        readOnlyHint: false,
+        destructiveHint: true,
+        openWorldHint: true,
+      }
     },
     {
       name: "playwright_save_as_pdf",
@@ -482,6 +668,12 @@ export function createToolDefinitions() {
         },
         required: ["outputPath"],
       },
+      annotations: {
+        title: "Save as PDF",
+        readOnlyHint: true,
+        destructiveHint: false,
+        openWorldHint: true,
+      }
     },
     {
       name: "playwright_click_and_switch_tab",
@@ -493,6 +685,12 @@ export function createToolDefinitions() {
         },
         required: ["selector"],
       },
+      annotations: {
+        title: "Click and Switch Tab",
+        readOnlyHint: false,
+        destructiveHint: true,
+        openWorldHint: true,
+      }
     },
   ] as const satisfies Tool[];
 }
