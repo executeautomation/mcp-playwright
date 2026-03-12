@@ -159,7 +159,7 @@ export const endCodegenSession: Tool = {
 
 export const getCodegenSession: Tool = {
   name: 'get_codegen_session',
-  description: 'Get information about a code generation session',
+  description: 'Retrieve detailed information about the current active code generation session including recorded actions and session state. Use when the user wants to check the status, review recorded steps, or inspect session metadata before ending or clearing a session. Do not use when you need to start a new session (use start_codegen_session instead) or when you want to finalize the session (use end_codegen_session instead). Accepts `session_id` (optional) to query a specific session or defaults to the currently active session. e.g., returns session ID, recorded actions count, and timestamp information. Raises an error if no active code generation session exists.',
   parameters: {
     type: 'object',
     properties: {

@@ -6,7 +6,7 @@ export function createToolDefinitions() {
     // Codegen tools
     {
       name: "start_codegen_session",
-      description: "Start a new code generation session to record Playwright actions",
+      description: "Start a new code generation session to record Playwright actions for automated test creation. Use when the user wants to begin capturing browser interactions that will be converted into test code. Do not use when a session is already active (use clear_codegen_session first) or when you only need to execute single actions without recording (use individual playwright_ tools instead). Accepts `session_id` (optional identifier) and `output_format` (optional: "javascript", "python", "csharp"). e.g., session_id="login_test", output_format="javascript". Raises an error if a session with the same ID already exists.",
       inputSchema: {
         type: "object",
         properties: {
@@ -35,7 +35,7 @@ export function createToolDefinitions() {
     },
     {
       name: "end_codegen_session",
-      description: "End a code generation session and generate the test file",
+      description: "Finalize a code generation session and generate the complete Playwright test file from recorded actions. Use when the user wants to complete their test recording and output the final test code. Do not use when you need to discard the session without generating a test (use clear_codegen_session instead). Accepts `session_id` (required) and `output_format` (optional: "javascript" or "typescript"). e.g., session_id="session_123", output_format="typescript". Raises an error if no active session exists or if the session contains no recorded actions.",
       inputSchema: {
         type: "object",
         properties: {
@@ -49,7 +49,7 @@ export function createToolDefinitions() {
     },
     {
       name: "get_codegen_session",
-      description: "Get information about a code generation session",
+      description: "Retrieve detailed information about the current active code generation session including recorded actions and session state. Use when the user wants to check the status, review recorded steps, or inspect session metadata before ending or clearing a session. Do not use when you need to start a new session (use start_codegen_session instead) or when you want to finalize the session (use end_codegen_session instead). Accepts `session_id` (optional) to query a specific session or defaults to the currently active session. e.g., returns session ID, recorded actions count, and timestamp information. Raises an error if no active code generation session exists.",
       inputSchema: {
         type: "object",
         properties: {
@@ -63,7 +63,7 @@ export function createToolDefinitions() {
     },
     {
       name: "clear_codegen_session",
-      description: "Clear a code generation session without generating a test",
+      description: "Clear a code generation session without generating a test file. Use when the user wants to discard recorded Playwright actions and start fresh without saving the current session. Do not use when you want to save the recorded actions as a test (use end_codegen_session instead). Accepts `session_id` (required) to identify which session to clear. e.g., session_id="playwright_session_123". Raises an error if the specified session does not exist or is already cleared.",
       inputSchema: {
         type: "object",
         properties: {
@@ -77,7 +77,7 @@ export function createToolDefinitions() {
     },
     {
       name: "playwright_navigate",
-      description: "Navigate to a URL",
+      description: "Navigate to a specified URL in the browser. Use when the user wants to load a new webpage, redirect to a different site, or start browsing from a specific address. Accepts `url` (required string), e.g., "https://example.com" or "https://github.com/login". Do not use when you need to interact with elements on the current page (use playwright_click, playwright_fill, or other interaction tools instead). Raises an error if the URL is malformed or the page fails to load within the timeout period.",
       inputSchema: {
         type: "object",
         properties: {
@@ -94,7 +94,7 @@ export function createToolDefinitions() {
     },
     {
       name: "playwright_screenshot",
-      description: "Take a screenshot of the current page or a specific element",
+      description: "Capture a screenshot of the current webpage or a specific element on the page. Use when the user wants to visually document, debug, or verify the current state of a web page or UI component. Do not use when you need to interact with page elements (use playwright_click or playwright_fill instead). Accepts `selector` (optional, targets specific element), `full_page` (optional boolean for full-page capture), and `path` (optional, save location). e.g., selector="#login-form" or full_page=true. Raises an error if the specified element selector is not found on the page.",
       inputSchema: {
         type: "object",
         properties: {
@@ -112,7 +112,7 @@ export function createToolDefinitions() {
     },
     {
       name: "playwright_click",
-      description: "Click an element on the page",
+      description: "Click an element on the page to trigger interactions like buttons, links, or clickable components. Use when the user wants to interact with visible page elements to navigate, submit forms, or activate functionality. Do not use when the element is inside an iframe (use playwright_iframe_click instead) or when you need to fill text into input fields (use playwright_fill instead). Accepts `selector` (required CSS selector or text content) and optional `timeout` parameter. e.g., selector="button[type='submit']" or selector="text=Login". Raises an error if the element is not found, not visible, or not clickable within the timeout period.",
       inputSchema: {
         type: "object",
         properties: {
@@ -123,7 +123,7 @@ export function createToolDefinitions() {
     },
     {
       name: "playwright_iframe_click",
-      description: "Click an element in an iframe on the page",
+      description: "Click an element within an iframe on the current page. Use when the user wants to interact with buttons, links, or clickable elements that are embedded inside an iframe. Do not use when the element is in the main page content (use playwright_click instead) or when you need to fill text into an iframe element (use playwright_iframe_fill instead). Accepts `iframe_selector` (required, CSS selector for the iframe), `element_selector` (required, CSS selector for the element within the iframe), and `timeout` (optional, milliseconds). e.g., iframe_selector="#payment-frame", element_selector="button[type='submit']". Raises an error if the iframe or target element cannot be found within the timeout period.",
       inputSchema: {
         type: "object",
         properties: {
@@ -135,7 +135,7 @@ export function createToolDefinitions() {
     },
     {
       name: "playwright_iframe_fill",
-      description: "Fill an element in an iframe on the page",
+      description: "Fill text into an input field located within an iframe on the page. Use when the user wants to enter data into form fields that are embedded in iframes or cross-origin content. Do not use when the target element is in the main page content (use playwright_fill instead). Accepts `iframe_selector` (required), `element_selector` (required), and `text` (required). e.g., iframe_selector="#payment-frame", element_selector="input[name='cardNumber']", text="4111111111111111". Raises an error if the iframe cannot be found or the element is not fillable.",
       inputSchema: {
         type: "object",
         properties: {
@@ -148,7 +148,7 @@ export function createToolDefinitions() {
     },
     {
       name: "playwright_fill",
-      description: "fill out an input field",
+      description: "Fill text into an input field, textarea, or other form element on the current page. Use when the user wants to enter text data into web forms, search boxes, or editable fields. Do not use when you need to interact with elements inside an iframe (use playwright_iframe_fill instead) or select from dropdown options (use playwright_select instead). Accepts `selector` (required CSS/XPath selector), `text` (required string to enter), and `options` (optional object with delay, timeout settings). e.g., selector="#email", text="user@example.com". Raises an error if the element is not found, not visible, or not editable.",
       inputSchema: {
         type: "object",
         properties: {
@@ -160,7 +160,7 @@ export function createToolDefinitions() {
     },
     {
       name: "playwright_select",
-      description: "Select an element on the page with Select tag",
+      description: "Select an option from a dropdown element with a Select tag on the page. Use when the user wants to choose a value from a dropdown menu or select list. Do not use when you need to fill text into an input field (use playwright_fill instead) or click regular buttons (use playwright_click instead). Accepts `selector` (required CSS/XPath selector) and `value` (required option value or text to select), e.g., selector="#country-dropdown", value="United States". Raises an error if the select element is not found or the specified option does not exist.",
       inputSchema: {
         type: "object",
         properties: {
@@ -172,7 +172,7 @@ export function createToolDefinitions() {
     },
     {
       name: "playwright_hover",
-      description: "Hover an element on the page",
+      description: "Hover over an element on the page to trigger hover effects like tooltips, dropdown menus, or visual state changes. Use when the user wants to reveal hidden content, test hover interactions, or simulate mouse-over behavior without clicking. Do not use when you need to actually click an element (use playwright_click instead). Accepts `selector` (required CSS selector or text content) and optional `timeout` parameter. e.g., selector="#menu-button" or "Contact Us". Raises an error if the element is not found or not visible within the timeout period.",
       inputSchema: {
         type: "object",
         properties: {
@@ -183,7 +183,7 @@ export function createToolDefinitions() {
     },
     {
       name: "playwright_upload_file",
-      description: "Upload a file to an input[type='file'] element on the page",
+      description: "Upload a file to an input[type='file'] element on the current page. Use when the user wants to attach documents, images, or other files through a file upload form field. Do not use when you need to fill text into regular input fields (use playwright_fill instead). Accepts `selector` (required CSS selector for the file input), `file_path` (required path to the file), and `timeout` (optional milliseconds). e.g., selector="input[type='file']", file_path="/path/to/document.pdf". Raises an error if the file does not exist or the selector does not match a file input element.",
       inputSchema: {
         type: "object",
         properties: {
@@ -195,7 +195,7 @@ export function createToolDefinitions() {
     },
     {
       name: "playwright_evaluate",
-      description: "Execute JavaScript in the browser console",
+      description: "Execute JavaScript code in the browser console and return the result. Use when the user wants to run custom JavaScript, inspect page elements, or debug web applications programmatically. Do not use when you need to retrieve existing console messages (use playwright_console_logs instead). Accepts `expression` (required JavaScript code string), e.g., "document.title" or "window.location.href" or "document.querySelectorAll('.button').length". Raises an error if the JavaScript contains syntax errors or if no browser page is currently loaded.",
       inputSchema: {
         type: "object",
         properties: {
@@ -206,7 +206,7 @@ export function createToolDefinitions() {
     },
     {
       name: "playwright_console_logs",
-      description: "Retrieve console logs from the browser with filtering options",
+      description: "Retrieve console logs from the browser with optional filtering by log level or message content. Use when the user wants to debug JavaScript errors, monitor console output, or analyze browser-generated messages during page interactions. Do not use when you need to execute JavaScript code in the browser (use playwright_evaluate instead). Accepts `level` (optional: "error", "warn", "info", "debug"), `message_filter` (optional string pattern), and `limit` (optional number of recent logs). e.g., level="error" to show only error messages, or message_filter="API" to find logs containing "API". Raises an error if no browser session is active or the page has not been loaded.",
       inputSchema: {
         type: "object",
         properties: {
@@ -233,7 +233,7 @@ export function createToolDefinitions() {
     },
     {
       name: "playwright_resize",
-      description: "Resize the browser viewport using manual dimensions or device presets. Supports 143+ device presets including iPhone, iPad, Android devices, and desktop browsers with proper user-agent and touch emulation.",
+      description: "Resize the browser viewport to specific dimensions or device presets for responsive testing. Use when the user wants to test how a webpage appears on different screen sizes, devices, or orientations. Accepts `width` and `height` (integers) for custom dimensions, or `device` (string) for presets. Supports 143+ device presets such as "iPhone 14", "iPad Pro", "Galaxy S21", or desktop browsers like "Desktop Chrome". Do not use when you need to navigate to a different page first (use playwright_navigate instead). Raises an error if the device preset name is invalid or dimensions are negative.",
       inputSchema: {
         type: "object",
         properties: {
@@ -260,7 +260,7 @@ export function createToolDefinitions() {
     },
     {
       name: "playwright_close",
-      description: "Close the browser and release all resources",
+      description: "Close the browser instance and release all associated resources including memory and processes. Use when the user wants to terminate the browser session after completing web automation tasks or testing. Do not use when you need to navigate to a different page or perform additional browser actions (use other playwright tools instead). Accepts no parameters (`void` function call). e.g., call after finishing a web scraping session or completing automated tests. Fails if no browser instance is currently running or already closed.",
       inputSchema: {
         type: "object",
         properties: {},
@@ -269,7 +269,7 @@ export function createToolDefinitions() {
     },
     {
       name: "playwright_get",
-      description: "Perform an HTTP GET request",
+      description: "Execute an HTTP GET request to retrieve data from a web endpoint. Use when the user wants to fetch API responses, download content, or test HTTP endpoints programmatically. Do not use when you need to interact with page elements after navigation (use playwright_navigate instead). Accepts `url` (required string) and optional headers as key-value pairs. e.g., url="https://api.github.com/users/octocat" or url="https://example.com/data.json". Raises an error if the URL is malformed or the server returns a non-2xx status code.",
       inputSchema: {
         type: "object",
         properties: {
@@ -286,7 +286,7 @@ export function createToolDefinitions() {
     },
     {
       name: "playwright_post",
-      description: "Perform an HTTP POST request",
+      description: "Send an HTTP POST request to submit data to a web server endpoint. Use when the user wants to submit form data, send JSON payloads, or interact with REST APIs that require POST methods. Do not use when you need to interact with page elements through the browser UI (use playwright_click or playwright_fill instead). Accepts `url` (required), `data` (optional JSON or form data), `headers` (optional), and `timeout` (optional). e.g., url="https://api.example.com/users", data={"name": "John", "email": "john@example.com"}. Raises an error if the URL is unreachable or the server returns a non-2xx status code.",
       inputSchema: {
         type: "object",
         properties: {
@@ -304,7 +304,7 @@ export function createToolDefinitions() {
     },
     {
       name: "playwright_put",
-      description: "Perform an HTTP PUT request",
+      description: "Execute an HTTP PUT request to update or create a resource on a web server. Use when the user wants to send data to modify an existing resource or create a new one at a specific URL endpoint. Do not use when you need to interact with page elements or navigate within a browser (use other playwright tools instead). Accepts `url` (required), `data` (optional request body), `headers` (optional), and `timeout` (optional). e.g., url="https://api.example.com/users/123", data={"name": "John"}. Raises an error if the server returns a non-2xx status code or the request times out.",
       inputSchema: {
         type: "object",
         properties: {
@@ -322,7 +322,7 @@ export function createToolDefinitions() {
     },
     {
       name: "playwright_patch",
-      description: "Perform an HTTP PATCH request",
+      description: "Send an HTTP PATCH request to update resources on a web server. Use when the user wants to modify existing data through API calls or test PATCH endpoints during web automation. Do not use when you need to interact with page elements (use playwright_click or playwright_fill instead). Accepts `url` (required), `data` (optional request body), and `headers` (optional HTTP headers). e.g., url="https://api.example.com/users/123", data={"name": "John"}. Raises an error if the URL is unreachable or returns a non-2xx status code.",
       inputSchema: {
         type: "object",
         properties: {
@@ -340,7 +340,7 @@ export function createToolDefinitions() {
     },
     {
       name: "playwright_delete",
-      description: "Perform an HTTP DELETE request",
+      description: "Execute an HTTP DELETE request to remove resources from a web server. Use when the user wants to delete data, remove records, or perform cleanup operations via REST API calls. Do not use when you need to interact with page elements (use playwright_click instead). Accepts `url` (required), `headers` (optional object), and `data` (optional request body). e.g., url="https://api.example.com/users/123", headers={"Authorization": "Bearer token"}. Raises an error if the server returns a non-success status code or the URL is unreachable.",
       inputSchema: {
         type: "object",
         properties: {
@@ -357,7 +357,7 @@ export function createToolDefinitions() {
     },
     {
       name: "playwright_expect_response",
-      description: "Ask Playwright to start waiting for a HTTP response. This tool initiates the wait operation but does not wait for its completion.",
+      description: "Start waiting for an HTTP response without blocking execution during Playwright automation. Use when the user wants to set up response monitoring that will be checked later in the test flow. Do not use when you need to immediately wait for and capture the response data (use playwright_evaluate with page.waitForResponse instead). Accepts `url_pattern` (required string or regex) and `timeout` (optional milliseconds). e.g., url_pattern="**/api/data" or url_pattern=/\.json$/. Returns immediately after starting the wait operation. Raises an error if the URL pattern is invalid or malformed.",
       inputSchema: {
         type: "object",
         properties: {
@@ -369,7 +369,7 @@ export function createToolDefinitions() {
     },
     {
       name: "playwright_assert_response",
-      description: "Wait for and validate a previously initiated HTTP response wait operation.",
+      description: "Validate a previously initiated HTTP response wait operation and assert its properties. Use when the user wants to verify response status codes, headers, or body content after triggering a network request. Do not use when you need to initiate a new navigation or request (use playwright_navigate instead). Accepts `timeout` (optional, milliseconds), `status` (optional, expected status code), and `headers` (optional, object with expected header values). e.g., status=200, headers={"content-type": "application/json"}. Raises an error if the response validation fails or times out before completion.",
       inputSchema: {
         type: "object",
         properties: {
@@ -381,7 +381,7 @@ export function createToolDefinitions() {
     },
     {
       name: "playwright_custom_user_agent",
-      description: "Set a custom User Agent for the browser",
+      description: "Set a custom User-Agent string for the browser session to simulate different devices or browsers. Use when the user wants to test how websites respond to specific browsers, mobile devices, or crawlers. Accepts `user_agent` (required string), e.g., "Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X)" or "Googlebot/2.1". Do not use when you need to navigate to a page first (use playwright_navigate instead). Raises an error if the user agent string is malformed or empty.",
       inputSchema: {
         type: "object",
         properties: {
@@ -392,7 +392,7 @@ export function createToolDefinitions() {
     },
     {
       name: "playwright_get_visible_text",
-      description: "Get the visible text content of the current page",
+      description: "Extract the visible text content from the current web page. Use when the user wants to read, analyze, or capture all text displayed on a webpage for content analysis or verification. Do not use when you need to take a visual screenshot (use playwright_screenshot instead) or execute JavaScript to get dynamic content (use playwright_evaluate instead). Accepts no parameters and returns all human-readable text from the page. e.g., extracting article content, form labels, or button text for testing validation. Fails if no page is currently loaded in the browser session.",
       inputSchema: {
         type: "object",
         properties: {},
@@ -401,7 +401,7 @@ export function createToolDefinitions() {
     },
     {
       name: "playwright_get_visible_html",
-      description: "Get the HTML content of the current page. By default, all <script> tags are removed from the output unless removeScripts is explicitly set to false.",
+      description: "Get the HTML content of the current page for inspection or analysis. Use when the user wants to examine the page structure, debug layout issues, or extract specific HTML elements. Accepts `removeScripts` (optional boolean, defaults to true to exclude script tags). Do not use when you need to interact with page elements (use playwright_click or playwright_fill instead) or capture visual content (use playwright_screenshot instead). e.g., removeScripts=false to include JavaScript code in the output. Raises an error if no page is currently loaded in the browser session.",
       inputSchema: {
         type: "object",
         properties: {
@@ -419,7 +419,7 @@ export function createToolDefinitions() {
     },
     {
       name: "playwright_go_back",
-      description: "Navigate back in browser history",
+      description: "Navigate back one page in the browser's history stack. Use when the user wants to return to the previously visited page or undo a navigation action. Do not use when you need to navigate to a specific URL (use playwright_navigate instead). Accepts no required parameters - operates on the current browser session context. e.g., after clicking a link or submitting a form, go back to the previous page. Fails if there is no previous page in the browser history stack.",
       inputSchema: {
         type: "object",
         properties: {},
@@ -428,7 +428,7 @@ export function createToolDefinitions() {
     },
     {
       name: "playwright_go_forward",
-      description: "Navigate forward in browser history",
+      description: "Navigate forward in browser history to the next page. Use when the user wants to move forward through previously visited pages after going back. Do not use when you need to navigate to a specific URL (use playwright_navigate instead). Takes no parameters. e.g., moving forward after using the back button to return to a form submission page. Fails if there is no forward history available in the browser session.",
       inputSchema: {
         type: "object",
         properties: {},
@@ -437,7 +437,7 @@ export function createToolDefinitions() {
     },
     {
       name: "playwright_drag",
-      description: "Drag an element to a target location",
+      description: "Drag an element from its current position to a target location on the page. Use when the user wants to perform drag-and-drop interactions, reorder items, or move elements between containers. Do not use when you need to simply click an element (use playwright_click instead) or hover over it (use playwright_hover instead). Accepts `source_selector` (required), `target_selector` (required), and optional positioning parameters like `source_position` and `target_position`. e.g., dragging a file from one folder to another or reordering items in a sortable list. Raises an error if either the source or target element is not found or not visible on the page.",
       inputSchema: {
         type: "object",
         properties: {
@@ -449,7 +449,7 @@ export function createToolDefinitions() {
     },
     {
       name: "playwright_press_key",
-      description: "Press a keyboard key",
+      description: "Press a keyboard key or key combination on the current page. Use when the user wants to simulate keyboard input like pressing Enter, Tab, Escape, or keyboard shortcuts. Do not use when you need to type text into a field (use playwright_fill instead). Accepts `key` (required string) such as "Enter", "Tab", "Escape", "Control+A", or "Shift+Tab". e.g., key="Enter" to submit a form or key="Escape" to close a modal. Raises an error if the page is not loaded or the key combination is invalid.",
       inputSchema: {
         type: "object",
         properties: {
@@ -461,7 +461,7 @@ export function createToolDefinitions() {
     },
     {
       name: "playwright_save_as_pdf",
-      description: "Save the current page as a PDF file",
+      description: "Generate a PDF file from the current webpage and save it to disk. Use when the user wants to create a downloadable PDF document of the webpage content for archiving, sharing, or offline viewing. Do not use when you need to capture a visual image of the page (use playwright_screenshot instead). Accepts `path` (required, file destination), `format` (optional: "A4", "Letter"), `landscape` (optional boolean), and `margin` options. e.g., path="report.pdf", format="A4", landscape=true. Raises an error if the page is not loaded or the specified directory path does not exist.",
       inputSchema: {
         type: "object",
         properties: {
@@ -485,7 +485,7 @@ export function createToolDefinitions() {
     },
     {
       name: "playwright_click_and_switch_tab",
-      description: "Click a link and switch to the newly opened tab",
+      description: "Click a link element and automatically switch to the newly opened tab or window. Use when the user wants to navigate to a link that opens in a new tab and immediately work with that new page. Do not use when clicking links that stay in the same tab (use playwright_click instead). Accepts `selector` (required CSS selector or text content to identify the link), e.g., 'a[href="/new-page"]' or 'text="Open in New Tab"'. Raises an error if no new tab opens after clicking or if the selector matches multiple elements.",
       inputSchema: {
         type: "object",
         properties: {
