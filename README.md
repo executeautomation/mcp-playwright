@@ -54,6 +54,10 @@ await playwright_resize({ device: "Desktop Chrome" });
 
 ## [Documentation](https://executeautomation.github.io/mcp-playwright/) | [API reference](https://executeautomation.github.io/mcp-playwright/docs/playwright-web/Supported-Tools)
 
+## Hosted deployment
+
+A hosted deployment is available on [Fronteir AI](https://fronteir.ai/mcp/executeautomation-playwright-mcp-server).
+
 ## Installation
 
 You can install the package using either npm, mcp-get, or Smithery:
