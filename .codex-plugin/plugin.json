@@ -1,0 +1,24 @@
+{
+  "name": "playwright-automation",
+  "version": "0.1.0",
+  "description": "Automate browsers and APIs with Playwright from Codex via MCP",
+  "author": {
+    "name": "executeautomation",
+    "url": "https://github.com/executeautomation/mcp-playwright"
+  },
+  "homepage": "https://github.com/executeautomation/mcp-playwright",
+  "repository": "https://github.com/executeautomation/mcp-playwright",
+  "keywords": [
+    "mcp",
+    "codex"
+  ],
+  "mcpServers": "./.mcp.json",
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Playwright Automation MCP",
+    "shortDescription": "Automate browsers and APIs with Playwright from Codex via MCP",
+    "longDescription": "Playwright Model Context Protocol Server. Tool to automate Browsers and APIs in Claude Desktop, Cline, Cursor IDE and more.",
+    "category": "Browser",
+    "websiteURL": "https://github.com/executeautomation/mcp-playwright"
+  }
+}
