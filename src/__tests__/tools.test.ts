@@ -13,9 +13,14 @@ describe('Tool Definitions', () => {
       expect(tool).toHaveProperty('name');
       expect(tool).toHaveProperty('description');
       expect(tool).toHaveProperty('inputSchema');
+      expect(tool.inputSchema).toHaveProperty('$schema', 'http://json-schema.org/draft-07/schema');
       expect(tool.inputSchema).toHaveProperty('type');
       expect(tool.inputSchema).toHaveProperty('properties');
     });
+  });
+
+  test('tool schemas should not reference the HTTPS Draft-07 meta-schema', () => {
+    expect(JSON.stringify(toolDefinitions)).not.toContain('https://json-schema.org/draft-07/schema');
   });
 
   test('BROWSER_TOOLS should contain browser-related tool names', () => {
