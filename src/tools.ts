@@ -1,8 +1,10 @@
 import type { Tool } from "@modelcontextprotocol/sdk/types.js";
 import { codegenTools } from './tools/codegen';
 
+const JSON_SCHEMA_DRAFT_07 = "http://json-schema.org/draft-07/schema";
+
 export function createToolDefinitions() {
-  return [
+  const toolDefinitions = [
     // Codegen tools
     {
       name: "start_codegen_session",
@@ -495,6 +497,14 @@ export function createToolDefinitions() {
       },
     },
   ] as const satisfies Tool[];
+
+  return toolDefinitions.map(tool => ({
+    ...tool,
+    inputSchema: {
+      $schema: JSON_SCHEMA_DRAFT_07,
+      ...tool.inputSchema
+    }
+  })) satisfies Tool[];
 }
 
 // Browser-requiring tools for conditional browser launch
