@@ -61,6 +61,25 @@ export function resetBrowserState() {
   page = undefined;
   currentBrowserType = 'chromium';
 }
+
+/**
+ * Closes the active browser (if any) and resets state. Safe to call when no
+ * browser is open. Used during process shutdown / client disconnect so we
+ * don't leave orphaned Chromium processes behind.
+ */
+export async function closeBrowser(): Promise<void> {
+  if (browser) {
+    try {
+      if (browser.isConnected()) {
+        await browser.close();
+      }
+    } catch (error) {
+      console.error("Error closing browser during cleanup:", error);
+    } finally {
+      resetBrowserState();
+    }
+  }
+}
 /**
  * Sets the provided page to the global page variable
  * @param newPage The Page object to set as the global page
