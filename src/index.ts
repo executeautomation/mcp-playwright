@@ -4,6 +4,7 @@ import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { createToolDefinitions } from "./tools.js";
 import { setupRequestHandlers } from "./requestHandler.js";
+import { closeBrowser } from "./toolHandler.js";
 import { Logger, RequestLoggingMiddleware } from "./logging/index.js";
 import { MonitoringSystem } from "./monitoring/index.js";
 import { startHttpServer } from "./http-server.js";
@@ -125,18 +126,31 @@ async function runServer() {
     logger.warn('Failed to start monitoring HTTP server', { error: error instanceof Error ? error.message : String(error) });
   }
 
-  // Graceful shutdown logic
+  // Graceful shutdown logic — close the browser so we don't leak Chromium
+  let shuttingDown = false;
   async function shutdown() {
+    if (shuttingDown) return; // ignore repeat signals / 'exit' re-entry
+    shuttingDown = true;
     loggingMiddleware.logServerShutdown();
     logger.info('Shutdown signal received');
-    
+
+    // Close the browser, but never let a hung close block process exit
+    try {
+      await Promise.race([
+        closeBrowser(),
+        new Promise<void>((resolve) => setTimeout(resolve, 5000)),
+      ]);
+    } catch (error) {
+      logger.error('Error closing browser on shutdown', error instanceof Error ? error : new Error(String(error)));
+    }
+
     try {
       await monitoringSystem.stopMetricsCollection();
       logger.info('Monitoring system stopped');
     } catch (error) {
       logger.error('Error stopping monitoring system', error instanceof Error ? error : new Error(String(error)));
     }
-    
+
     process.exit(0);
   }
 
@@ -150,6 +164,13 @@ async function runServer() {
       platform: process.platform,
     });
   });
+
+  // Exit when the client/parent goes away. StdioServerTransport only listens
+  // for 'data'/'error' on stdin, so when the parent process dies (stdin EOF)
+  // nothing tears the server down — without this it lingers and leaks its
+  // browser. Watching stdin end/close lets us shut down cleanly.
+  process.stdin.on('end', shutdown);
+  process.stdin.on('close', shutdown);
 
   // Create transport and connect
   const transport = new StdioServerTransport();
