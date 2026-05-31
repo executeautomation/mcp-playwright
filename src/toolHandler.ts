@@ -52,11 +52,52 @@ let browser: Browser | undefined;
 let page: Page | undefined;
 let currentBrowserType: 'chromium' | 'firefox' | 'webkit' = 'chromium';
 
+// --- Optional idle auto-close ------------------------------------------------
+// Close an unused browser after a period of inactivity so headless browsers
+// don't accumulate across long-lived sessions. Opt-in and OFF by default:
+// enabled only when PLAYWRIGHT_IDLE_TIMEOUT_MS is set to a positive number of
+// milliseconds. The timer resets on every browser tool call and is cleared
+// whenever the browser closes or disconnects. (e.g. PLAYWRIGHT_IDLE_TIMEOUT_MS=
+// 1800000 closes the browser after 30 min idle.)
+let idleTimer: ReturnType<typeof setTimeout> | undefined;
+
+function getIdleTimeoutMs(): number {
+  const raw = process.env.PLAYWRIGHT_IDLE_TIMEOUT_MS;
+  if (raw === undefined || raw === '') return 0; // disabled by default
+  const parsed = Number(raw);
+  if (!Number.isFinite(parsed) || parsed < 0) return 0;
+  return parsed;
+}
+
+function clearIdleTimer(): void {
+  if (idleTimer) {
+    clearTimeout(idleTimer);
+    idleTimer = undefined;
+  }
+}
+
+function resetIdleTimer(): void {
+  clearIdleTimer();
+  const timeoutMs = getIdleTimeoutMs();
+  if (timeoutMs <= 0) return; // opt-in: off unless configured
+  idleTimer = setTimeout(() => {
+    idleTimer = undefined;
+    if (browser && browser.isConnected()) {
+      console.error(`[Playwright MCP] Closing idle browser after ${timeoutMs}ms of inactivity`);
+      // 'disconnected' handler clears state once the browser is gone
+      browser.close().catch(err => console.error("Error closing idle browser:", err));
+    }
+  }, timeoutMs);
+  // Don't let the idle timer alone keep the process alive
+  if (typeof idleTimer.unref === 'function') idleTimer.unref();
+}
+
 /**
  * Resets browser and page variables
  * Used when browser is closed
  */
 export function resetBrowserState() {
+  clearIdleTimer();
   browser = undefined;
   page = undefined;
   currentBrowserType = 'chromium';
@@ -295,6 +336,7 @@ export async function ensureBrowser(browserSettings?: BrowserSettings) {
 
       // Add cleanup logic when browser is disconnected
       browser.on('disconnected', () => {
+        clearIdleTimer();
         browser = undefined;
         page = undefined;
       });
@@ -375,6 +417,7 @@ export async function ensureBrowser(browserSettings?: BrowserSettings) {
     currentBrowserType = browserType;
 
     browser.on('disconnected', () => {
+      clearIdleTimer();
       browser = undefined;
       page = undefined;
     });
@@ -535,6 +578,8 @@ export async function handleToolCall(
     try {
       context.page = await ensureBrowser(browserSettings);
       context.browser = browser;
+      // Browser is in active use — (re)start the idle auto-close countdown
+      resetIdleTimer();
     } catch (error) {
       return {
         content: [{
