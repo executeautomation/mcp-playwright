@@ -1,0 +1,16 @@
+{
+  "targetId": "mcp-server",
+  "adapter": "local-process",
+  "command": "npx",
+  "args": [
+    "-y",
+    "@executeautomation/playwright-mcp-server@latest"
+  ],
+  "securitySuppressions": [
+    "playwright_evaluate:shell-injection"
+  ],
+  "timeoutMs": 60000,
+  "metadata": {
+    "observatory": "generated-by-init-ci"
+  }
+}

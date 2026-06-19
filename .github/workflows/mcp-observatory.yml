@@ -1,0 +1,20 @@
+name: MCP Observatory
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  mcp-observatory:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Playwright browser
+        run: npx -y playwright@1.57.0 install chromium
+      - uses: KryptosAI/mcp-observatory/action@main
+        with:
+          target: mcp-observatory.target.json
+          deep: true
+          security: true
+          comment-on-pr: true
