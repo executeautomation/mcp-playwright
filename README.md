@@ -1,3 +1,5 @@
+[![MCP Toplist](https://mcptoplist.com/badge/glama%2Fexecuteautomation%2Fmcp-playwright.svg)](https://mcptoplist.com/server/glama%2Fexecuteautomation%2Fmcp-playwright)
+
 <div align="center" markdown="1">
   <table>
     <tr>
