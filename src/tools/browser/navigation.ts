@@ -1,5 +1,6 @@
 import { BrowserToolBase } from './base.js';
 import { ToolContext, ToolResponse, createSuccessResponse, createErrorResponse } from '../common/types.js';
+import { validateUrl } from '../common/urlValidator.js';
 import { resetBrowserState } from '../../toolHandler.js';
 
 /**
@@ -28,6 +29,10 @@ export class NavigationTool extends BrowserToolBase {
 
     return this.safeExecute(context, async (page) => {
       try {
+        const urlError = await validateUrl(args.url);
+        if (urlError) {
+          return urlError;
+        }
         await page.goto(args.url, {
           timeout: args.timeout || 30000,
           waitUntil: args.waitUntil || "load"

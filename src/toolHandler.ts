@@ -3,6 +3,7 @@ import { chromium, firefox, webkit, request } from 'playwright';
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { BROWSER_TOOLS, API_TOOLS } from './tools.js';
 import type { ToolContext } from './tools/common/types.js';
+import { installNavigationGuard } from './tools/common/urlValidator.js';
 import { ActionRecorder } from './tools/codegen/recorder.js';
 import { spawn } from 'child_process';
 import { 
@@ -308,6 +309,8 @@ export async function ensureBrowser(browserSettings?: BrowserSettings) {
         deviceScaleFactor: 1,
       });
 
+      await installNavigationGuard(context);
+
       page = await context.newPage();
 
       // Register console message handler
@@ -387,6 +390,8 @@ export async function ensureBrowser(browserSettings?: BrowserSettings) {
       },
       deviceScaleFactor: 1,
     });
+
+    await installNavigationGuard(context);
 
     page = await context.newPage();
     

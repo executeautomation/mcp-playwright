@@ -1,4 +1,5 @@
 import { ApiToolBase } from './base.js';
+import { fetchWithValidation } from '../common/urlValidator.js';
 import { ToolContext, ToolResponse, createSuccessResponse, createErrorResponse } from '../common/types.js';
 
 /**
@@ -96,7 +97,9 @@ export class GetRequestTool extends ApiToolBase {
         return createErrorResponse(headerError);
       }
       
-      const response = await apiContext.get(args.url, {
+      const response = await fetchWithValidation(apiContext, {
+        method: 'GET',
+        url: args.url,
         headers: buildHeaders(args.token, args.headers)
       });
       
@@ -141,7 +144,9 @@ export class PostRequestTool extends ApiToolBase {
         }
       }
       
-      const response = await apiContext.post(args.url, {
+      const response = await fetchWithValidation(apiContext, {
+        method: 'POST',
+        url: args.url,
         data: parseJsonSafely(args.value),
         headers: buildHeaders(args.token, args.headers, true)
       });
@@ -187,7 +192,9 @@ export class PutRequestTool extends ApiToolBase {
         }
       }
       
-      const response = await apiContext.put(args.url, {
+      const response = await fetchWithValidation(apiContext, {
+        method: 'PUT',
+        url: args.url,
         data: parseJsonSafely(args.value),
         headers: buildHeaders(args.token, args.headers, true)
       });
@@ -233,7 +240,9 @@ export class PatchRequestTool extends ApiToolBase {
         }
       }
       
-      const response = await apiContext.patch(args.url, {
+      const response = await fetchWithValidation(apiContext, {
+        method: 'PATCH',
+        url: args.url,
         data: parseJsonSafely(args.value),
         headers: buildHeaders(args.token, args.headers, true)
       });
@@ -269,7 +278,9 @@ export class DeleteRequestTool extends ApiToolBase {
         return createErrorResponse(headerError);
       }
       
-      const response = await apiContext.delete(args.url, {
+      const response = await fetchWithValidation(apiContext, {
+        method: 'DELETE',
+        url: args.url,
         headers: buildHeaders(args.token, args.headers)
       });
       
