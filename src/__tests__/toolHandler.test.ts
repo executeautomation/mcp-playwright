@@ -1,6 +1,13 @@
 import { handleToolCall, getConsoleLogs, getScreenshots, registerConsoleMessage } from '../toolHandler.js';
 import { Browser, Page, chromium, firefox, webkit } from 'playwright';
 import { jest } from '@jest/globals';
+import * as dns from 'node:dns';
+
+jest.mock('node:dns');
+const mockDnsLookup = dns.lookup as unknown as jest.Mock;
+mockDnsLookup.mockImplementation(((hostname: string, options: any, callback: any) =>
+  callback(null, [{ address: '93.184.216.34', family: 4 }])
+) as any);
 
 // Mock the Playwright browser and page
 jest.mock('playwright', () => {
@@ -62,7 +69,8 @@ jest.mock('playwright', () => {
   const mockNewPage = jest.fn().mockImplementation(() => Promise.resolve(mockPage));
   const mockContexts = jest.fn().mockReturnValue([]);
   const mockContext = {
-    newPage: mockNewPage
+    newPage: mockNewPage,
+    route: jest.fn().mockImplementation(() => Promise.resolve())
   };
 
   const mockNewContext = jest.fn().mockImplementation(() => Promise.resolve(mockContext));
@@ -316,7 +324,7 @@ describe('Tool Handler', () => {
     });
 
     test('should handle console messages of different types', async () => {
-      await handleToolCall('playwright_navigate', { url: 'about:blank' }, mockServer);
+      await handleToolCall('playwright_navigate', { url: 'https://example.com' }, mockServer);
 
       // Setup mock handlers
       const mockHandlers: Record<string, jest.Mock> = {};
@@ -352,7 +360,7 @@ describe('Tool Handler', () => {
     });
 
     test('should handle unhandled promise rejection with detailed info', async () => {
-      await handleToolCall('playwright_navigate', { url: 'about:blank' }, mockServer);
+      await handleToolCall('playwright_navigate', { url: 'https://example.com' }, mockServer);
 
       mockPage.on.mockImplementation((event: string, handler: (arg: any) => void) => {
         if (event === 'console') {
@@ -383,12 +391,12 @@ describe('Tool Handler', () => {
     process.env.CHROME_EXECUTABLE_PATH = mockExecutablePath;
 
     // Call the navigation tool to trigger browser launch
-    await handleToolCall('playwright_navigate', { url: 'about:blank' }, mockServer);
+    await handleToolCall('playwright_navigate', { url: 'https://example.com' }, mockServer);
 
     // This is a proxy for checking if the executable path is being used.
     // A more direct test would require exporting ensureBrowser and spying on it.
     // For now, we will just check if the tool call succeeds.
-    const result = await handleToolCall('playwright_navigate', { url: 'about:blank' }, mockServer);
+    const result = await handleToolCall('playwright_navigate', { url: 'https://example.com' }, mockServer);
     expect(result.content[0].type).toBe('text');
     if (result.content[0].type === 'text') {
       expect(result.content[0].text).toContain('Navigated to');

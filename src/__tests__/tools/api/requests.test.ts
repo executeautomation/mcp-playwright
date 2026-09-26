@@ -2,6 +2,13 @@ import { GetRequestTool, PostRequestTool, PutRequestTool, PatchRequestTool, Dele
 import { ToolContext } from '../../../tools/common/types.js';
 import { APIRequestContext } from 'playwright';
 import { jest } from '@jest/globals';
+import * as dns from 'node:dns';
+
+jest.mock('node:dns');
+const mockDnsLookup = dns.lookup as unknown as jest.Mock;
+mockDnsLookup.mockImplementation(((hostname: string, options: any, callback: any) =>
+  callback(null, [{ address: '93.184.216.34', family: 4 }])
+) as any);
 
 // Mock response
 const mockStatus200 = jest.fn().mockReturnValue(200);
@@ -16,20 +23,19 @@ const mockResponse = {
   text: mockText
 };
 
-// Mock API context
-const mockGet = jest.fn().mockImplementation(() => Promise.resolve(mockResponse));
-const mockPost = jest.fn().mockImplementation(() => Promise.resolve({...mockResponse, status: mockStatus201}));
-const mockPut = jest.fn().mockImplementation(() => Promise.resolve(mockResponse));
-const mockPatch = jest.fn().mockImplementation(() => Promise.resolve(mockResponse));
-const mockDelete = jest.fn().mockImplementation(() => Promise.resolve({...mockResponse, status: mockStatus204}));
+// Mock API context: tools issue requests through fetchWithValidation ->
+// apiContext.fetch(url, { method, ... })
+const mockHeaders = jest.fn().mockReturnValue({});
+const mockFetch = jest.fn().mockImplementation(((url: string, opts: any) => {
+  const status = opts?.method === 'POST' ? mockStatus201
+    : opts?.method === 'DELETE' ? mockStatus204
+    : mockStatus200;
+  return Promise.resolve({ ...mockResponse, status, headers: mockHeaders });
+}) as any);
 const mockDispose = jest.fn().mockImplementation(() => Promise.resolve());
 
 const mockApiContext = {
-  get: mockGet,
-  post: mockPost,
-  put: mockPut,
-  patch: mockPatch,
-  delete: mockDelete,
+  fetch: mockFetch,
   dispose: mockDispose
 } as unknown as APIRequestContext;
 
@@ -68,7 +74,10 @@ describe('API Request Tools', () => {
 
       const result = await getRequestTool.execute(args, mockContext);
 
-      expect(mockGet).toHaveBeenCalledWith('https://api.example.com', { headers: {} });
+      expect(mockFetch).toHaveBeenCalledWith('https://api.example.com', expect.objectContaining({
+        method: 'GET',
+        headers: {}
+      }));
       expect(result.isError).toBe(false);
       expect(result.content[0].type).toBe('text');
       if (result.content[0].type === 'text') {
@@ -84,11 +93,12 @@ describe('API Request Tools', () => {
 
       const result = await getRequestTool.execute(args, mockContext);
 
-      expect(mockGet).toHaveBeenCalledWith('https://api.example.com', { 
+      expect(mockFetch).toHaveBeenCalledWith('https://api.example.com', expect.objectContaining({
+        method: 'GET',
         headers: {
           'Authorization': 'Bearer test-token'
         }
-      });
+      }));
       expect(result.isError).toBe(false);
       expect(result.content[0].type).toBe('text');
       if (result.content[0].type === 'text') {
@@ -107,12 +117,13 @@ describe('API Request Tools', () => {
 
       const result = await getRequestTool.execute(args, mockContext);
 
-      expect(mockGet).toHaveBeenCalledWith('https://api.example.com', { 
+      expect(mockFetch).toHaveBeenCalledWith('https://api.example.com', expect.objectContaining({
+        method: 'GET',
         headers: {
           'Authorization': 'Basic YWRtaW46cGFzc3dvcmQxMjM=',
           'X-Custom-Header': 'custom-value'
         }
-      });
+      }));
       expect(result.isError).toBe(false);
       expect(result.content[0].type).toBe('text');
       if (result.content[0].type === 'text') {
@@ -126,7 +137,7 @@ describe('API Request Tools', () => {
       };
 
       // Mock a request error
-      mockGet.mockImplementationOnce(() => Promise.reject(new Error('Request failed')));
+      mockFetch.mockImplementationOnce(() => Promise.reject(new Error('Request failed')));
 
       const result = await getRequestTool.execute(args, mockContext);
 
@@ -144,7 +155,7 @@ describe('API Request Tools', () => {
 
       const result = await getRequestTool.execute(args, { server: mockServer } as ToolContext);
 
-      expect(mockGet).not.toHaveBeenCalled();
+      expect(mockFetch).not.toHaveBeenCalled();
       expect(result.isError).toBe(true);
       expect(result.content[0].type).toBe('text');
       if (result.content[0].type === 'text') {
@@ -162,12 +173,13 @@ describe('API Request Tools', () => {
 
       const result = await postRequestTool.execute(args, mockContext);
 
-      expect(mockPost).toHaveBeenCalledWith('https://api.example.com', { 
+      expect(mockFetch).toHaveBeenCalledWith('https://api.example.com', expect.objectContaining({
+        method: 'POST',
         data: { data: "test" },
         headers: {
           'Content-Type': 'application/json'
         }
-      });
+      }));
       expect(result.isError).toBe(false);
       expect(result.content[0].type).toBe('text');
       if (result.content[0].type === 'text') {
@@ -184,13 +196,14 @@ describe('API Request Tools', () => {
 
       const result = await postRequestTool.execute(args, mockContext);
 
-      expect(mockPost).toHaveBeenCalledWith('https://api.example.com', { 
+      expect(mockFetch).toHaveBeenCalledWith('https://api.example.com', expect.objectContaining({
+        method: 'POST',
         data: { data: "test" },
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer test-token'
         }
-      });
+      }));
       expect(result.isError).toBe(false);
       expect(result.content[0].type).toBe('text');
       if (result.content[0].type === 'text') {
@@ -210,14 +223,15 @@ describe('API Request Tools', () => {
 
       const result = await postRequestTool.execute(args, mockContext);
 
-      expect(mockPost).toHaveBeenCalledWith('https://api.example.com', { 
+      expect(mockFetch).toHaveBeenCalledWith('https://api.example.com', expect.objectContaining({
+        method: 'POST',
         data: { data: "test" },
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer test-token',
           'X-Custom-Header': 'custom-value'
         }
-      });
+      }));
       expect(result.isError).toBe(false);
       expect(result.content[0].type).toBe('text');
       if (result.content[0].type === 'text') {
@@ -235,12 +249,13 @@ describe('API Request Tools', () => {
 
       const result = await putRequestTool.execute(args, mockContext);
 
-      expect(mockPut).toHaveBeenCalledWith('https://api.example.com', { 
+      expect(mockFetch).toHaveBeenCalledWith('https://api.example.com', expect.objectContaining({
+        method: 'PUT',
         data: { data: "test" },
         headers: {
           'Content-Type': 'application/json'
         }
-      });
+      }));
       expect(result.isError).toBe(false);
       expect(result.content[0].type).toBe('text');
       if (result.content[0].type === 'text') {
@@ -257,13 +272,14 @@ describe('API Request Tools', () => {
 
       const result = await putRequestTool.execute(args, mockContext);
 
-      expect(mockPut).toHaveBeenCalledWith('https://api.example.com', { 
+      expect(mockFetch).toHaveBeenCalledWith('https://api.example.com', expect.objectContaining({
+        method: 'PUT',
         data: { data: "test" },
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer test-token'
         }
-      });
+      }));
       expect(result.isError).toBe(false);
       expect(result.content[0].type).toBe('text');
       if (result.content[0].type === 'text') {
@@ -283,14 +299,15 @@ describe('API Request Tools', () => {
 
       const result = await putRequestTool.execute(args, mockContext);
 
-      expect(mockPut).toHaveBeenCalledWith('https://api.example.com', { 
+      expect(mockFetch).toHaveBeenCalledWith('https://api.example.com', expect.objectContaining({
+        method: 'PUT',
         data: { data: "test" },
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Basic YWRtaW46cGFzc3dvcmQxMjM=',
           'Accept': 'application/json'
         }
-      });
+      }));
       expect(result.isError).toBe(false);
       expect(result.content[0].type).toBe('text');
       if (result.content[0].type === 'text') {
@@ -308,12 +325,13 @@ describe('API Request Tools', () => {
 
       const result = await patchRequestTool.execute(args, mockContext);
 
-      expect(mockPatch).toHaveBeenCalledWith('https://api.example.com', { 
+      expect(mockFetch).toHaveBeenCalledWith('https://api.example.com', expect.objectContaining({
+        method: 'PATCH',
         data: { data: "test" },
         headers: {
           'Content-Type': 'application/json'
         }
-      });
+      }));
       expect(result.isError).toBe(false);
       expect(result.content[0].type).toBe('text');
       if (result.content[0].type === 'text') {
@@ -330,13 +348,14 @@ describe('API Request Tools', () => {
 
       const result = await patchRequestTool.execute(args, mockContext);
 
-      expect(mockPatch).toHaveBeenCalledWith('https://api.example.com', { 
+      expect(mockFetch).toHaveBeenCalledWith('https://api.example.com', expect.objectContaining({
+        method: 'PATCH',
         data: { data: "test" },
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer test-token'
         }
-      });
+      }));
       expect(result.isError).toBe(false);
       expect(result.content[0].type).toBe('text');
       if (result.content[0].type === 'text') {
@@ -355,13 +374,14 @@ describe('API Request Tools', () => {
 
       const result = await patchRequestTool.execute(args, mockContext);
 
-      expect(mockPatch).toHaveBeenCalledWith('https://api.example.com', { 
+      expect(mockFetch).toHaveBeenCalledWith('https://api.example.com', expect.objectContaining({
+        method: 'PATCH',
         data: { data: "test" },
         headers: {
           'Content-Type': 'application/json',
           'X-Custom-Header': 'custom-value'
         }
-      });
+      }));
       expect(result.isError).toBe(false);
       expect(result.content[0].type).toBe('text');
       if (result.content[0].type === 'text') {
@@ -378,7 +398,10 @@ describe('API Request Tools', () => {
 
       const result = await deleteRequestTool.execute(args, mockContext);
 
-      expect(mockDelete).toHaveBeenCalledWith('https://api.example.com/1', { headers: {} });
+      expect(mockFetch).toHaveBeenCalledWith('https://api.example.com/1', expect.objectContaining({
+        method: 'DELETE',
+        headers: {}
+      }));
       expect(result.isError).toBe(false);
       expect(result.content[0].type).toBe('text');
       if (result.content[0].type === 'text') {
@@ -394,11 +417,12 @@ describe('API Request Tools', () => {
 
       const result = await deleteRequestTool.execute(args, mockContext);
 
-      expect(mockDelete).toHaveBeenCalledWith('https://api.example.com/1', { 
+      expect(mockFetch).toHaveBeenCalledWith('https://api.example.com/1', expect.objectContaining({
+        method: 'DELETE',
         headers: {
           'Authorization': 'Bearer test-token'
         }
-      });
+      }));
       expect(result.isError).toBe(false);
       expect(result.content[0].type).toBe('text');
       if (result.content[0].type === 'text') {
@@ -417,12 +441,13 @@ describe('API Request Tools', () => {
 
       const result = await deleteRequestTool.execute(args, mockContext);
 
-      expect(mockDelete).toHaveBeenCalledWith('https://api.example.com/1', { 
+      expect(mockFetch).toHaveBeenCalledWith('https://api.example.com/1', expect.objectContaining({
+        method: 'DELETE',
         headers: {
           'Authorization': 'Basic YWRtaW46cGFzc3dvcmQxMjM=',
           'X-Custom-Header': 'custom-value'
         }
-      });
+      }));
       expect(result.isError).toBe(false);
       expect(result.content[0].type).toBe('text');
       if (result.content[0].type === 'text') {
@@ -466,11 +491,12 @@ describe('API Request Tools', () => {
       expect(consoleWarnSpy).toHaveBeenCalledWith(
         'Both token and Authorization header provided. Custom Authorization header will override token.'
       );
-      expect(mockGet).toHaveBeenCalledWith('https://api.example.com', {
+      expect(mockFetch).toHaveBeenCalledWith('https://api.example.com', expect.objectContaining({
+        method: 'GET',
         headers: {
           'Authorization': 'Basic xyz'  // Custom header should win
         }
-      });
+      }));
       expect(result.isError).toBe(false);
       
       consoleWarnSpy.mockRestore();
@@ -493,13 +519,14 @@ describe('API Request Tools', () => {
       expect(consoleWarnSpy).toHaveBeenCalledWith(
         'Both token and Authorization header provided. Custom Authorization header will override token.'
       );
-      expect(mockPost).toHaveBeenCalledWith('https://api.example.com', {
+      expect(mockFetch).toHaveBeenCalledWith('https://api.example.com', expect.objectContaining({
+        method: 'POST',
         data: { test: 'data' },
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Custom auth-value'  // Custom header wins
         }
-      });
+      }));
       expect(result.isError).toBe(false);
       
       consoleWarnSpy.mockRestore();
@@ -519,12 +546,13 @@ describe('API Request Tools', () => {
         'Failed to parse JSON, using raw string:',
         expect.any(String)
       );
-      expect(mockPost).toHaveBeenCalledWith('https://api.example.com', {
+      expect(mockFetch).toHaveBeenCalledWith('https://api.example.com', expect.objectContaining({
+        method: 'POST',
         data: 'not-valid-json-but-valid-string',
         headers: {
           'Content-Type': 'application/json'
         }
-      });
+      }));
       expect(result.isError).toBe(false);
       
       consoleWarnSpy.mockRestore();
@@ -538,9 +566,10 @@ describe('API Request Tools', () => {
 
       const result = await getRequestTool.execute(args, mockContext);
 
-      expect(mockGet).toHaveBeenCalledWith('https://api.example.com', {
+      expect(mockFetch).toHaveBeenCalledWith('https://api.example.com', expect.objectContaining({
+        method: 'GET',
         headers: {}
-      });
+      }));
       expect(result.isError).toBe(false);
     });
 
